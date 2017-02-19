@@ -1,45 +1,38 @@
-#  `/scripting/events/LaboratoryTimeline`  #
+#  `研.events.LaboratoryTimeline`  #
 
 ##  Usage  ##
 
 >   ```javascript
 >       //  Fires when a status is added to the stream:
->       LaboratoryStatusLoaded({stream: …, payload: …})
+>       LaboratoryTimeline.StatusLoaded({stream: …, payload: …})
 >       //  Fires when a status is deleted from the stream:
->       LaboratoryStatusDeleted({stream: …, payload: …})
+>       LaboratoryTimeline.StatusDeleted({stream: …, payload: …})
 >   ```
 >   - **`stream` :** A string identifying the stream which triggered the event.
 >   - **`payload` :** The payload associated with the event.
 
-##  Imports  ##
+##  Object Initialization  ##
 
-The `getEventBuilder` function is used to create new event constructors.
-
-    `import getEventBuilder from '../scripts/getEventBuilder'`
+    此 = 研.events.LaboratoryTimeline = {}
 
 ##  Events  ##
 
-###  `LaboratoryStatusLoaded`:
+###  `LaboratoryTimeline.StatusLoaded`:
 
-The `LaboratoryStatusLoaded` event has two properties: the `stream` it was fired from, and the `payload` it was issued with.
+The `LaboratoryTimeline.StatusLoaded` event has two properties: the `stream` it was fired from, and the `payload` it was issued with.
 
-    LaboratoryStatusLoaded = getEventBuilder 'LaboratoryStatusLoaded',
+    此.StatusLoaded = getEventBuilder 'LaboratoryStatusLoaded',
         stream: null,
         payload: null
 
-###  `LaboratoryStatusDeleted`:
+###  `LaboratoryTimeline.StatusDeleted`:
 
-The `LaboratoryStatusDeleted` event has two properties: the `stream` it was fired from, and the `payload` it was issued with.
+The `LaboratoryTimeline.StatusDeleted` event has two properties: the `stream` it was fired from, and the `payload` it was issued with.
 
-    LaboratoryStatusDeleted = getEventBuilder 'LaboratoryStatusDeleted',
+    此.StatusDeleted = getEventBuilder 'LaboratoryStatusDeleted',
         stream: null,
         payload: null
 
-##  Exports  ##
+##  Object Freezing  ##
 
-This package exports the events listed above.
-
-    `export {
-        LaboratoryStatusLoaded,
-        LaboratoryStatusDeleted
-    };`
+    Object.freeze 此

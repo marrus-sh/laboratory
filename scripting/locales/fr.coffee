@@ -1,4 +1,4 @@
-fr =
+研.locales.fr = Object.freeze
   "column_back_button.label": "Retour"
   "lightbox.close": "Fermer"
   "loading_indicator.label": "Chargement…"
@@ -52,5 +52,3 @@ fr =
   "notification.favourite": "{name} a ajouté à ses favoris :"
   "notification.reblog": "{name} a partagé votre statut :"
   "notification.mention": "{name} vous a mentionné⋅e :"
-
-export default fr

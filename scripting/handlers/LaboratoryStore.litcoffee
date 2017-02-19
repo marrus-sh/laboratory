@@ -1,24 +1,28 @@
-#  `scripting/handlers/LaboratoryStore`  #
+#  `研.handlers.LaboratoryStore`  #
 
 ##  Coverage  ##
 
 **The following events from `LaboratoryStore` have handlers:**
 
-- `LaboratoryStoreUp`
+- `LaboratoryStore.StoreUp`
+
+##  Object Initialization  ##
+
+    此 = 研.handlers.LaboratoryStore = {}
 
 ##  Handlers  ##
 
-###  `LaboratoryStoreUpHandler`:
+###  `LaboratoryStore.StoreUp`:
 
-The `LaboratoryStoreUp` handler defines the root React component for our `Laboratory` engine and stores it in `document.Laboratory`.
+The `LaboratoryStore.StoreUp` handler defines the root React component for our `Laboratory` engine and stores it in `document.Laboratory`.
 We can't do this until our Laboratory store has been created because the engine requires the store to operate.
-Of course, if our event isn't a `LaboratoryStoreUp` event then we don't want to handle it.
+Of course, if our event isn't a `LaboratoryStore.StoreUp` event then we don't want to handle it.
 
-    LaboratoryStoreUpHandler = (event, store) ->
+    此.StoreUp = (event, store) ->
 
-        return unless event? and store? and event.type = LaboratoryStoreUpHandler.forType
+        return unless event? and store? and event.type is 此.StoreUp.type
 
-The `LaboratoryStoreUp` handler is just a wrapper for `目 'Laboratory'` that provides it with access to our access token and locale data, and then renders the final element in the React root.
+The `LaboratoryStore.StoreUp` handler is just a wrapper for `目 'Laboratory'` that provides it with access to our access token and locale data, and then renders the final element in the React root.
 The React root is determined according to the following rules:
 
 1.  If there exists an element with id `"frontend"`, this will be used.
@@ -35,10 +39,9 @@ The React root is determined according to the following rules:
 
         ReactDOM.render Laboratory, if (elt = document.getElementById("frontend")) then elt else if (elt = document.getElementsByClassName("app-body").item(0)) then elt else document.body
 
-    Object.defineProperty LaboratoryStoreUpHandler, "forType", {value: "LaboratoryStoreUp"}
+    此.StoreUp.type = 研.events.LaboratoryStore.StoreUp.type
+    Object.freeze 此.StoreUp
 
-##  Exports  ##
+##  Object Freezing  ##
 
-The only thing we have to export is our `LaboratoryStoreUpHandler`:
-
-    `export {LaboratoryStoreUpHandler};`
+    Object.freeze 此

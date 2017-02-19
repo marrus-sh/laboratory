@@ -1,4 +1,4 @@
-#  `/scripting/components/logic/Laboratory`  #
+#  `研.components.logic.Laboratory`  #
 
 ##  Usage  ##
 
@@ -16,30 +16,25 @@
 
 ##  Imports  ##
 
-As `Laboratory` contains our entire frontend, we'll need to import a fair bit.
-
-The first thing we'll do when loading our frontend is create our WebSocket stream, which `createStream` does for us:
-
-    `import createStream from '../../scripts/createStream';`
-
 From React, we'll need a number of functions to route the right-hand column through the URL:
 
-    `import {
+    {
         applyRouterMiddleware,
+        useRouterHistory,
         Router,
         Route,
         IndexRedirect,
         IndexRoute
-    } from 'react-router';
-    import {useScroll} from 'react-router-scroll';`
+    } = require "react-router"
+    {useScroll} = require "react-router-scroll"
+
+This gives us access to our browser history:
+
+    createBrowserHistory = require "history/lib/createBrowserHistory"
 
 We also need internationalization for our react components:
 
-    `import {IntlProvider} from 'react-intl';`
-
-And our own internationalization support, of course:
-
-    `import getMessagesForLocale from './scripting/locales';`
+    {IntlProvider} = require "react-intl"
 
 ##  The Component  ##
 
@@ -51,6 +46,12 @@ Here we define the initial properties, as above.
         propTypes:
             accessToken: React.PropTypes.string.isRequired
             locale: React.PropTypes.string.isRequired
+
+###  Tracking browser history:
+
+This starts tracking our browser history for our router:
+
+        browserHistory = useRouterHistory(createBrowserHistory) {basename: '/web'}
 
 ###  Loading:
 
@@ -88,11 +89,11 @@ Let's go!
 
 …And here's what we render (remember `目` is just an alias for `React.createElement`):
 
-            return 目 'IntlProvider', {locale: @props.locale, messages: getMessagesForLocale(@props.locale)},
+            return 目 'IntlProvider', {locale: @props.locale, messages: 研.locales.getL10n(@props.locale)},
                 目 'Router', {history: browserHistory, render: applyRouterMiddleware(useScroll())},
                     目 'Route', {path: '/', component: UI},
                         目 'IndexRedirect', {to: '/getting-started'}
-
+    ###
                         目 'Route', {path: 'getting-started', component: GettingStarted}
                         目 'Route', {path: 'timelines/home', component: HomeTimeline}
                         目 'Route', {path: 'timelines/public', component: PublicTimeline}
@@ -115,3 +116,4 @@ Let's go!
                         目 'Route', {path: 'report', component: Report}
 
                         目 'Route', {path: '*', component: GenericNotFound}
+    ###

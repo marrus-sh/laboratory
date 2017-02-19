@@ -1,4 +1,4 @@
-de =
+研.locales.de = Object.freeze
   "column_back_button.label": "Zurück"
   "lightbox.close": "Schließen"
   "loading_indicator.label": "Lade..."
@@ -72,5 +72,3 @@ de =
   "home.column_settings.show_replies": "Antworten anzeigen"
   "home.column_settings.filter_regex": "Filter durch reguläre Ausdrücke"
   "missing_indicator.label": "Nicht gefunden"
-
-export default de

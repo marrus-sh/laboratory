@@ -1,4 +1,4 @@
-en =
+研.locales.en = Object.freeze
   "column_back_button.label": "Back"
   "lightbox.close": "Close"
   "loading_indicator.label": "Loading..."
@@ -63,5 +63,3 @@ en =
   "notifications.column_settings.favourite": "Favourites:"
   "notifications.column_settings.mention": "Mentions:"
   "notifications.column_settings.reblog": "Boosts:"
-
-export default en

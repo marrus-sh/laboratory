@@ -1,4 +1,4 @@
-pt = 
+研.locales.pt = Object.freeze
   "column_back_button.label": "Voltar"
   "lightbox.close": "Fechar"
   "loading_indicator.label": "Carregando..."
@@ -50,5 +50,3 @@ pt =
   "notification.favourite": "{name} favoritou  seu post"
   "notification.reblog": "{name} reblogou o seu post"
   "notification.mention": "{name} mecionou você"
-
-export default pt

@@ -1,32 +1,26 @@
-#  `/scripting/events/LaboratoryNotification`  #
+#  `研.events.LaboratoryNotification`  #
 
 ##  Usage  ##
 
 >   ```javascript
 >       //  Fires when a new notification is created:
->       LaboratoryStatusLoaded({payload: …})
+>       LaboratoryNotification.NotificationLoaded({payload: …})
 >   ```
 >   - **`payload` :** The content of the notification.
 
-##  Imports  ##
+##  Object Initialization  ##
 
-The `getEventBuilder` function is used to create new event constructors.
-
-    `import getEventBuilder from '../scripts/getEventBuilder'`
+    此 = 研.events.LaboratoryNotification = {}
 
 ##  Events  ##
 
-###  `LaboratoryNotificationLoaded`:
+###  `LaboratoryNotification.NotificationLoaded`:
 
-The `LaboratoryNotificationLoaded` event has two properties: the `stream` it was fired from, and the `payload` it was issued with.
+The `LaboratoryNotification.NotificationLoaded` event has two properties: the `stream` it was fired from, and the `payload` it was issued with.
 
-    LaboratoryNotificationLoaded = getEventBuilder 'LaboratoryNotificationLoaded',
+    此.NotificationLoaded = getEventBuilder 'LaboratoryNotificationLoaded',
         payload: null
 
-##  Exports  ##
+##  Object Freezing  ##
 
-This package exports the events listed above.
-
-    `export {
-        LaboratoryNotificationLoaded
-    };`
+    Object.freeze 此

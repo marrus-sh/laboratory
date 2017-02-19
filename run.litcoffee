@@ -5,38 +5,29 @@ Consequently, it should probably be the last thing you load.
 
 ##  Imports  ##
 
-As this script activates everything else, it has a number of imports.
-First, we need to import our event handlers:
+We need internationalization for our react components:
 
-    `import initializeHandlers from './scripting/handlers';`
+    {addLocaleData} = require "react-intl"
+    en = require "react-intl/locale-data/en"
+    de = require "react-intl/locale-data/de"
+    es = require "react-intl/locale-data/es"
+    fr = require "react-intl/locale-data/fr"
+    pt = require "react-intl/locale-data/pt"
+    hu = require "react-intl/locale-data/hu"
+    uk = require "react-intl/locale-data/uk"
 
-We will need the `LaboratoryStoreUp` event to signal that our store has been created:
-
-    `import {LaboratoryStoreUp} from './scripting/events/LaboratoryStore';`
-
-`useRouterHistory` gives us access to the React router:
-
-    `import useRouterHistory from 'react-router';`
-
-We also need internationalization for our react components:
-
-    `import {addLocaleData} from 'react-intl';
-    import en from 'react-intl/locale-data/en';
-    import de from 'react-intl/locale-data/de';
-    import es from 'react-intl/locale-data/es';
-    import fr from 'react-intl/locale-data/fr';
-    import pt from 'react-intl/locale-data/pt';
-    import hu from 'react-intl/locale-data/hu';
-    import uk from 'react-intl/locale-data/uk';`
-
-There are two final functions we need: one to create a WebSocket stream, and one to manage our browser history.
 We also import `Howler` for some initial configuration.
 
-    `import createStream from 'scripting/scripts/stream';
-    import createBrowserHistory from 'history/lib/createBrowserHistory';
-    import Howler from 'howler';`
+    Howler = require "howler"
 
 ##  First Steps  ##
+
+###  Freezing the Laboratory object:
+
+We don't want nefarious entities meddling in our affairs, so let's freeze `研` and keep ourselves safe.
+
+    Object.freeze 研[module] for module of 研
+    Object.freeze 研.components[module] for module of 研.components
 
 ###  Disabling Howler:
 
@@ -46,16 +37,9 @@ So we disable it.
 
     Howler.mobileAutoEnable = false
 
-###  Tracking browser history:
-
-There are a few more things we need to initialize.
-Our browser history is the first…
-
-    browserHistory = useRouterHistory(createBrowserHistory) {basename: '/web'}
-
 ###  Handling locale data:
 
-…our locale data is the second.
+This adds locale data so that our router can handle it:
 
     addLocaleData [en..., de..., es..., fr..., pt..., hu..., uk...]
 
@@ -83,9 +67,8 @@ We'll wrap this all in a closure to make extra sure that nobody has access to it
 
     run = ->
 
-If our application has already been created, then we shouldn't be running this function!
-
-        if (document.Laboratory) return
+>   **ISSUE :**
+>   Check to ensure that this hasn't already happened?
 
 We generate our store from the JSON in `window.INITIAL_STATE` using `objectDescribe`.
 
@@ -94,11 +77,11 @@ We generate our store from the JSON in `window.INITIAL_STATE` using `objectDescr
 
 Now that our store is created, we can initialize our event handlers using it as input:
 
-        initializeHandlers store
+        研.handlers.initialize store
 
-Finally, we fire the `LaboratoryStoreUp` event, which generates our engine and assigns it to `document.Laboratory` for later use.
+Finally, we fire the `LaboratoryStore.StoreUp` event, which generates our engine and assigns it to `document.Laboratory` for later use.
 
-        document.dispatchEvent LaboratoryStoreUp
+        document.dispatchEvent 研.events.LaboratoryStore.StoreUp
 
 We don't want the store loading before `document.body`, so we'll attach a `DOMContentLoaded` event handler.
 

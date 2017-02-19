@@ -1,66 +1,57 @@
-#  `/scripting/events/LaboratoryStream`  #
+#  `研.events.LaboratoryStream`  #
 
 ##  Usage  ##
 
 >   ```javascript
 >       //  Fires when a WebSocket stream is opened:
->       LaboratoryOpen({stream: …})
+>       LaboratoryStream.Open({stream: …})
 >       //  Fires when a WebSocket stream is closed:
->       LaboratoryClose({stream: …, code: …})
+>       LaboratoryStream.Close({stream: …, code: …})
 >       //  Fires when a WebSocket stream receives a message:
->       LaboratoryMessage({stream: …, data: …})
+>       LaboratoryStream.Message({stream: …, data: …})
 >       //  Fires when a WebSocket stream receives an error:
->       LaboratoryError({stream: …})
+>       LaboratoryStream.Error({stream: …})
 >   ```
 >   - **`stream` :** A string identifying the stream which triggered the event.
 >   - **`code` :** A numberic code issued when the stream was closed.
 >   - **`data` :** The data contained in the message.
 
-##  Imports  ##
+##  Object Initialization  ##
 
-The `getEventBuilder` function is used to create new event constructors.
-
-    `import getEventBuilder from '../scripts/getEventBuilder'`
+    此 = 研.events.LaboratoryStream = {}
 
 ##  Events  ##
 
-###  `LaboratoryOpen`:
+###  `LaboratoryStream.Open`:
 
-The `LaboratoryOpen` event has a single property: the `stream` it was fired from.
+The `LaboratoryStream.Open` event has a single property: the `stream` it was fired from.
 
-    LaboratoryOpen = getEventBuilder 'LaboratoryOpen',
+    此.Open = getEventBuilder 'LaboratoryOpen',
         stream: null
 
-###  `LaboratoryClose`:
+###  `LaboratoryStream.Close`:
 
-The `LaboratoryClose` event has two properties: the `stream` it was fired from, and the `code` issued when closing.
+The `LaboratoryStream.Close` event has two properties: the `stream` it was fired from, and the `code` issued when closing.
 
-    LaboratoryClose = getEventBuilder 'LaboratoryClose',
+    此.Close = getEventBuilder 'LaboratoryClose',
         stream: null
         code: 1000
 
-###  `LaboratoryMessage`:
+###  `LaboratoryStream.Message`:
 
-The `LaboratoryMessage` event has two properties: the `stream` it was fired from, and the message's `data`.
+The `LaboratoryStream.Message` event has two properties: the `stream` it was fired from, and the message's `data`.
 
-    LaboratoryMessage = getEventBuilder 'LaboratoryMessage',
+    此.Message = getEventBuilder 'LaboratoryMessage',
         stream: null
         data: null
 
-###  `LaboratoryError`:
+###  `LaboratoryStream.Error`:
 
-The `LaboratoryError` event has a single property: the `stream` it was fired from.
+The `LaboratoryStream.Error` event has a single property: the `stream` it was fired from.
 
-    LaboratoryError = getEventBuilder 'LaboratoryError',
+    此.Error = getEventBuilder 'LaboratoryError',
         stream: null
 
-##  Exports  ##
+##  Object Freezing  ##
 
-This package exports the events listed above.
-
-    `export {
-        LaboratoryOpen,
-        LaboratoryClose,
-        LaboratoryMessage,
-        LaboratoryError
-    };`
+    Object.freeze 此

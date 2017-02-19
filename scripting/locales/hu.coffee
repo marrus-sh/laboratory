@@ -1,4 +1,4 @@
-hu =
+研.locales.hu = Object.freeze
   "column_back_button.label": "Vissza"
   "lightbox.close": "Bezárás"
   "loading_indicator.label": "Betöltés..."
@@ -52,5 +52,3 @@ hu =
   "notification.favourite": "{name} kedvencnek jelölte az állapotod"
   "notification.reblog": "{name} reblogolta az állapotod"
   "notification.mention": "{name} megemlített"
-
-export default hu

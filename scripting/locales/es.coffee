@@ -1,4 +1,4 @@
-es =
+研.locales.es = Object.freeze
   "column_back_button.label": "Atrás"
   "lightbox.close": "Cerrar"
   "loading_indicator.label": "Cargando..."
@@ -51,5 +51,3 @@ es =
   "notification.favourite": "{name} marcó como favorito su estado"
   "notification.reblog": "{name} volvió a publicar su estado"
   "notification.mention": "Fue mencionado por {name}"
-
-export default es

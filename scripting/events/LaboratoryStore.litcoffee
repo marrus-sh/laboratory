@@ -1,28 +1,24 @@
-#  `/scripting/events/LaboratoryStore`  #
+#  `研.events.LaboratoryStore`  #
 
 ##  Usage  ##
 
 >   ```javascript
 >       //  Fires when the laboratory store is created:
->       LaboratoryStoreUp()
+>       LaboratoryStore.StoreUp()
 >   ```
 
-##  Imports  ##
+##  Object Initialization  ##
 
-The `getEventBuilder` function is used to create new event constructors.
-
-    `import getEventBuilder from '../scripts/getEventBuilder'`
+    此 = 研.events.LaboratoryStore = {}
 
 ##  Events  ##
 
-###  `LaboratoryStoreUp`:
+###  `LaboratoryStore.StoreUp`:
 
-The `LaboratoryStoreUp` event doesn't have any associated data—it's just a simple event.
+The `LaboratoryStore.StoreUp` event doesn't have any associated data—it's just a simple event.
 
-    LaboratoryStoreUp = getEventBuilder 'LaboratoryStoreUp'
+    此.StoreUp = getEventBuilder 'LaboratoryStoreUp'
 
-##  Exports  ##
+##  Object Freezing  ##
 
-This package simply exports the `LaboratoryStoreUp` event.
-
-    `export {LaboratoryStoreUp}`
+Object.freeze 此

@@ -10,10 +10,27 @@ if (!window.Intl) {
   require('intl/locale-data/jsonp/en.js');
 }
 
-//  We will use 目 as an alias for React.createElement because… its
-//  way shorter lol
+//  We will use 目 as an alias for React.createElement because… its way shorter lol
 
-window.目 = React.createElement;
+Object.defineProperty(window, "目", {value: React.createElement});
+
+//  We'll also store all our Laboratory functions in 研 because why the fuck not
+
+Object.defineProperty(window, "Laboratory", {value: {}});
+Object.defineProperty(window, "研", {value: window.Laboratory});
+Object.freeze(Object.defineProperties(window.研, {
+  components: {value: {}},
+  events: {value: {}},
+  handlers: {value: {}},
+  locales: {value: {}},
+  functions: {value: {}}
+}));
+Object.freeze(Object.defineProperties(window.研.components, {
+  logic: {value: {}},
+  rendering: {value: {}}
+}));
+
+//  You'll see 此 in some of the source as a quick reference for the current module
 
 //  Polyfill for IE 9 `CustomEvent()`
 
@@ -38,8 +55,8 @@ if (!window.Symbol) {
     return Object.freeze(this);
   }
   Symbol.prototype = {
-    toString: function () {return this.description}
-    valueOf: function () {return this}
+    toString: function () {return this.description},
+    valueOf: function () {return this},
     toSource: function () {return "Symbol(" + this.description + ")"}
   };
   Object.freeze(Symbol);

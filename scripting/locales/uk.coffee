@@ -1,4 +1,4 @@
-uk =
+研.locales.uk = Object.freeze
   "column_back_button.label": "Назад"
   "lightbox.close": "Закрити"
   "loading_indicator.label": "Завантаження..."
@@ -52,5 +52,3 @@ uk =
   "notification.favourite": "{name} сподобався ваш допис"
   "notification.reblog": "{name} передмухнув(-ла) Ваш статус"
   "notification.mention": "{name} згадав(-ла) Вас"
-
-export default uk

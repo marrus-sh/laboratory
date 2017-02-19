@@ -1,33 +1,24 @@
-#  `scripting/handlers/LaboratoryStream`  #
+#  `研.handlers.LaboratoryStream`  #
 
 ##  Coverage  ##
 
 **The following events from `LaboratoryStream` have handlers:**
 
-- `LaboratoryMessage`
+- `LaboratoryStream.Message`
 
 **The following events from `LaboratoryStream` do *not* have handlers:**
 
-- `LaboratoryOpen`
-- `LaboratoryClose`
-- `LaboratoryError`
+- `LaboratoryStream.Open`
+- `LaboratoryStream.Close`
+- `LaboratoryStream.Error`
 
-##  Imports  ##
+##  Object Initialization  ##
 
-A lot of what we're going to be doing when handling `LaboratoryStream` events is forwarding stream data data to other events/handlers.
-We import these here:
-
-    `import {
-        LaboratoryStatusLoaded,
-        LaboratoryStatusDeleted
-    } from LaboratoryTimeline;
-    import {
-        Laboratory
-    } from LaboratoryNotification;`
+    此 = 研.handlers.LaboratoryStream = {}
 
 ##  Handlers  ##
 
-###  `LaboratoryMessageHandler`
+###  `LaboratoryStream.Message`
 
 The Mastodon API sends a number of different messages, distinguished by the `event` property on the message data.
 These are:
@@ -43,36 +34,33 @@ These are:
 
 We'll simply forward the message onto the appropriate handler by creating a new event for each of these situations.
 
-    LaboratoryMessageHandler = (event, store) ->
+    此.Message = (event, store) ->
 
-        return unless event? and store? and event.type = LaboratoryMessageHandler.forType
+        return unless event? and store? and event.type is 此.Message.type
 
         switch event.detail.data.type
 
 The `LaboratoryStatusLoaded` event will handle any new posts which have been made.
 
-            when "update" then document.dispatchEvent LaboratoryStatusLoaded
+            when "update" then document.dispatchEvent 研.events.LaboratoryTimeline.StatusLoaded
                 fromStream: event.detail.stream
                 payload: JSON.parse event.detail.data.payload
 
 The `LaboratoryStatusDeleted` event will handle any old posts which have been deleted.
 
-            when "delete" then document.dispatchEvent LaboratoryStatusDeleted
+            when "delete" then document.dispatchEvent 研.events.LaboratoryTimeline.StatusDeleted
                 fromStream: event.detail.stream
                 payload: JSON.parse event.detail.data.payload
 
 The `LaboratoryNotificationLoaded` event will handle any new notifications which have appeared.
 We don't need to specify the stream here because notifications are only sent to `"user"`.
 
-            when "notification" then document.dispatchEvent LaboratoryNotificationLoaded
+            when "notification" then document.dispatchEvent 研.events.LaboratoryNotification.NotificationLoaded
                 payload: JSON.parse event.detail.data.payload
 
-    Object.defineProperty LaboratoryMessageHandler, "forType", {value: "LaboratoryMessage"}
+    此.Message.type = 研.events.LaboratoryStream.Message.type
+    Object.freeze 此.Message
 
-##  Exports  ##
+##  Object Freezing  ##
 
-This package exports the handlers listed above.
-
-    `export {
-        LaboratoryMessageHandler
-    };`
+    Object.freeze 此
