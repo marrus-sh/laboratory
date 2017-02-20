@@ -1,4 +1,4 @@
-#  `研.events.newBuilder`  #
+#  `动.newBuilder`  #
 
 The `newBuilder()` function is used to generate event constructors on-the-fly.
 
@@ -9,7 +9,7 @@ All these functions do is create a new `CustomEvent` with the given properties.
 `newBuilder()` takes two arguments: `type` gives the name of the event, and `data` is an object listing the valid properties for the event alongside their default values.
 We use `Object.defineProperty` because this shouldn't be enumerable.
 
-    Object.defineProperty 研.events, "newBuilder",
+    Object.defineProperty 动, "newBuilder",
         value: (type, data) ->
 
 `type` needs to be a string and `data` needs to be an object; we'll just use `String()` and `Object()` to ensure this is the case.
@@ -18,24 +18,26 @@ Furthermore `data` shouldn't contain the property `_builder`; if it does, this p
             type = String type
             data = Object data
 
-###  Defining the event constructor:
+###  Defining the event builder:
 
-Our event constructor simply creates a new `CustomEvent` and assigns it the necessary properties.
+Our event builder simply creates a new `CustomEvent` and assigns it the necessary properties.
+It then dispatches that event to `document` when it's done.
 It sets the properties provided in `data` using `props`.
 The `_builder` property is special and contains a reference to the event builder.
 
             此 = (props) ->
                 detail = {}
                 for name, initial of data
-                    Object.defineProperty detail, name,
+                    定 detail, name,
                         value: if props? and props[name]? and name isnt '_builder' then props[name] else initial
                         enumerable: name isnt '_builder'
-                new CustomEvent type, {detail: detail}
+                页.dispatchEvent new CustomEvent type, {detail: detail}
+                return
 
             此.type = type
-            Object.freeze 此
+            冻 此
 
-            Object.defineProperty data, "_builder",
+            定 data, "_builder",
                 value: 此
                 enumerable: true
 

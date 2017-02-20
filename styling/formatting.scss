@@ -1,0 +1,33 @@
+@charset "UTF-8";
+
+#laboratory-ui {
+
+  &::before, &::after {
+    content: "";
+  }
+
+  #laboratory-header {
+
+    h1 {
+      text-decoration: underline;
+    }
+
+    #laboratory-composelabel {
+      text-transform: uppercase;
+    }
+
+    &::before, &::after {
+      content: "";
+    }
+
+  }
+
+  *.laboratory-column {
+
+  }
+
+  a[href] {
+    text-decoration: none;
+  }
+
+}

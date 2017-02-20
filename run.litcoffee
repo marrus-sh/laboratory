@@ -26,8 +26,8 @@ We also import `Howler` for some initial configuration.
 
 We don't want nefarious entities meddling in our affairs, so let's freeze `研` and keep ourselves safe.
 
-    Object.freeze 研[module] for module of 研
-    Object.freeze 研.components[module] for module of 研.components
+    冻 研[module] for module of 研
+    冻 块[module] for module of 块
 
 ###  Disabling Howler:
 
@@ -51,14 +51,37 @@ The store is not available outside of those events specified through `initialize
 ###  Describing store data:
 
 We will read in our store data using `Object.defineProperties`, but it is cumbersome to use property descriptors to define our entire initial store.
-Consequently, we will treat `"key": value` as a synonym for `"key": {value: value}` so long as none of `value`s own properties has a property descriptor property.
-The `objectDescribe()` function handles this conversion.
+Consequently, we will treat `"key": value` as a synonym for `"key": {value: value, enumerable: true}` so long as none of `value`s own properties has a property descriptor property.
+`propertyClone` handles this conversion while leaving the original object intact.
 
-    objectDescribe = (obj) ->
-        for own key, value of obj
-            if typeof value is "object" and not (value.hasOwnProperty("configurable") or value.hasOwnProperty("enumerable") or value.hasOwnProperty("value") or value.hasOwnProperty("writable") or value.hasOwnProperty("get") or value.hasOwnProperty("set")) then obj[key] = objectDescribe value
-            else obj[key] = {value: value} unless typeof value is "object"
-        return obj
+    propertyClone = (mixedobj) ->
+
+The `objectDescribe()` function converts the object into a nested property definition.
+
+        objectDescribe = (obj) ->
+            此 = {}
+            for own key, value of obj
+                if value? and typeof value is "object"
+                    if value instanceof Array then 此[key] = {value: value, enumerable: true}
+                    else if (有(value, "configurable") or 有(value, "enumerable") or 有(value, "value") or 有(value, "writable"))
+                        此[key] = value
+                        此[key].value = objectDescribe(此[key].value) if 此[key].value? and typeof 此[key].value is "object" and not (此[key].value instanceof Array)
+                    else 此[key] = {value: objectDescribe(value), enumerable: true}
+                else 此[key] = {value: (value), enumerable: true}
+            return 此
+
+`objectDefine()` then iterates over this result to return the final object.
+
+        objectDefine = (obj) ->
+            此 = {}
+            for own key, value of obj
+                value.value = objectDefine value.value if typeof value.value is "object" and not (value.value instanceof Array)
+            return 定定 此, obj
+
+We string these functions together to get our final output.
+
+        return objectDefine objectDescribe mixedobj
+
 
 ###  Loading the store:
 
@@ -70,19 +93,20 @@ We'll wrap this all in a closure to make extra sure that nobody has access to it
 >   **ISSUE :**
 >   Check to ensure that this hasn't already happened?
 
-We generate our store from the JSON in `window.INITIAL_STATE` using `objectDescribe`.
+We generate our store from the JSON in `window.INITIAL_STATE` using `propertyClone`.
 
-        store = {}
-        Object.defineProperties store, objectDescribe JSON.parse INITIAL_STATE
+        store = propertyClone INITIAL_STATE
 
 Now that our store is created, we can initialize our event handlers using it as input:
 
-        研.handlers.initialize store
+        理.initialize store
 
-Finally, we fire the `LaboratoryStore.StoreUp` event, which generates our engine and assigns it to `document.Laboratory` for later use.
+Finally, we fire the `Store.Up` event, which generates our engine and assigns it to `document.Laboratory` for later use.
 
-        document.dispatchEvent 研.events.LaboratoryStore.StoreUp
+        动.Store.Up()
+
+        return
 
 We don't want the store loading before `document.body`, so we'll attach a `DOMContentLoaded` event handler.
 
-    document.addEventListener "DOMContentLoaded", run, false
+    听 "DOMContentLoaded", run

@@ -10,27 +10,51 @@ if (!window.Intl) {
   require('intl/locale-data/jsonp/en.js');
 }
 
-//  We will use 目 as an alias for React.createElement because… its way shorter lol
-
-Object.defineProperty(window, "目", {value: React.createElement});
-
-//  We'll also store all our Laboratory functions in 研 because why the fuck not
+//  This sets up our Laboratory object
 
 Object.defineProperty(window, "Laboratory", {value: {}});
-Object.defineProperty(window, "研", {value: window.Laboratory});
-Object.freeze(Object.defineProperties(window.研, {
-  components: {value: {}},
-  events: {value: {}},
-  handlers: {value: {}},
-  locales: {value: {}},
-  functions: {value: {}}
+Object.freeze(Object.defineProperties(window.Laboratory, {
+  components: {value: {}, enumerable: true},
+  constructors: {value: {}, enumerable: true},
+  events: {value: {}, enumerable: true},
+  handlers: {value: {}, enumerable: true},
+  locales: {value: {}, enumerable: true},
+  functions: {value: {}, enumerable: true}
 }));
-Object.freeze(Object.defineProperties(window.研.components, {
-  logic: {value: {}},
-  rendering: {value: {}}
+Object.freeze(Object.defineProperties(window.Laboratory.components, {
+  logic: {value: {}, enumerable: true},
+  rendering: {value: {}, enumerable: true}
 }));
 
-//  You'll see 此 in some of the source as a quick reference for the current module
+//  We will use Han characters as aliases for Laboratory components to save room.
+
+(function () {
+
+  var hasOwnP = ({}).hasOwnProperty;
+
+  Object.defineProperties(window, {
+    页: {value: document},
+    目: {value: React.createElement},
+    定: {value: Object.defineProperty},
+    定定: {value: Object.defineProperties},
+    冻: {value: Object.freeze},
+    有: {value: function (obj, val) {return hasOwnP.call(obj, val)}},
+    听: {value: document.addEventListener.bind(document)},
+    除: {value: document.removeEventListener.bind(document)},
+    研: {value: window.Laboratory},
+    块: {value: window.Laboratory.components},
+    论: {value: window.Laboratory.components.logic},
+    示: {value: window.Laboratory.components.rendering},
+    建: {value: window.Laboratory.constructors},
+    动: {value: window.Laboratory.events},
+    理: {value: window.Laboratory.handlers},
+    语: {value: window.Laboratory.locales},
+    作: {value: window.Laboratory.functions}
+  });
+
+})();
+
+//  You'll see 此 in some of the source as a quick reference for the current module or result
 
 //  Polyfill for IE 9 `CustomEvent()`
 

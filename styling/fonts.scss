@@ -1,0 +1,41 @@
+@charset "UTF-8";
+
+#laboratory-ui {
+
+  font-family: $laboratory-sans;
+  font-size: 15pt;
+  font-style: normal;
+  font-weight: normal;
+  font-synthesis: none;
+  line-height: 1.4;
+
+  #laboratory-header {
+
+    h1 {
+      font-size: 22.5pt;
+      font-weight: 900;
+    }
+
+    #laboratory-composelabel {
+      font-size: 15pt;
+      line-height: 1;
+    }
+
+    #laboratory-composebutton {
+      font-size: 21pt;
+      line-height: 1;
+    }
+
+  }
+
+  *.laboratory-column {
+
+    *.laboratory-heading {
+      font-size: 20pt;
+      font-weight: 300;
+      line-height: 28pt;
+    }
+
+  }
+
+}

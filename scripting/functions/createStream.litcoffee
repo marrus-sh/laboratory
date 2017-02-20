@@ -1,4 +1,4 @@
-#  `研.functions.createStream`
+#  `作.createStream`
 
 This module is used to open a WebSocket stream with the Ardipithecus/Mastodon API.
 
@@ -20,10 +20,28 @@ The `createStream()` function takes an `accessToken` and a `stream` and uses the
 
 Note `STREAMING_API_BASE_URL` is set on the `Window` object during configuration (see `/app/views/home/index.html.haml` in the Mastodon source).
 
-    研.functions.createStream = (accessToken, stream) ->
-        ws = new WebSocket("#{createWebSocketURL(STREAMING_API_BASE_URL)}/api/v1/streaming/#{stream}?access_token=#{accessToken}")
-        ws.addEventListener "open", ((e) -> document.dispatchEvent(LaboratoryStream.LaboratoryOpen {stream: stream})), false
-        ws.addEventListener "close", ((e) -> document.dispatchEvent(LaboratoryStream.LaboratoryClose {stream: stream, code: e.code})), false
-        ws.addEventListener "message", ((e) -> document.dispatchEvent(LaboratoryStream.LaboratoryMessage {stream: stream, data: JSON.parse(e.data)})), false
-        ws.addEventListener "error", ((e) -> document.dispatchEvent(LaboratoryStream.LaboratoryError {stream: stream})), false
+    作.createStream = (accessToken, stream) ->
+        ws = new WebSocket createWebSocketURL "#{STREAMING_API_BASE_URL}/api/v1/streaming/#{stream}?access_token=#{accessToken}"
+        ws.addEventListener(
+            "open",
+            (e) -> 动.Stream.Open
+                stream: stream
+        )
+        ws.addEventListener(
+            "close",
+            (e) -> 动.Stream.Close
+                stream: stream
+                code: e.code
+        )
+        ws.addEventListener(
+            "message",
+            (e) -> 动.Stream.Message
+                stream: stream
+                data: JSON.parse e.data
+        )
+        ws.addEventListener(
+            "error",
+            (e) -> 动.Stream.Error
+                stream: stream
+        )
         return ws

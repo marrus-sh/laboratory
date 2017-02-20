@@ -1,40 +1,41 @@
+@import 'palettes';
+
 /*
   This stylesheet assigns the default values to SCSS variables used by
   the Laboratory frontend. You can browse this file to gather a sense
   for what customizations are available.
 */
 
-///////////////////////////////////////////////////////////////////////
-
-/*  PRINT + PASTELS  */
-/*  by: Kibigo!      */
+/*  FONTS  */
 
 /*
-  This theme combines offwhite greys with bright pastels for a faded
-  yet distinctive look. Mastodon doesn't ship with this colour scheme,
-  so we define it here if it hasn't already been defined.
+  Including font files is outside of the scope of this package.
+  You should do that yourself by editing the home view.
 */
 
-//  PRINT  //
+$laboratory-sans: 'Lato', 'Helvetica Neue', 'Helvetica', sans-serif !default;
+$laboratory-mono: "Inconsolata", "Courier Prime", monospace !default;
 
-$print_white: #faf8f7 !default;
-$print_bright: #dedbd9 !default;
-$print_light: #b8b3b0 !default;
-$print: #948d87 !default;
-$print_medium: #75706a !default;
-$print_dark: #57534c !default;
-$print_dim: #302f2b !default;
-$print_black: #1f1a14 !default;
+/*  BACKGROUNDS  */
 
-//  PASTELS  //
+/*
+  These don't have to be plain colours if you don't want them to be.
+*/
 
-$pastel_red: #b01c1c !default;
-$pastel_orange: #d15919 !default;
-$pastel_gold: #eb9100 !default;
-$pastel_yellow: #fae13e !default;
-$pastel_green: #50d952 !default;
-$pastel_cyan: #1aaceb !default;
-$pastel_blue: #4b2df7 !default;
-$pastel_pink: #f56e97 !default;
+$laboratory-background: $print_dim !default;
 
-///////////////////////////////////////////////////////////////////////
+/*  COLOURS  */
+
+$laboratory-bgColor: $print_dim !default;
+$laboratory-mainTextColor: $print_bright !default;
+$laboratory-emphTextColor: $print_white !default;
+$laboratory-highlightColor: $print_bright !default;
+$laboratory-highlightTextColor: $print_black !default;
+$laboratory-columnColor: $print_black !default;
+$laboratory-headerColor: $print_white !default;
+$laboratory-headerTextColor: $print_dim !default;
+
+/*  OPACITIES  */
+
+$laboratory-notificationBgOpacity: .35 !default;
+$laboratory-notificationTextOpacity: .8 !default;

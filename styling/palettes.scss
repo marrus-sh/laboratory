@@ -1,0 +1,30 @@
+/*  PRINT + PASTELS  */
+/*  by: Kibigo!      */
+
+/*
+  This theme combines offwhite greys with bright pastels for a faded
+  yet distinctive look. Mastodon doesn't ship with this colour scheme,
+  so we define it here if it hasn't already been defined.
+*/
+
+//  PRINT  //
+
+$print_white: #faf8f7 !default;
+$print_bright: #dedbd9 !default;
+$print_light: #b8b3b0 !default;
+$print: #948d87 !default;
+$print_medium: #75706a !default;
+$print_dark: #57534c !default;
+$print_dim: #302f2b !default;
+$print_black: #1f1a14 !default;
+
+//  PASTELS  //
+
+$pastel_red: #b01c1c !default;
+$pastel_orange: #d15919 !default;
+$pastel_gold: #eb9100 !default;
+$pastel_yellow: #fae13e !default;
+$pastel_green: #50d952 !default;
+$pastel_cyan: #1aaceb !default;
+$pastel_blue: #4b2df7 !default;
+$pastel_pink: #f56e97 !default;
