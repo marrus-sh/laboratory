@@ -4,6 +4,9 @@
     "notifications.notifications": "Értesítések"
     "composer.compose": "Összeállítás"
     "notfound.not_found": "Nem található"
+    # "go.heading":
+    # "go.community":
+    # "go.global":
 
     #  Unused codes from Mastodon:
 

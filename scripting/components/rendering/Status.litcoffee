@@ -3,24 +3,16 @@
 ##  Usage  ##
 
 >   ```jsx
->       <Status
->           data=React.PropTypes.object.isRequired
->       />
+>       <Status>
+>           {/*  contents  */}
+>       </Status>
 >   ```
->   Creates a `Status` component, which contains a status post. The accepted properties are:
->   -   **`data` [REQUIRED `string`] :**
->       The data of the status.
+>   Creates a `Status` component, which contains a post or a notification.
 
 ##  The Component  ##
 
-Each `Status` only has one property, an object specifying the `data` of the status.
+The `Status` component is just a simple functional React component, which loads an `<article>` containing the status.
 
-    示.Status = React.createClass
-
-        propTypes:
-            name: React.PropTypes.object.isRequired
-
-###  Rendering:
-
-        render: ->
-            目 'article', {className: "laboratory-status"}
+    示.Status = (props) ->
+        目 'article', null,
+            props.children

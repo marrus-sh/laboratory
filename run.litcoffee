@@ -97,9 +97,15 @@ We generate our store from the JSON in `window.INITIAL_STATE` using `propertyClo
 
         store = propertyClone INITIAL_STATE
 
-Now that our store is created, we can initialize our event handlers using it as input:
+###  Adding our listeners:
 
-        理.initialize store
+Now that our store is created, we can initialize our event handlers, binding them to its value.
+It's pretty easy; we just enumerate over `理`.
+
+        for category, object of 理
+            听 handler.type, handler.bind store for name, handler of object
+
+###  Firing our first event:
 
 Finally, we fire the `Store.Up` event, which generates our engine and assigns it to `document.Laboratory` for later use.
 
@@ -107,6 +113,8 @@ Finally, we fire the `Store.Up` event, which generates our engine and assigns it
 
         return
 
-We don't want the store loading before `document.body`, so we'll attach a `DOMContentLoaded` event handler.
+###  Running asynchronously:
 
-    听 "DOMContentLoaded", run
+We don't want the store loading before `document.body` or any of our other scripts, so we'll attach a `window.onload` event handler.
+
+    window.addEventListener "load", run

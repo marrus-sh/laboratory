@@ -2,7 +2,25 @@
 
     "timeline.home": "Home"
     "notifications.notifications": "Notifications"
+
     "composer.compose": "Compose"
+    "composer.post": "Post"
+    "composer.private": "Private"
+    "composer.public": "Public"
+    "composer.unlisted": "Unlisted"
+    "composer.listed": "Listed"
+    "composer.safe": "Safe"
+    "composer.sensitive": "Sensitive"
+    "composer.hidewithmessage": "Hide behind message"
+    "composer.placeholder": "What's going on?"
+
+    "go.heading": "let's GO!"
+    "go.community": "Community"
+    "go.global": "Global"
+
+    "toggle.off": "Off"
+    "toggle.on": "On"
+
     "notfound.not_found": "Not found"
 
     #  Unused codes from Mastodon:

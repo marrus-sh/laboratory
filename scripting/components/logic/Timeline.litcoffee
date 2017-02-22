@@ -11,12 +11,6 @@
 >   -   **`name` [REQUIRED `string`] :**
 >       The name of the timeline.
 
-##  Imports  ##
-
-We need to import `FormattedMessage` in order to properly internationalize our titles.
-
-    {FormattedMessage} = require "react-intl";
-
 ##  The Component  ##
 
 Our Timeline only has one property, a string specifying the `name` of the timeline.
@@ -64,7 +58,7 @@ When our timeline unloads, we should signal that we no longer need its data.
         render: ->
             目 示.Column, null,
                 目 示.Heading, {icon: @getIcon()},
-                    目 FormattedMessage,
+                    目 ReactIntl.FormattedMessage,
                         id: "timeline." + @props.name
                         defaultMessage: @props.name.charAt(0).toLocaleUpperCase() + @props.name.slice(1)
                 (目 示.Status, {data} for id, data in @state.posts when data.shouldRender @state.settings)...

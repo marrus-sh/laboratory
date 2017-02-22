@@ -4,7 +4,7 @@
 
 >   ```jsx
 >       <Heading
->           icon=React.PropTypes.string.isRequired
+>           icon=React.PropTypes.string
 >       >
 >           {/* content */}
 >       </Heading>
@@ -19,5 +19,7 @@ The `Heading` is just a simple functional React component.
 
     示.Heading = (props) ->
         目 'h2', {className: "laboratory-heading"},
-            目 'i', {className: "fa fa-fw fa-" + props.icon, "aria-hidden": ""}
-            props.children
+            (if props.icon then [目('i', {className: "fa fa-fw fa-" + props.icon, "aria-hidden": true}), props.children] else [props.children])...
+
+    示.Heading.propTypes =
+        icon: React.PropTypes.string

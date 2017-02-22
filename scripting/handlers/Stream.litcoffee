@@ -34,9 +34,9 @@ These are:
 
 We'll simply forward the message onto the appropriate handler by creating a new event for each of these situations.
 
-    此.Message = (event, store) ->
+    此.Message = (event) ->
 
-        return unless event? and store? and event.type is 此.Message.type
+        return unless event? and this? and event.type is 此.Message.type
 
         switch event.detail.data.type
 

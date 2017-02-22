@@ -4,6 +4,9 @@
     "notifications.notifications": "Сповіщення"
     "composer.compose": "Написати"
     "notfound.not_found": "Не знайдено"
+    # "go.heading":
+    # "go.community":
+    # "go.global":
 
     #  Unused codes from Mastodon:
 

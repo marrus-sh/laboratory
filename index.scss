@@ -1,5 +1,5 @@
 @charset "UTF-8";
 @import "variables";
 @import "./styling/defaults";
-@import "./styling/layout", "./styling/colours", "./styling/fonts", "./styling/formatting";
+@import "./styling/ui", "./styling/header", "./styling/column", "./styling/module";
 @import 'font-awesome';

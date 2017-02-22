@@ -18,11 +18,11 @@ The `Store.Up` handler defines the root React component for our `Laboratory` eng
 We can't do this until our Laboratory store has been created because the engine requires the store to operate.
 Of course, if our event isn't a `Store.Up` event then we don't want to handle it.
 
-    此.Up = (event, store) ->
+    此.Up = (event) ->
 
-        return unless event? and store? and event.type is 此.Up.type
+        return unless event? and this? and event.type is 此.Up.type
 
-The `Store.Up` handler is just a wrapper for `目 'Laboratory'` that provides it with access to our access token and locale data, and then renders the final element in the React root.
+The `Store.Up` handler is mostly just a wrapper for `目 'Laboratory'` that provides it with the data that it needs to run, and then renders the final element in the React root.
 The React root is determined according to the following rules:
 
 1.  If there exists an element with id `"frontend"`, this will be used.
@@ -33,10 +33,17 @@ The React root is determined according to the following rules:
 
 3.  Otherwise, `document.body` is used as the React root.
 
+We don't give our React components direct access to our store so there's quite a few properties we need to set instead.
+
         Laboratory = 目 论.Laboratory,
-            locale: store.meta.locale
-            accessToken: store.meta.access_token
-            title: store.site.title
+            locale: @meta.locale
+            accessToken: @meta.access_token
+            myacct: @meta.me
+            routerBase: @meta.router_basename
+            title: @site.title
+            links: @site.links
+            maxChars: @compose.max_chars
+            defaultPrivacy: @compose.default_privacy
 
         ReactDOM.render Laboratory, if (elt = document.getElementById("frontend")) then elt else if (elt = document.getElementsByClassName("app-body").item(0)) then elt else document.body
 

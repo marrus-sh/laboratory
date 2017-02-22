@@ -1,9 +1,8 @@
-//= require_self
-//= require react_ujs
-
-window.React    = require('react');
-window.ReactDOM = require('react-dom');
-window.Perf     = require('react-addons-perf');
+window.React       = require('react');
+window.ReactDOM    = require('react-dom');
+window.ReactRouter = require('react-router');
+window.ReactIntl   = require('react-intl');
+window.Perf        = require('react-addons-perf');
 
 if (!window.Intl) {
   require('intl');

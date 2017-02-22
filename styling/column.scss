@@ -1,0 +1,157 @@
+#laboratory-ui {
+  *.laboratory-column {
+    display: block;
+    position: relative;
+    flex: auto;
+    margin: 21pt 10pt 42pt;
+    padding: 38.5pt 10pt 10.5pt;
+    max-width: 300pt;
+    min-width: 180pt;
+    background-color: $laboratory-columnColor;
+    -ms-scroll-snap-type: proximity;
+    -webkit-scroll-snap-type: proximity;
+    scroll-snap-type: proximity;
+    -ms-scroll-snap-destination: 0% 100%;
+    -webkit-scroll-snap-destination: 0% 100%;
+    scroll-snap-destination: 0% 100%;
+    -ms-scroll-snap-points-x: repeat(100%);
+    -webkit-scroll-snap-points-x: repeat(100%);
+    scroll-snap-points-x: repeat(100%);
+    -ms-scroll-snap-align: center;
+    -webkit-scroll-snap-align: center;
+    scroll-snap-align: center;
+
+    @media (max-width: 480px) {
+      flex: none;
+      margin: 7pt 5pt;
+      width: calc(100vw - 30pt);
+      max-width: none;
+      min-width: 0;
+      -ms-scroll-snap-type: mandatory;
+      -webkit-scroll-snap-type: mandatory;
+      scroll-snap-type: mandatory;
+    }
+
+    *[data-laboratory-simple] & {
+      padding-top: 10.5pt;
+    }
+  }
+
+  *.laboratory-heading {
+    display: block;
+    position: absolute;
+    top: -10.5pt;
+    left: -10pt;
+    margin: 0;
+    padding: 7pt 5pt 7pt;
+    width: calc(100% - 10pt);
+    height: 28pt;
+    overflow: hidden;
+    white-space: nowrap;
+    color: $laboratory-highlightTextColor;
+    background-color: $laboratory-highlightColor;
+    font-size: 20pt;
+    font-weight: 400;
+    font-variant: small-caps;
+    line-height: 28pt;
+    text-overflow: ellipsis;
+
+    @media (max-width: 480px) {
+      top: 0;
+      left: 0;
+    }
+
+    *[data-laboratory-simple] & {
+      top: -20pt;
+      left: -20pt;
+      width: 32pt;
+      color: $laboratory-accentTextColor;
+      background: transparent;
+
+      & *:not(:first-child) {
+        display: none;
+      }
+    }
+
+    i.fa:first-child {
+      margin-right: 5pt;
+      width: 32pt;
+    }
+  }
+
+  *.laboratory-columnnav {
+    display: block;
+    padding: 21pt 0;
+
+    a[href] {
+      display: block;
+      margin: 0 0 7pt;
+      padding: 7pt 5pt 7pt;
+      width: calc(100% - 10pt);
+      height: 28pt;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      color: $laboratory-highlightTextColor;
+      background-color: $laboratory-highlightColor;
+      font-size: 20pt;
+      font-weight: 400;
+      line-height: 28pt;
+      text-overflow: ellipsis;
+      transition: margin .35s ease-in-out, color .35s, background-color .35s;
+
+      &:hover {
+        margin-left: 5pt;
+        margin-right: -5pt;
+        color: $laboratory-highlightAccentTextColor;
+        background-color: $laboratory-highlightAccentColor;
+
+        *[data-laboratory-reduce_motion] & {
+          margin-left: 0;
+          margin-right: 0;
+          transition: none;
+        }
+      }
+
+      i.fa:first-child {
+        margin-right: 5pt;
+        width: 32pt;
+      }
+    }
+  }
+
+  *.laboratory-columnfooter {
+    display: block;
+    font-size: 12pt;
+    text-align: center;
+
+    nav a[href] {
+      display: inline-block;
+      margin: 0 .5em;
+    }
+  }
+
+  #laboratory-notifications {
+    background-color: transparentize($laboratory-columnColor, $laboratory-notificationBgOpacity);
+
+    *[data-laboratory-no_transparency] & {
+      background-color: $laboratory-columnColor;
+    }
+
+    *.laboratory-heading {
+      opacity: $laboratory-notificationTextOpacity;
+
+      *[data-laboratory-no_transparency] & {
+        opacity: 1;
+      }
+    }
+  }
+
+  a[href] {
+    color: $laboratory-accentTextColor;
+
+    &:hover {
+      color: inherit;
+    }
+  }
+}

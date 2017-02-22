@@ -3,17 +3,27 @@
 ##  Usage  ##
 
 >   ```jsx
->       <UI title=React.PropTypes.string>
+>       <UI
+>           title=React.PropTypes.string
+>           maxchars=React.PropTypes.number.isRequired
+>           defaultPrivacy=React.PropTypes.string
+>           getThirdColumn=React.PropTypes.func.isRequired
+>           showComposer=React.PropTypes.bool
+>       >
 >           {/* content */}
 >       </UI>
 >   ```
->   Creates a `UI` component, which contains the entire rendered frontend.
-
-##  Imports  ##
-
-We need to import `FormattedMessage` in order to properly internationalize our "not found" message.
-
-    {FormattedMessage} = require "react-intl";
+>   Creates a `UI` component, which contains the entire rendered frontend. The accepted properties are:
+>   -   **`title` [OPTIONAL `string`] :**
+>       The title of the site.
+>   -   **`maxChars` [REQUIRED `number`] :**
+>       The maximum number of characters to allow in a post.
+>   -   **`defaultPrivacy` [OPTIONAL `string`] :**
+>       The default privacy setting.
+>   -   **`getThirdColumn` [REQUIRED `element`] :**
+>       A function providing the component to display in the third column.
+>   -   **`showComposer` [OPTIONAL `boolean`] :**
+>       Whether or not to show the composer.
 
 ##  The Component  ##
 
@@ -22,8 +32,10 @@ Our UI doesn't have any properties except for its `title` and children.
     示.UI = React.createClass
 
         propTypes:
-            children: React.PropTypes.node
             title: React.PropTypes.string
+            maxChars: React.PropTypes.number.isRequired
+            getThirdColumn: React.PropTypes.func.isRequired
+            showComposer: React.PropTypes.bool
 
 ###  Event handling:
 
@@ -71,14 +83,12 @@ We can remove our event listeners if we're unloading our UI.
 
         render: ->
             目 'div', {id: "laboratory-ui"},
-                目 示.Header, null,
-                    目 示.Title, null,
-                        @props.title
-                    目 'span', {id: "laboratory-composelabel"},
-                        目 FormattedMessage,
-                            id: "composer.compose"
-                            defaultMessage: "Compose"
-                    目 示.Compose
+                目 示.Header, {title: @props.title}
                 目 论.Timeline, {name: "home"}
                 目 论.Notifications
+                目 @props.getThirdColumn
                 @props.children
+                目 论.Composer,
+                    defaultPrivacy: @props.defaultPrivacy
+                    maxChars: @props.maxChars,
+                    visible: @props.showComposer

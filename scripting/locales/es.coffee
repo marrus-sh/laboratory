@@ -4,6 +4,9 @@
     "notifications.notifications": "Notificaciones"
     "composer.compose": "Redactar"
     "notfound.not_found": "No encontrada"
+    # "go.heading":
+    # "go.community":
+    # "go.global":
 
     #  Unused codes from Mastodon:
 

@@ -7,12 +7,6 @@
 >   ```
 >   Creates a `Notifications` component, which contains a column of notifications.
 
-##  Imports  ##
-
-We need to import `FormattedMessage` in order to properly internationalize our titles.
-
-    {FormattedMessage} = require "react-intl";
-
 ##  The Component  ##
 
 Our `Notifications` component doesn't take any properties, as it is only used for displaying notifications.
@@ -44,7 +38,7 @@ When our component unloads, we should signal that we no longer need its data.
         render: ->
             目 示.Column, {id: "laboratory-notifications"},
                 目 示.Heading, {icon: "star-half-o"},
-                    目 FormattedMessage,
+                    目 ReactIntl.FormattedMessage,
                         id: "notifications.notifications"
                         defaultMessage: "Notifications"
-                (目 示.Notification, {data} for id, data in @state.items when data.shouldRender @state.settings)...
+                (目 示.Status, {data} for id, data in @state.items when data.shouldRender @state.settings)...

@@ -28,14 +28,42 @@ $laboratory-background: $print_dim !default;
 
 $laboratory-bgColor: $print_dim !default;
 $laboratory-mainTextColor: $print_bright !default;
-$laboratory-emphTextColor: $print_white !default;
+$laboratory-accentTextColor: $print_white !default;
 $laboratory-highlightColor: $print_bright !default;
 $laboratory-highlightTextColor: $print_black !default;
+$laboratory-highlightAccentColor: $print_dim !default;
+$laboratory-highlightAccentTextColor: $print_white !default;
 $laboratory-columnColor: $print_black !default;
 $laboratory-headerColor: $print_white !default;
 $laboratory-headerTextColor: $print_dim !default;
+$laboratory-buttonColor: $print_dark !default;
+$laboratory-buttonTextColor: $print_white !default;
+$laboratory-buttonHoverColor: $print_black !default;
+$laboratory-buttonHoverTextColor: $print_bright !default;
+$laboratory-curtainColor: $print_dim !default;
+$laboratory-moduleColor: $print_bright !default;
+$laboratory-moduleTextColor: $print_dim !default;
+$laboratory-moduleShadowColor: $print_black !default;
+$laboratory-moduleAsideColor: $print_light !default;
+$laboratory-moduleAsideTextColor: $print_black !default;
+$laboratory-moduleAsideBorderColor: $print_medium !default;
+$laboratory-textboxColor: $print_white !default;
+$laboratory-textboxTextColor: $print_black !default;
+$laboratory-textboxPlaceholderColor: $print;
+$laboratory-textboxBorderColor: $print !default;
+$laboratory-composerMessageColor: $print_bright !default;
+$laboratory-composerMessageTextColor: $print_black !default;
+$laboratory-composerMessageBorderColor: $print_medium !default;
+$laboratory-toggleOffColor: $print_white !default;
+$laboratory-toggleOnColor: $print_black !default;
+$laboratory-toggleHoverOffColor: $print_white !default;
+$laboratory-toggleHoverOnColor: $print_black !default;
+$laboratory-toggleForegroundOffColor: $print_dark !default;
+$laboratory-toggleForegroundOnColor: $print_light !default;
 
 /*  OPACITIES  */
 
 $laboratory-notificationBgOpacity: .35 !default;
 $laboratory-notificationTextOpacity: .8 !default;
+$laboratory-curtainOpacity: .35 !default;
+$laboratory-toggleInactiveOpacity: .4 !default;

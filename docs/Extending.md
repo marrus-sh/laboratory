@@ -10,10 +10,21 @@ For example, the following event produces a custom notification:
 ```javascript
     document.dispatchEvent(
         new CustomEvent("LaboratoryNotificationsItemLoaded", {details: {
-            payload: mynotification
+            payload: myNotification
         }});
     );
 ```
+
+Event names follow the form `Laboratory[Category][EventName]`, and there is another (shorter?) syntax which uses these to skip the constructor:
+
+```javascript
+    Laboratory.events.Notifications.ItemLoaded({
+        payload: myNotification
+    });
+```
+
+Events dispatched in this way will have a reference to the function which dispatched them in the `_builder` property of their `detail`.
+However, this property is never checked.
 
 A quick reference for these events follows:
 

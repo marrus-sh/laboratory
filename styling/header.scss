@@ -1,0 +1,44 @@
+#laboratory-ui {
+  #laboratory-header {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    align-items: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 31.5pt;
+    margin: 0;
+    padding: 5.25pt 30pt;
+    font-size: 15pt;
+    line-height: 1;
+    text-transform: uppercase;
+    white-space: nowrap;
+    color: $laboratory-headerTextColor;
+    background-color: $laboratory-headerColor;
+
+    &:before, &:after {  //  Used for centering
+      display: block;
+      width: calc(50% - 495pt);  // 990pt = 3 * width of column - left padding (but not right)
+      content: "";
+    }
+
+    h1 {
+      display: inline;
+      flex: auto;
+      margin: 0 auto 0 0;
+      padding: 0;
+      overflow: hidden;
+      font-size: 22.5pt;
+      font-weight: 900;
+      text-transform: none;
+      text-decoration: underline;
+      text-overflow: ellipsis;
+
+      a[href] {
+        color: inherit;
+      }
+    }
+  }
+}
