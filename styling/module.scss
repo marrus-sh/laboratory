@@ -41,6 +41,10 @@
         }
       }
     }
+
+    a[href] {
+      color: $laboratory-moduleAccentTextColor;
+    }
   }
 
   #laboratory-curtain {
@@ -115,6 +119,16 @@
       border-top: thin $laboratory-moduleAsideBorderColor solid;
       padding: 21pt
     }
+
+    p {
+      margin: 0;
+      text-align: left;
+      white-space: pre-wrap;
+
+      & + p {
+        margin-top: 24.3pt;
+      }
+    }
   }
 
   #laboratory-composer {
@@ -124,8 +138,17 @@
       animation: none;
     }
 
-    & > textarea:focus + #laboratory-composerplaceholder, & > textarea:not(:invalid) + #laboratory-composerplaceholder {
-      display: none;
+    & > header {
+      display: flex;
+      margin: 0 0 9pt;
+      flex-direction: row;
+      justify-content: flex-end;
+      align-items: center;
+
+      *.laboratory-idcard {
+        margin: 0 auto 0 0;
+        font-size: 37.5pt;
+      }
     }
 
     & > footer {
@@ -245,6 +268,94 @@
       height: 21pt;
       visibility: visible;
       opacity: 1;
+    }
+  }
+
+  #laboratory-account {
+    @media (max-width: 480px) {
+      text-align: center;
+    }
+
+    header {
+      display: block;
+      margin: -21pt -21pt 0;
+      padding: 0;
+      height: 126pt;
+      background-repeat: no-repeat;
+      background-position: center;
+      background-size: cover;
+      background-color: $laboratory-moduleAsideColor;
+    }
+
+    *.laboratory-idcard {
+      margin: .2em 0 .4em;
+      font-size: 42pt;
+
+      *.laboratory-avatar {
+        margin: -1em .25em 0 0;
+        height: 2em;
+        width: 2em;
+      }
+    }
+
+    *.laboratory-buttoncontainer {
+      float: right;
+      margin: 9pt 0;
+
+      @media (max-width: 480px) {
+        float: none;
+        font-size: 15pt;
+      }
+    }
+
+    footer {
+      display: block;
+      margin: 9pt -21pt -21pt;
+      border-top: thin $laboratory-moduleBorderColor solid;
+      padding: 9pt;
+      color: $laboratory-accountFooterTextColor;
+      background: $laboratory-accountFooterColor;
+
+      @media (max-width: 480px) {
+        padding: 9pt 0;
+      }
+
+      table {
+        margin: 0;
+        border: 0;
+        border-collapse: collapse;
+        padding: 0;
+        width: 100%;
+        font-size: 15pt;
+        line-height: 1.4;
+        text-align: right;
+
+        tr {
+          margin: 0;
+          border: none;
+          padding: 0
+        }
+
+        td {
+          margin: 0;
+          border: none;
+          padding: 0 27pt;
+
+          @media (max-width: 480px) {
+            padding: 0 9pt;
+          }
+
+          & + td {
+            border-left: thin $laboratory-moduleBorderColor solid;
+          }
+
+          b {
+            display: block;
+            font-size: 21pt;
+            line-height: 1;
+          }
+        }
+      }
     }
   }
 }

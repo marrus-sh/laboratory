@@ -1,15 +1,19 @@
-#  `动.Composer`  #
+#  `Laboratory.Events.Composer`  #
 
 ##  Usage  ##
 
 >   ```javascript
 >       //  Fires when the composer window should be displayed.
 >       Composer.Request()
+>       //  Fires when a media attachment is added.
+>       Composer.Upload({file: …})
+>       //  Fires when a status should be sent.
+>       Composer.Post({text: …, message: …, makePublic: …, makeListed: …, makeNSFW: …})
 >   ```
 
 ##  Object Initialization  ##
 
-    此 = 动.Composer = {}
+    current = Laboratory.Events.Composer = {}
 
 ##  Events  ##
 
@@ -17,13 +21,20 @@
 
 The `Composer.Request` event doesn't have any properties.
 
-    此.Request = 动.newBuilder "LaboratoryComposerRequest"
+    current.Request = Laboratory.Events.newBuilder "LaboratoryComposerRequest"
+
+###  `Composer.Upload`:
+
+The `Composer.Upload` event has one property: the `file` to upload.
+
+    current.Upload = Laboratory.Events.newBuilder 'LaboratoryComposerUpload',
+        file: null
 
 ###  `Composer.Post`:
 
-The `Composer.Request` event doesn't have any properties.
+The `Composer.Post` event has several properties: the `text` of the status to post; its associated `message`, if any; and whether to `makePublic`, `makeListed`, or `makeNSFW`.
 
-    此.Post = 动.newBuilder "LaboratoryComposerPost",
+    current.Post = Laboratory.Events.newBuilder "LaboratoryComposerPost",
         text: ""
         message: null
         makePublic: false
@@ -32,4 +43,4 @@ The `Composer.Request` event doesn't have any properties.
 
 ##  Object Freezing  ##
 
-    冻 此
+    Object.freeze current

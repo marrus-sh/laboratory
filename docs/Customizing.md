@@ -12,13 +12,13 @@ The possible variables are as follows:
 | **Backgrounds** |  |
 | `$laboratory-background` | Used to set the background of the entire frontend. |
 | **Colours** |  |
-| `$laboratory-bgColor` | The background colour for the page; drawn behind `$laboratory-background`. |
+| `$laboratory-backgroundColor` | The background colour for the page; drawn behind `$laboratory-background`. |
 | `$laboratory-mainTextColor` | The main colour for text on the page. |
 | `$laboratory-accentTextColor` | The colour of emphasized text and other text which needs to stand out. |
-| `$laboratory-highlightColor` | The background colour used for highlighted text. |
-| `$laboratory-highlightTextColor` | The text colour used for highlighted text. |
-| `$laboratory-highlightAccentColor` | The background colour used for accented highlighted text. |
-| `$laboratory-highlightAccentTextColor` | The text colour used for accented highlighted text. |
+| `$laboratory-cardColor` | The background colour used for highlighted text. |
+| `$laboratory-cardTextColor` | The text colour used for highlighted text. |
+| `$laboratory-cardAccentColor` | The background colour used for accented highlighted text. |
+| `$laboratory-cardAccentTextColor` | The text colour used for accented highlighted text. |
 | `$laboratory-columnColor` | The background colour for frontend columns. |
 | `$laboratory-headerColor` | The background colour for the frontend header. |
 | `$laboratory-headerTextColor` | The text colour for the frontend header. |

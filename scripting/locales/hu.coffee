@@ -1,4 +1,4 @@
-语.hu = Object.freeze
+Laboratory.Locales.hu = Object.freeze
 
     "timeline.home": "Kezdőlap"
     "notifications.notifications": "Értesítések"

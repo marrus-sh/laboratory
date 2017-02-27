@@ -4,10 +4,11 @@
     position: relative;
     flex: auto;
     margin: 21pt 10pt 42pt;
-    padding: 38.5pt 10pt 10.5pt;
+    padding: 42pt 10pt 10.5pt;
     max-width: 300pt;
     min-width: 180pt;
-    background-color: $laboratory-columnColor;
+    color: $laboratory-columnTextColor;
+    background-color: transparentize($laboratory-columnColor, 1 - $laboratory-columnBackgroundOpacity);
     -ms-scroll-snap-type: proximity;
     -webkit-scroll-snap-type: proximity;
     scroll-snap-type: proximity;
@@ -24,6 +25,7 @@
     @media (max-width: 480px) {
       flex: none;
       margin: 7pt 5pt;
+      padding-top: 52.5pt;
       width: calc(100vw - 30pt);
       max-width: none;
       min-width: 0;
@@ -34,6 +36,14 @@
 
     *[data-laboratory-simple] & {
       padding-top: 10.5pt;
+    }
+
+    a[href] {
+      color: $laboratory-columnAccentTextColor;
+
+      &:hover {
+        color: $laboratory-columnTextColor;
+      }
     }
   }
 
@@ -48,8 +58,8 @@
     height: 28pt;
     overflow: hidden;
     white-space: nowrap;
-    color: $laboratory-highlightTextColor;
-    background-color: $laboratory-highlightColor;
+    color: $laboratory-columnHeadingTextColor;
+    background-color: $laboratory-columnHeadingColor;
     font-size: 20pt;
     font-weight: 400;
     font-variant: small-caps;
@@ -65,7 +75,7 @@
       top: -20pt;
       left: -20pt;
       width: 32pt;
-      color: $laboratory-accentTextColor;
+      color: $laboratory-columnHeadingColor;
       background: transparent;
 
       & *:not(:first-child) {
@@ -87,13 +97,11 @@
       display: block;
       margin: 0 0 7pt;
       padding: 7pt 5pt 7pt;
-      width: calc(100% - 10pt);
       height: 28pt;
       overflow: hidden;
-      text-overflow: ellipsis;
       white-space: nowrap;
-      color: $laboratory-highlightTextColor;
-      background-color: $laboratory-highlightColor;
+      color: $laboratory-cardTextColor;
+      background-color: $laboratory-cardColor;
       font-size: 20pt;
       font-weight: 400;
       line-height: 28pt;
@@ -103,8 +111,8 @@
       &:hover {
         margin-left: 5pt;
         margin-right: -5pt;
-        color: $laboratory-highlightAccentTextColor;
-        background-color: $laboratory-highlightAccentColor;
+        color: $laboratory-cardHighlightTextColor;
+        background-color: $laboratory-cardHighlightColor;
 
         *[data-laboratory-reduce_motion] & {
           margin-left: 0;
@@ -132,14 +140,14 @@
   }
 
   #laboratory-notifications {
-    background-color: transparentize($laboratory-columnColor, $laboratory-notificationBgOpacity);
+    background-color: transparentize($laboratory-columnColor, 1 - $laboratory-notificationBackgroundOpacity);
 
     *[data-laboratory-no_transparency] & {
       background-color: $laboratory-columnColor;
     }
 
     *.laboratory-heading {
-      opacity: $laboratory-notificationTextOpacity;
+      opacity: $laboratory-notificationForegroundOpacity;
 
       *[data-laboratory-no_transparency] & {
         opacity: 1;
@@ -147,11 +155,121 @@
     }
   }
 
-  a[href] {
-    color: $laboratory-accentTextColor;
+  *.laboratory-status {
+    display: block;
+    margin: 0 0 7pt;
+    padding: 7pt 5pt 7pt;
+    overflow: hidden;
+    color: $laboratory-cardTextColor;
+    background-color: $laboratory-cardColor;
+    text-overflow: ellipsis;
+    transition: color .5s, background-color .5s;
 
-    &:hover {
-      color: inherit;
+    &.laboratory-status--highlighted {
+      color: $laboratory-cardHighlightTextColor;
+      background-color: $laboratory-cardHighlightColor;
+
+      a[href] {
+        color: $laboratory-cardHighlightAccentTextColor;
+
+        &:hover {
+          color: inherit;
+        }
+      }
+    }
+
+    a[href] {
+      color: $laboratory-cardAccentTextColor;
+
+      &:hover {
+        color: inherit;
+      }
+    }
+
+    header {
+      margin: 0 0 7pt;
+
+      *.laboratory-idcard {
+        font-size: 30pt;
+        margin: 0;
+      }
+
+      time {
+        float: right;
+        font-size: 12pt;
+        font-weight: 300;
+      }
+    }
+
+    footer {
+      display: flex;
+      flex-direction: row;
+      justify-content: flex-start;
+      align-items: stretch;
+      margin: 7pt -5pt -7pt;
+      border-top: thin $laboratory-cardButtonBorderColor solid;
+      padding: 0;
+      overflow-x: auto;
+      overflow-y: hidden;
+      text-transform: uppercase;
+      font-size: 12pt;
+
+      *.laboratory-buttoncontainer {
+        flex: auto;
+        margin: 0;
+        padding: 7pt 5pt;
+        color: $laboratory-cardButtonTextColor;
+        background-color: $laboratory-cardButtonColor;
+        transition: color .5s, background-color .5s;
+
+        *[data-reduce_motion] & {
+          transition: none;
+        }
+
+        &:hover {
+          color: $laboratory-cardButtonHoverTextColor;
+          background-color: $laboratory-cardButtonHoverColor;
+        }
+
+        & + .laboratory-buttoncontainer {
+          border-left: thin $laboratory-cardButtonBorderColor solid;
+        }
+      }
+
+      *.laboratory-unboostbutton, *.laboratory-unhighlightbutton {
+        color: $laboratory-cardButtonActiveTextColor;
+        background-color: $laboratory-cardButtonActiveColor;
+
+        &:hover {
+          color: $laboratory-cardButtonActiveHoverTextColor;
+          background-color: $laboratory-cardButtonActiveHoverColor;
+        }
+      }
+
+      *.laboratory-noboostbutton, *.laboratory-noboostbutton:hover {
+        color: inherit;
+        background-color: transparent;
+      }
+    }
+  }
+
+  *.laboratory-statusContent {
+    p {
+      margin: 0;
+      padding: 0 10pt;
+      text-align: left;
+      white-space: pre-wrap;
+      hyphens: auto;
+
+      & + p {
+        text-indent: 15pt;
+      }
+
+      a[href] {
+        hyphens: none;
+        text-decoration: underline;
+        text-decoration-style: dashed;
+      }
     }
   }
 }

@@ -1,4 +1,4 @@
-#  `理.Store`  #
+#  `Laboratory.Handlers.Store`  #
 
 ##  Coverage  ##
 
@@ -8,7 +8,7 @@
 
 ##  Object Initialization  ##
 
-    此 = 理.Store = {}
+    current = Laboratory.Handlers.Store = {}
 
 ##  Handlers  ##
 
@@ -18,11 +18,11 @@ The `Store.Up` handler defines the root React component for our `Laboratory` eng
 We can't do this until our Laboratory store has been created because the engine requires the store to operate.
 Of course, if our event isn't a `Store.Up` event then we don't want to handle it.
 
-    此.Up = (event) ->
+    current.Up = (event) ->
 
-        return unless event? and this? and event.type is 此.Up.type
+        return unless event? and this? and event.type is current.Up.type
 
-The `Store.Up` handler is mostly just a wrapper for `目 'Laboratory'` that provides it with the data that it needs to run, and then renders the final element in the React root.
+The `Store.Up` handler is mostly just a wrapper for `彁 'Laboratory'` that provides it with the data that it needs to run, and then renders the final element in the React root.
 The React root is determined according to the following rules:
 
 1.  If there exists an element with id `"frontend"`, this will be used.
@@ -35,21 +35,21 @@ The React root is determined according to the following rules:
 
 We don't give our React components direct access to our store so there's quite a few properties we need to set instead.
 
-        Laboratory = 目 论.Laboratory,
+        frontend = 彁 Laboratory.Components.Shared.productions.Laboratory,
             locale: @meta.locale
-            accessToken: @meta.access_token
-            myacct: @meta.me
-            routerBase: @meta.router_basename
+            accessToken: @meta.accessToken
+            myAcct: @accounts[@meta.me]
+            routerBase: @meta.routerBasename
             title: @site.title
             links: @site.links
-            maxChars: @compose.max_chars
-            defaultPrivacy: @compose.default_privacy
+            maxChars: @compose.maxChars
+            defaultPrivacy: @compose.defaultPrivacy
 
-        ReactDOM.render Laboratory, if (elt = document.getElementById("frontend")) then elt else if (elt = document.getElementsByClassName("app-body").item(0)) then elt else document.body
+        ReactDOM.render frontend, if (elt = document.getElementById("frontend")) then elt else if (elt = document.getElementsByClassName("app-body").item(0)) then elt else document.body
 
-    此.Up.type = 动.Store.Up.type
-    冻 此.Up
+    current.Up.type = Laboratory.Events.Store.Up.type
+    Object.freeze current.Up
 
 ##  Object Freezing  ##
 
-    冻 此
+    Object.freeze current

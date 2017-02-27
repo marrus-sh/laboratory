@@ -1,4 +1,4 @@
-#  `动.Notifications`  #
+#  `Laboratory.Events.Notifications`  #
 
 ##  Usage  ##
 
@@ -15,7 +15,7 @@
 
 ##  Object Initialization  ##
 
-    此 = 动.Notifications = {}
+    current = Laboratory.Events.Notifications = {}
 
 ##  Events  ##
 
@@ -23,23 +23,23 @@
 
 The `Notifications.ItemLoaded` event has one property: the `payload` it was issued with.
 
-    此.ItemLoaded = 动.newBuilder 'LaboratoryNotificationsItemLoaded',
+    current.ItemLoaded = Laboratory.Events.newBuilder 'LaboratoryNotificationsItemLoaded',
         payload: null
 
 ###  `Notifications.Requested`:
 
 The `Notifications.Requested` event has one property: the `component` that it will be rendered in.
 
-    此.Requested = 动.newBuilder 'LaboratoryNotificationsRequested',
+    current.Requested = Laboratory.Events.newBuilder 'LaboratoryNotificationsRequested',
         component: null
 
 ###  `Notifications.Removed`:
 
 The `Notifications.Removed` event has one property: the `component` that was removed.
 
-    此.Removed = 动.newBuilder 'LaboratoryNotificationsRemoved',
+    current.Removed = Laboratory.Events.newBuilder 'LaboratoryNotificationsRemoved',
         component: null
 
 ##  Object Freezing  ##
 
-    冻 此
+    Object.freeze current

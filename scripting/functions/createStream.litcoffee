@@ -1,4 +1,4 @@
-#  `作.createStream`
+#  `Laboratory.Functions.createStream`
 
 This module is used to open a WebSocket stream with the Ardipithecus/Mastodon API.
 
@@ -20,28 +20,28 @@ The `createStream()` function takes an `accessToken` and a `stream` and uses the
 
 Note `STREAMING_API_BASE_URL` is set on the `Window` object during configuration (see `/app/views/home/index.html.haml` in the Mastodon source).
 
-    作.createStream = (accessToken, stream) ->
+    Laboratory.Functions.createStream = (accessToken, stream) ->
         ws = new WebSocket createWebSocketURL "#{STREAMING_API_BASE_URL}/api/v1/streaming/#{stream}?access_token=#{accessToken}"
         ws.addEventListener(
             "open",
-            (e) -> 动.Stream.Open
+            (e) -> Laboratory.Events.Stream.Open
                 stream: stream
         )
         ws.addEventListener(
             "close",
-            (e) -> 动.Stream.Close
+            (e) -> Laboratory.Events.Stream.Close
                 stream: stream
                 code: e.code
         )
         ws.addEventListener(
             "message",
-            (e) -> 动.Stream.Message
+            (e) -> Laboratory.Events.Stream.Message
                 stream: stream
                 data: JSON.parse e.data
         )
         ws.addEventListener(
             "error",
-            (e) -> 动.Stream.Error
+            (e) -> Laboratory.Events.Stream.Error
                 stream: stream
         )
         return ws

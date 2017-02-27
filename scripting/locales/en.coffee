@@ -1,4 +1,4 @@
-语.en = Object.freeze
+Laboratory.Locales.en = Object.freeze
 
     "timeline.home": "Home"
     "notifications.notifications": "Notifications"
@@ -13,6 +13,15 @@
     "composer.sensitive": "Sensitive"
     "composer.hidewithmessage": "Hide behind message"
     "composer.placeholder": "What's going on?"
+
+    "account.follow": "Follow"
+    "account.unfollow": "Unfollow"
+    "account.blocking": "Blocking"
+    "account.requestfollow": "Request Follow"
+    "account.requestsent": "Request Sent"
+    "account.statuses": "Posts"
+    "account.following": "Follows"
+    "account.followers": "Followers"
 
     "go.heading": "let's GO!"
     "go.community": "Community"

@@ -1,6 +1,6 @@
-//= require ./components
-//= require ./constructors
-//= require ./events
-//= require ./functions
-//= require ./handlers
-//= require ./locales
+//= require ./Symbols
+//= require ./Components
+//= require ./Events
+//= require ./Functions
+//= require ./Handlers
+//= require ./Locales

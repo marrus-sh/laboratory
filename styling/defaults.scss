@@ -26,14 +26,27 @@ $laboratory-background: $print_dim !default;
 
 /*  COLOURS  */
 
-$laboratory-bgColor: $print_dim !default;
-$laboratory-mainTextColor: $print_bright !default;
-$laboratory-accentTextColor: $print_white !default;
-$laboratory-highlightColor: $print_bright !default;
-$laboratory-highlightTextColor: $print_black !default;
-$laboratory-highlightAccentColor: $print_dim !default;
-$laboratory-highlightAccentTextColor: $print_white !default;
+$laboratory-backgroundColor: $print_dim !default;
 $laboratory-columnColor: $print_black !default;
+$laboratory-columnTextColor: $print_bright !default;
+$laboratory-columnAccentTextColor: $print_white !default;
+$laboratory-columnHeadingColor: $print_white !default;
+$laboratory-columnHeadingTextColor: $print_dim !default;
+$laboratory-cardColor: $print_bright !default;
+$laboratory-cardTextColor: $print_black !default;
+$laboratory-cardAccentTextColor: $print_dark !default;
+$laboratory-cardHighlightColor: $print_white !default;
+$laboratory-cardHighlightTextColor: $print_dim !default;
+$laboratory-cardHighlightAccentTextColor: $print_medium !default;
+$laboratory-cardButtonColor: $print_white !default;
+$laboratory-cardButtonTextColor: $print_dark !default;
+$laboratory-cardButtonBorderColor: $print !default;
+$laboratory-cardButtonHoverColor: $print_light !default;
+$laboratory-cardButtonHoverTextColor: $print_black !default;
+$laboratory-cardButtonActiveColor: $print_dim !default;
+$laboratory-cardButtonActiveTextColor: $print_white !default;
+$laboratory-cardButtonActiveHoverColor: $print_black !default;
+$laboratory-cardButtonActiveHoverTextColor: $print_bright !default;
 $laboratory-headerColor: $print_white !default;
 $laboratory-headerTextColor: $print_dim !default;
 $laboratory-buttonColor: $print_dark !default;
@@ -43,7 +56,9 @@ $laboratory-buttonHoverTextColor: $print_bright !default;
 $laboratory-curtainColor: $print_dim !default;
 $laboratory-moduleColor: $print_bright !default;
 $laboratory-moduleTextColor: $print_dim !default;
+$laboratory-moduleBorderColor: $print !default;
 $laboratory-moduleShadowColor: $print_black !default;
+$laboratory-moduleAccentTextColor: $print_black !default;
 $laboratory-moduleAsideColor: $print_light !default;
 $laboratory-moduleAsideTextColor: $print_black !default;
 $laboratory-moduleAsideBorderColor: $print_medium !default;
@@ -54,6 +69,8 @@ $laboratory-textboxBorderColor: $print !default;
 $laboratory-composerMessageColor: $print_bright !default;
 $laboratory-composerMessageTextColor: $print_black !default;
 $laboratory-composerMessageBorderColor: $print_medium !default;
+$laboratory-accountFooterColor: $print_white !default;
+$laboratory-accountFooterTextColor: $print_medium !default;
 $laboratory-toggleOffColor: $print_white !default;
 $laboratory-toggleOnColor: $print_black !default;
 $laboratory-toggleHoverOffColor: $print_white !default;
@@ -63,7 +80,12 @@ $laboratory-toggleForegroundOnColor: $print_light !default;
 
 /*  OPACITIES  */
 
-$laboratory-notificationBgOpacity: .35 !default;
-$laboratory-notificationTextOpacity: .8 !default;
+$laboratory-headerBackgroundOpacity: .95 !default;
+$laboratory-columnBackgroundOpacity: .95 !default;
+$laboratory-notificationBackgroundOpacity: .4 !default;
+//  Waiting for `backdrop-filter` to be implemented:
+//  $laboratory-notificationBackgroundFilter: contrast(150%) blur(5pt) !default;
+$laboratory-notificationForegroundOpacity: .9 !default;
 $laboratory-curtainOpacity: .35 !default;
 $laboratory-toggleInactiveOpacity: .4 !default;
+$laboratory-leadingCommAtOpacity: .65 !default;

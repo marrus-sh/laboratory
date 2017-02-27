@@ -18,7 +18,7 @@ For example, the following event produces a custom notification:
 Event names follow the form `Laboratory[Category][EventName]`, and there is another (shorter?) syntax which uses these to skip the constructor:
 
 ```javascript
-    Laboratory.events.Notifications.ItemLoaded({
+    Laboratory.Events.Notifications.ItemLoaded({
         payload: myNotification
     });
 ```

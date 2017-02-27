@@ -24,10 +24,12 @@ We also import `Howler` for some initial configuration.
 
 ###  Freezing the Laboratory object:
 
-We don't want nefarious entities meddling in our affairs, so let's freeze `研` and keep ourselves safe.
+We don't want nefarious entities meddling in our affairs, so let's freeze `Laboratory` and keep ourselves safe.
 
-    冻 研[module] for module of 研
-    冻 块[module] for module of 块
+    Object.freeze Laboratory[module] for module of Laboratory
+    for module of Laboratory.Components
+        Object.freeze Laboratory.Components[module].parts
+        Object.freeze Laboratory.Components[module].productions
 
 ###  Disabling Howler:
 
@@ -48,41 +50,6 @@ This adds locale data so that our router can handle it:
 Laboratory data is all stored in a single store, and then acted upon through events and event listeners.
 The store is not available outside of those events specified through `initialize`
 
-###  Describing store data:
-
-We will read in our store data using `Object.defineProperties`, but it is cumbersome to use property descriptors to define our entire initial store.
-Consequently, we will treat `"key": value` as a synonym for `"key": {value: value, enumerable: true}` so long as none of `value`s own properties has a property descriptor property.
-`propertyClone` handles this conversion while leaving the original object intact.
-
-    propertyClone = (mixedobj) ->
-
-The `objectDescribe()` function converts the object into a nested property definition.
-
-        objectDescribe = (obj) ->
-            此 = {}
-            for own key, value of obj
-                if value? and typeof value is "object"
-                    if value instanceof Array then 此[key] = {value: value, enumerable: true}
-                    else if (有(value, "configurable") or 有(value, "enumerable") or 有(value, "value") or 有(value, "writable"))
-                        此[key] = value
-                        此[key].value = objectDescribe(此[key].value) if 此[key].value? and typeof 此[key].value is "object" and not (此[key].value instanceof Array)
-                    else 此[key] = {value: objectDescribe(value), enumerable: true}
-                else 此[key] = {value: (value), enumerable: true}
-            return 此
-
-`objectDefine()` then iterates over this result to return the final object.
-
-        objectDefine = (obj) ->
-            此 = {}
-            for own key, value of obj
-                value.value = objectDefine value.value if typeof value.value is "object" and not (value.value instanceof Array)
-            return 定定 此, obj
-
-We string these functions together to get our final output.
-
-        return objectDefine objectDescribe mixedobj
-
-
 ###  Loading the store:
 
 We can now load the store.
@@ -90,26 +57,76 @@ We'll wrap this all in a closure to make extra sure that nobody has access to it
 
     run = ->
 
->   **ISSUE :**
->   Check to ensure that this hasn't already happened?
+We generate our store from `window.INITIAL_STATE` by pulling the following attributes.
+Most of these properties are set as non-writable and non-configurable, but there are some exceptions.
+Notably, account objects are immutable but their properties are not.
 
-We generate our store from the JSON in `window.INITIAL_STATE` using `propertyClone`.
+The `apiURL` attribute is just the generic Mastodon API for now but we're setting it here anyway.
 
-        store = propertyClone INITIAL_STATE
+        return unless INITIAL_STATE?
+
+        store = Object.defineProperties {},
+            meta:
+                value: Object.freeze
+                    accessToken: INITIAL_STATE.meta.access_token
+                    apiURL: "/api/v1/"
+                    locale: INITIAL_STATE.meta.locale
+                    routerBasename: INITIAL_STATE.meta.router_basename
+                    me: INITIAL_STATE.meta.me
+                enumerable: true
+            site:
+                value: Object.freeze
+                    title: INITIAL_STATE.site.title
+                    links: do ->
+                        links = {}
+                        links[name] = link for own name, link of INITIAL_STATE.site.links
+                        return links
+                enumerable: true
+            compose:
+                value: Object.seal Object.defineProperties {},
+                    defaultPrivacy:
+                        value: INITIAL_STATE.compose.default_privacy
+                        writable: true
+                        enumerable: true
+                    maxChars:
+                        value: INITIAL_STATE.compose.max_chars
+                        enumerable: true
+                enumerable: true
+            accounts:
+                value: do ->
+                    accounts = JSON.parse JSON.stringify INITIAL_STATE.accounts
+                    Object.defineProperty(accounts, index, {value: Object.seal account, enumerable: true}) for account, index in accounts
+                    return accounts
+                enumerable: true
+            timelines:
+                value: {}
+                enumerable: true
+            interfaces:
+                value: Object.freeze
+                    accounts: {}
+                    notifications: {}
+                    timelines: {}
+                enumerable: true
+
+        window.store = store
+
+Once our store is created, we delete window.INITIAL_STATE to ensure that this function isn't somehow called more than once.
+
+        delete window.INITIAL_STATE
 
 ###  Adding our listeners:
 
 Now that our store is created, we can initialize our event handlers, binding them to its value.
-It's pretty easy; we just enumerate over `理`.
+It's pretty easy; we just enumerate over `Laboratory.Handlers`.
 
-        for category, object of 理
-            听 handler.type, handler.bind store for name, handler of object
+        for category, object of Laboratory.Handlers
+            document.addEventListener handler.type, handler.bind store for name, handler of object
 
 ###  Firing our first event:
 
 Finally, we fire the `Store.Up` event, which generates our engine and assigns it to `document.Laboratory` for later use.
 
-        动.Store.Up()
+        Laboratory.Events.Store.Up()
 
         return
 

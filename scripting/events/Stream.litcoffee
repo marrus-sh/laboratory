@@ -1,4 +1,4 @@
-#  `动.Stream`  #
+#  `Laboratory.Events.Stream`  #
 
 ##  Usage  ##
 
@@ -18,7 +18,7 @@
 
 ##  Object Initialization  ##
 
-    此 = 动.Stream = {}
+    current = Laboratory.Events.Stream = {}
 
 ##  Events  ##
 
@@ -26,14 +26,14 @@
 
 The `Stream.Open` event has a single property: the `stream` it was fired from.
 
-    此.Open = 动.newBuilder 'LaboratoryStreamOpen',
+    current.Open = Laboratory.Events.newBuilder 'LaboratoryStreamOpen',
         stream: null
 
 ###  `Stream.Close`:
 
 The `Stream.Close` event has two properties: the `stream` it was fired from, and the `code` issued when closing.
 
-    此.Close = 动.newBuilder 'LaboratoryStreamClose',
+    current.Close = Laboratory.Events.newBuilder 'LaboratoryStreamClose',
         stream: null
         code: 1000
 
@@ -41,7 +41,7 @@ The `Stream.Close` event has two properties: the `stream` it was fired from, and
 
 The `Stream.Message` event has two properties: the `stream` it was fired from, and the message's `data`.
 
-    此.Message = 动.newBuilder 'LaboratoryStreamMessage',
+    current.Message = Laboratory.Events.newBuilder 'LaboratoryStreamMessage',
         stream: null
         data: null
 
@@ -49,9 +49,9 @@ The `Stream.Message` event has two properties: the `stream` it was fired from, a
 
 The `Stream.Error` event has a single property: the `stream` it was fired from.
 
-    此.Error = 动.newBuilder 'LaboratoryStreamError',
+    current.Error = Laboratory.Events.newBuilder 'LaboratoryStreamError',
         stream: null
 
 ##  Object Freezing  ##
 
-    冻 此
+    Object.freeze current

@@ -1,4 +1,4 @@
-语.uk = Object.freeze
+Laboratory.Locales.uk = Object.freeze
 
     "timeline.home": "Головна"
     "notifications.notifications": "Сповіщення"

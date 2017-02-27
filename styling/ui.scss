@@ -8,8 +8,7 @@ html, body {
   display: block;
   margin: 0;
   padding: 0;
-  background-color: $laboratory-bgColor;
-  color: $laboratory-mainTextColor;
+  background-color: $laboratory-backgroundColor;
   font-family: $laboratory-sans;
   font-size: 15pt;
   font-style: normal;
@@ -27,7 +26,6 @@ html, body {
   margin: 0;
   padding: 42pt 0 0;
   height: calc(100vh - 42pt);
-  color: $laboratory-mainTextColor;
   background: $laboratory-background;
   font-family: $laboratory-sans;
   font-size: 15pt;
@@ -43,6 +41,7 @@ html, body {
   }
 
   a[href] {
+    color: inherit;
     text-decoration: none;
     transition: color .35s;
 
@@ -51,15 +50,20 @@ html, body {
     }
   }
 
+  code, pre {
+    font-family: $laboratory-mono;
+  }
+
   label {
     display: inline-flex;
     flex-direction: row;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
+    font-style: small-caps;
 
     & > span {
-      font-style: small-caps;
-      margin: 0 .5em;
+      overflow: hidden;
+      text-overflow: ellipsis;
 
       *[data-laboratory-simple] &, &:empty {
         display: none;
@@ -67,19 +71,83 @@ html, body {
     }
   }
 
+  *.laboratory-idcard {
+    display: inline-flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    margin: .2em .4em;
+    padding: 0;
+    height: 1em;
+    font-size: 1.2em;
+    font-weight: 400;
+
+    a[href] {
+      color: inherit;
+
+      :root:root:root & {
+        color: inherit;
+      }
+    }
+  }
+
+  *.laboratory-avatar {
+    display: block;
+    margin: 0 .2em 0;
+    border-radius: .1em;
+    height: 1em;
+    width: 1em;
+  }
+
+  *.laboratory-displayname {
+    display: block;
+    font-size: .4em;
+    font-weight: 700;
+    line-height: 1.2;
+
+    &:empty {
+      text-align: center;
+
+      &::after {
+        content: "———";
+      }
+    }
+  }
+
+  *.laboratory-username {
+    display: block;
+    font-family: $laboratory-mono;
+    font-size: .4em;
+    font-weight: 400;
+    line-height: 1;
+
+    &::before {
+      opacity: $laboratory-leadingCommAtOpacity;
+      content: "@";
+    }
+  }
+
+  *.laboratory-buttoncontainer {
+    cursor: pointer;
+
+    &.laboratory-buttoncontainer--disabled {
+      cursor: not-allowed;
+    }
+  }
+
   *.laboratory-button {
     display: inline-block;
     flex: none;
+    margin: 0 .4em;
     border: none;
     border-radius: .125em;
     padding: .2em .25em;
-    cursor: pointer;
     color: $laboratory-buttonTextColor;
     background-color: $laboratory-buttonColor;
     font-size: 1.2em;
     font-weight: 400;
     line-height: 1;
-    text-transform: uppercase;
+    cursor: pointer;
     transition: color .5s, background-color .5s;
 
     &:hover {
@@ -88,7 +156,7 @@ html, body {
     }
 
     &[disabled], &[disabled]:hover {
-      margin: -1px;
+      margin: -1px calc(.4em - 1px);
       border: 1px $laboratory-buttonColor solid;
       color: inherit;
       background-color: transparent;
@@ -97,6 +165,19 @@ html, body {
 
     *[data-laboratory-reduce_motion] & {
       transition: none;
+    }
+
+    &.laboratory-button--minimal {
+      margin: 0 -.5em 0 .25em;
+      padding: .1em .125em;
+      color: inherit;
+      background-color: transparent;
+
+      &[disabled] {
+        margin: 0 .2em;
+        border: none;
+        cursor: not-allowed;
+      }
     }
   }
 
@@ -120,7 +201,7 @@ html, body {
     appearance: none;
   }
 
-  *.laboratory-textbox.laboratory-textbox--empty[aria-label]:not(:focus)::before {
+  *.laboratory-textbox[aria-label]::before {
     display: block;
     position: absolute;
     top: 40%;
@@ -128,12 +209,18 @@ html, body {
     right: 0;
     margin: auto;
     width: 50%;
+    opacity: 0;
     color: $laboratory-textboxPlaceholderColor;
     font-weight: 300;
     text-align: center;
     user-select: none;
     pointer-events: none;
+    transition: opacity .25s;
     content: attr(aria-label);
+
+    &.laboratory-textbox--empty:not(:focus) {
+      opacity: 1;
+    }
   }
 
   *.laboratory-toggle {

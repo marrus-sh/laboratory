@@ -1,4 +1,4 @@
-#  `动.newBuilder`  #
+#  `Laboratory.Events.newBuilder`  #
 
 The `newBuilder()` function is used to generate event constructors on-the-fly.
 
@@ -9,7 +9,7 @@ All these functions do is create a new `CustomEvent` with the given properties.
 `newBuilder()` takes two arguments: `type` gives the name of the event, and `data` is an object listing the valid properties for the event alongside their default values.
 We use `Object.defineProperty` because this shouldn't be enumerable.
 
-    Object.defineProperty 动, "newBuilder",
+    Object.defineProperty Laboratory.Events, "newBuilder",
         value: (type, data) ->
 
 `type` needs to be a string and `data` needs to be an object; we'll just use `String()` and `Object()` to ensure this is the case.
@@ -25,20 +25,20 @@ It then dispatches that event to `document` when it's done.
 It sets the properties provided in `data` using `props`.
 The `_builder` property is special and contains a reference to the event builder.
 
-            此 = (props) ->
+            current = (props) ->
                 detail = {}
                 for name, initial of data
-                    定 detail, name,
+                    Object.defineProperty detail, name,
                         value: if props? and props[name]? and name isnt '_builder' then props[name] else initial
                         enumerable: name isnt '_builder'
-                页.dispatchEvent new CustomEvent type, {detail: detail}
+                document.dispatchEvent new CustomEvent type, {detail: detail}
                 return
 
-            此.type = type
-            冻 此
+            current.type = type
+            Object.freeze current
 
-            定 data, "_builder",
-                value: 此
+            Object.defineProperty data, "_builder",
+                value: current
                 enumerable: true
 
-            return 此
+            return current

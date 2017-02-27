@@ -16,7 +16,7 @@
     text-transform: uppercase;
     white-space: nowrap;
     color: $laboratory-headerTextColor;
-    background-color: $laboratory-headerColor;
+    background-color: transparentize($laboratory-headerColor, 1 - $laboratory-headerBackgroundOpacity);
 
     &:before, &:after {  //  Used for centering
       display: block;
@@ -35,10 +35,10 @@
       text-transform: none;
       text-decoration: underline;
       text-overflow: ellipsis;
+    }
 
-      a[href] {
-        color: inherit;
-      }
+    a[href] {
+      color: inherit;
     }
   }
 }
