@@ -15,22 +15,9 @@ Include this folder in `/app/assets/frontends` (feel free to create this folder 
     - Remove the line `= react_component 'Mastodon', default_props, class: 'app-holder', prerender: false`.
     - Optionally, add the line `#frontend` in the location that you want the frontend to render. If this is not specified then the frontend will render in the `<body>` element, which React doesn't recommend.
 
-2.  Add the following lines to `/config/initializers/assets.rb`:
+2.  Add the following line to `/config/initializers/assets.rb`:
 
     ```ruby
-    # Adds support for Literate CoffeeScript & Literate CoffeeScript + ERB
-
-    module LitCoffeeTransformer
-      def self.call(input)
-        tilter = Tilt::CoffeeScriptLiterateTemplate.new input[:filename], input[:data]
-        {data: tilter.render}
-      end
-    end
-    Sprockets.register_mime_type 'text/literate-coffeescript', extensions: ['.litcoffee', '.coffee.md']
-    Sprockets.register_transformer 'text/literate-coffeescript', 'application/javascript', LitCoffeeTransformer
-    Sprockets.register_mime_type 'application/x-erb', extensions: ['.litcoffee.erb', '.coffee.md.erb']
-
-    # Precompiles necessary assets
     Rails.application.config.assets.precompile += %w(laboratory.css laboratory.js)
     ```
 

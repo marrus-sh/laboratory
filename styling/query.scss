@@ -1,0 +1,53 @@
+#laboratory-instancequery {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: stretch;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  color: $laboratory-queryTextColor;
+  background: $laboratory-queryBackground;
+  font-size: 42pt;
+  line-height: 1.2;
+  text-align: center;
+
+  code, pre {
+    font-family: $laboratory-mono;
+  }
+
+  #laboratory-instancequeryinput {
+    margin: 42pt 0 21pt;
+    font-family: $laboratory-mono;
+    font-size: 36pt;
+
+    *.laboratory-username {
+      color: $laboratory-queryTextMinor;
+
+        &::before {
+          opacity: $laboratory-leadingCommAtOpacity;
+          content: "@";
+        }
+    }
+
+    input {
+      display: inline-block;
+      margin: 0;
+      border: none;
+      border-bottom: thick $laboratory-queryTextColor solid;
+      padding: 0;
+      width: 360pt;
+      color: $laboratory-queryTextMajor;
+      background-color: $laboratory-queryMarkColor;
+      font-size: inherit;
+      font-family: inherit;
+      text-align: center;
+
+      &:invalid {
+        color: $laboratory-queryTextMinor;
+      }
+    }
+  }
+}

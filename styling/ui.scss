@@ -25,7 +25,9 @@ html, body {
   position: relative;
   margin: 0;
   padding: 42pt 0 0;
+  width: 100%;
   height: calc(100vh - 42pt);
+  overflow: auto;
   background: $laboratory-background;
   font-family: $laboratory-sans;
   font-size: 15pt;
@@ -34,10 +36,31 @@ html, body {
   font-synthesis: none;
   line-height: 1.4;
 
-  &:before, &:after {  //  Used for centering
+  @media (max-width: 480px) {
+    -ms-scroll-snap-type: mandatory;
+    -webkit-scroll-snap-type: mandatory;
+    scroll-snap-type: mandatory;
+    -ms-scroll-snap-destination: 0 0;
+    -webkit-scroll-snap-destination: 0 0;
+    scroll-snap-destination: 0 0;
+    -ms-scroll-snap-points-x: repeat(100%);
+    -webkit-scroll-snap-points-x: repeat(100%);
+    scroll-snap-points-x: repeat(100%);
+  }
+
+  &::before, &::after {  //  Used for centering
     display: block;
     width: calc(50% - 510pt);  //  1020pt = 3 * width of column
+    min-width: 1px;  //  Ensures that the element renders
     content: "";
+  }
+
+  &::before {
+    margin-right: -1px;
+  }
+
+  &::after {
+    margin-left: -1px;
   }
 
   a[href] {
@@ -79,6 +102,7 @@ html, body {
     margin: .2em .4em;
     padding: 0;
     height: 1em;
+    vertical-align: middle;
     font-size: 1.2em;
     font-weight: 400;
 
@@ -89,37 +113,47 @@ html, body {
         color: inherit;
       }
     }
-  }
 
-  *.laboratory-avatar {
-    display: block;
-    margin: 0 .2em 0;
-    border-radius: .1em;
-    height: 1em;
-    width: 1em;
+    *.laboratory-avatar {
+      display: block;
+      margin: 0 .2em 0;
+      border-radius: .1em;
+      height: 1em;
+      width: 1em;
+    }
+
+    *.laboratory-displayname {
+      display: block;
+      font-size: .4em;
+      line-height: 1.2;
+
+      &:empty {
+        text-align: center;
+
+        &::after {
+          content: "———";
+        }
+      }
+    }
+
+    *.laboratory-username {
+      display: block;
+      font-size: .4em;
+      line-height: 1;
+    }
   }
 
   *.laboratory-displayname {
-    display: block;
-    font-size: .4em;
     font-weight: 700;
-    line-height: 1.2;
 
-    &:empty {
-      text-align: center;
-
-      &::after {
+    &:empty::after {
         content: "———";
-      }
     }
   }
 
   *.laboratory-username {
-    display: block;
     font-family: $laboratory-mono;
-    font-size: .4em;
     font-weight: 400;
-    line-height: 1;
 
     &::before {
       opacity: $laboratory-leadingCommAtOpacity;
@@ -168,8 +202,8 @@ html, body {
     }
 
     &.laboratory-button--minimal {
-      margin: 0 -.5em 0 .25em;
-      padding: .1em .125em;
+      margin: 0 -.375em 0 .25em;
+      padding: .1em 0;
       color: inherit;
       background-color: transparent;
 
@@ -177,6 +211,10 @@ html, body {
         margin: 0 .2em;
         border: none;
         cursor: not-allowed;
+      }
+
+      [data-laboratory-simple] & {
+        margin: 0 .25em;
       }
     }
   }
@@ -217,10 +255,10 @@ html, body {
     pointer-events: none;
     transition: opacity .25s;
     content: attr(aria-label);
+  }
 
-    &.laboratory-textbox--empty:not(:focus) {
-      opacity: 1;
-    }
+  *.laboratory-textbox[aria-label].laboratory-textbox--empty:not(:focus)::before {
+    opacity: 1;
   }
 
   *.laboratory-toggle {

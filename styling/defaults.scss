@@ -22,11 +22,16 @@ $laboratory-mono: "Inconsolata", "Courier Prime", monospace !default;
   These don't have to be plain colours if you don't want them to be.
 */
 
+$laboratory-queryBackground: linear-gradient(to top, $print_black 20%, $print_dim 80%) !default;
 $laboratory-background: $print_dim !default;
 
 /*  COLOURS  */
 
 $laboratory-backgroundColor: $print_dim !default;
+$laboratory-queryTextColor: $print_bright !default;
+$laboratory-queryTextMinor: $print_light !default;
+$laboratory-queryTextMajor: $print_white !default;
+$laboratory-queryMarkColor: $print_black !default;
 $laboratory-columnColor: $print_black !default;
 $laboratory-columnTextColor: $print_bright !default;
 $laboratory-columnAccentTextColor: $print_white !default;
@@ -38,6 +43,9 @@ $laboratory-cardAccentTextColor: $print_dark !default;
 $laboratory-cardHighlightColor: $print_white !default;
 $laboratory-cardHighlightTextColor: $print_dim !default;
 $laboratory-cardHighlightAccentTextColor: $print_medium !default;
+$laboratory-cardAsideColor: $print_dark !default;
+$laboratory-cardAsideTextColor: $print_light !default;
+$laboratory-cardAsideAccentTextColor: $print_bright !default;
 $laboratory-cardButtonColor: $print_white !default;
 $laboratory-cardButtonTextColor: $print_dark !default;
 $laboratory-cardButtonBorderColor: $print !default;

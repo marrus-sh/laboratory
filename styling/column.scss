@@ -2,25 +2,13 @@
   *.laboratory-column {
     display: block;
     position: relative;
-    flex: auto;
+    flex: 250pt 1 1;
     margin: 21pt 10pt 42pt;
     padding: 42pt 10pt 10.5pt;
     max-width: 300pt;
-    min-width: 180pt;
+    min-width: 225pt;
     color: $laboratory-columnTextColor;
     background-color: transparentize($laboratory-columnColor, 1 - $laboratory-columnBackgroundOpacity);
-    -ms-scroll-snap-type: proximity;
-    -webkit-scroll-snap-type: proximity;
-    scroll-snap-type: proximity;
-    -ms-scroll-snap-destination: 0% 100%;
-    -webkit-scroll-snap-destination: 0% 100%;
-    scroll-snap-destination: 0% 100%;
-    -ms-scroll-snap-points-x: repeat(100%);
-    -webkit-scroll-snap-points-x: repeat(100%);
-    scroll-snap-points-x: repeat(100%);
-    -ms-scroll-snap-align: center;
-    -webkit-scroll-snap-align: center;
-    scroll-snap-align: center;
 
     @media (max-width: 480px) {
       flex: none;
@@ -29,9 +17,6 @@
       width: calc(100vw - 30pt);
       max-width: none;
       min-width: 0;
-      -ms-scroll-snap-type: mandatory;
-      -webkit-scroll-snap-type: mandatory;
-      scroll-snap-type: mandatory;
     }
 
     *[data-laboratory-simple] & {
@@ -87,6 +72,12 @@
       margin-right: 5pt;
       width: 32pt;
     }
+  }
+
+  *.laboratory-posts {
+    height: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
   }
 
   *.laboratory-columnnav {
@@ -146,7 +137,7 @@
       background-color: $laboratory-columnColor;
     }
 
-    *.laboratory-heading {
+    *.laboratory-heading, *.laboratory-posts {
       opacity: $laboratory-notificationForegroundOpacity;
 
       *[data-laboratory-no_transparency] & {
@@ -186,19 +177,40 @@
       }
     }
 
+    aside {
+      margin: -7pt -5pt 7pt;
+      padding: 7pt 10pt;
+      color: $laboratory-cardAsideTextColor;
+      background-color: $laboratory-cardAsideColor;
+      font-size: 12pt;
+      font-weight: 300;
+
+      &::after {
+        content: ":"
+      }
+
+      a[href] {
+        color: $laboratory-cardAsideAccentTextColor;
+
+        &:hover {
+          color: inherit;
+        }
+      }
+    }
+
     header {
       margin: 0 0 7pt;
-
-      *.laboratory-idcard {
-        font-size: 30pt;
-        margin: 0;
-      }
 
       time {
         float: right;
         font-size: 12pt;
         font-weight: 300;
       }
+    }
+
+    *.laboratory-idcard {
+      font-size: 30pt;
+      margin: 0 .2em 0 0;
     }
 
     footer {
@@ -212,7 +224,7 @@
       overflow-x: auto;
       overflow-y: hidden;
       text-transform: uppercase;
-      font-size: 12pt;
+      font-size: 11pt;
 
       *.laboratory-buttoncontainer {
         flex: auto;
