@@ -31,7 +31,7 @@ We also get our redirect URI at this point.
         a = document.createElement("a")
         a.href = event.detail.url
         url = a.origin
-        a.href = @config.baseName
+        a.href = @config.baseName + "/"
         authURL = a.href
 
 Now we can send our request.
@@ -84,7 +84,7 @@ We also get our redirect URI at this point.
         a = document.createElement "a"
         a.href = event.detail.url
         url = a.origin
-        a.href = @config.baseName
+        a.href = @config.baseName + "/"
         authURL = a.href
 
 
