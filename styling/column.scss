@@ -75,7 +75,7 @@
   }
 
   *.laboratory-posts {
-    height: 100%;
+    height: calc(100vh - 157.5pt);  //  This *would* be `height: 100%;` but for some reason Safari refuses to respect that.
     overflow-x: hidden;
     overflow-y: auto;
   }
@@ -188,6 +188,19 @@
       &::after {
         content: ":"
       }
+
+      a[href] {
+        color: $laboratory-cardAsideAccentTextColor;
+
+        &:hover {
+          color: inherit;
+        }
+      }
+    }
+
+    &.laboratory-status--highlighted aside {
+      color: $laboratory-cardAsideTextColor;
+      background-color: $laboratory-cardAsideColor;
 
       a[href] {
         color: $laboratory-cardAsideAccentTextColor;

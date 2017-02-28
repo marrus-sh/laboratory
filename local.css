@@ -469,7 +469,7 @@ html, body {
     margin-right: 5pt;
     width: 32pt; }
 #laboratory-ui *.laboratory-posts {
-  height: 100%;
+  height: calc(100vh - 157.5pt);
   overflow-x: hidden;
   overflow-y: auto; }
 #laboratory-ui *.laboratory-columnnav {
@@ -548,6 +548,13 @@ html, body {
     #laboratory-ui *.laboratory-status aside a[href] {
       color: #dedbd9; }
       #laboratory-ui *.laboratory-status aside a[href]:hover {
+        color: inherit; }
+  #laboratory-ui *.laboratory-status.laboratory-status--highlighted aside {
+    color: #b8b3b0;
+    background-color: #57534c; }
+    #laboratory-ui *.laboratory-status.laboratory-status--highlighted aside a[href] {
+      color: #dedbd9; }
+      #laboratory-ui *.laboratory-status.laboratory-status--highlighted aside a[href]:hover {
         color: inherit; }
   #laboratory-ui *.laboratory-status header {
     margin: 0 0 7pt; }
