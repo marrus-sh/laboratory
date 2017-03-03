@@ -1,46 +1,88 @@
-#  `Laboratory.Events.Composer`  #
+#  COMPOSER EVENTS  #
 
-##  Usage  ##
+    Events.Composer = Object.freeze
 
->   ```javascript
->       //  Fires when the composer window should be displayed.
->       Composer.Request()
->       //  Fires when a media attachment is added.
->       Composer.Upload({file: …})
->       //  Fires when a status should be sent.
->       Composer.Post({text: …, message: …, makePublic: …, makeListed: …, makeNSFW: …})
->   ```
+The __Composer__ module of Laboratory Events is comprised of those events which are related to composing and posting statuses.
 
-##  Object Initialization  ##
+| Event / Builder | Description |
+| :-------------- | :---------- |
+| `LaboratoryComposerUploadRequested` / `Laboratory.Composer.UploadRequested` | Fires when a media file should be sent to the server |
+| `LaboratoryComposerUploadReceived` / `Laboratory.Composer.UploadReceived` | Fires when a media file has been received by the server |
+| `LaboratoryComposerRequested` / `Laboratory.Composer.Requested` | Registers a composer callback function |
+| `LaboratoryComposerPost` / `Laboratory.Composer.Post` | Fires when a post should be made to the server |
+| `LaboratoryComposerRemoved` / `Laboratory.Composer.Removed` | Asks to remove a composer callback function |
 
-    Laboratory.Events.Composer = {}
+##  `LaboratoryComposerUploadRequested`  ##
 
-##  Events  ##
+>   - __Builder :__ `Laboratory.Composer.UploadRequested`
+>   - __Properties :__
+>       - `file` – The file which should be uploaded.
 
-###  `Composer.Request`:
+        UploadRequested: new Constructors.LaboratoryEvent 'LaboratoryComposerUploadRequested',
+            file: null
 
-The `Composer.Request` event doesn't have any properties.
+The `LaboratoryComposerUploadRequested` event sends a `file` to the Mastodon server for uploading.
 
-    Laboratory.Events.Composer.Request = Laboratory.Events.newBuilder "LaboratoryComposerRequest"
+##  `LaboratoryComposerUploadReceived`  ##
 
-###  `Composer.Upload`:
+>   - __Builder :__ `Laboratory.Composer.UploadReceived`
+>   - __Properties :__
+>       - `data` – The response from the server.
 
-The `Composer.Upload` event has one property: the `file` to upload.
+        UploadReceived: new Constructors.LaboratoryEvent 'LaboratoryComposerUploadReceived',
+            data: null
 
-    Laboratory.Events.Composer.Upload = Laboratory.Events.newBuilder 'LaboratoryComposerUpload',
-        file: null
+The `LaboratoryComposerUploadReceived` fires when an upload has been received by the Mastodon server, and its `data` contains the server's response.
+The handler for `LaboratoryComposerUploadReceived` will call any composer callbacks with an immutable `Laboratory.MediaAttachment` object with the following properties:
 
-###  `Composer.Post`:
+| Property  | API Response  | Description |
+| :-------: | :-----------: | :---------- |
+|   `id`    |     `id`      | The id of the media attachment |
+|  `href`   |     `url`     | The url of the media attachment |
+| `preview` | `preview_url` | The url of a preview for the media attachment |
+|  `type`   |    `type`     | Either `Laboratory.MediaType.PHOTO` (for a photo attachment) or `Laboratory.MediaType.VIDEO` (for a video attachment) |
 
-The `Composer.Post` event has several properties: the `text` of the status to post; its associated `message`, if any; and whether to `makePublic`, `makeListed`, or `makeNSFW`.
+##  `LaboratoryComposerRequested`:  ##
 
-    Laboratory.Events.Composer.Post = Laboratory.Events.newBuilder "LaboratoryComposerPost",
-        text: ""
-        message: null
-        makePublic: false
-        makeListed: false
-        makeNSFW: true
+>   - __Builder :__ `Laboratory.Composer.Requested`
+>   - __Properties :__
+>       - `callback` – The callback to associate with the composer.
 
-##  Object Freezing  ##
+        ComposerRequested: new Constructors.LaboratoryEvent 'LaboratoryComposerRequested',
+            file: null
 
-    Object.freeze Laboratory.Events.Composer
+The `LaboratoryComposerRequested` event requests an association between composer events and a provided `callback`.
+This `callback` will receive media uploads from the handler for `LaboratoryComposerUploadReceived`; see the description of that event for more information.
+
+##  `LaboratoryComposerPost`  ##
+
+>   - __Builder :__ `Laboratory.Composer.Post`
+>   - __Properties :__
+>       - `text` – The text of the post.
+>       - `message` – A message to hide the post behind.
+>       - `makePublic` – Whether to make the post public.
+>       - `makeListed` – Whether to make the post listed.
+>       - `makeNSFW` – Whether to mark the post's media as sensitive.
+
+        Post: new Constructors.LaboratoryEvent "LaboratoryComposerPost",
+            text: ""
+            inReplyTo: null
+            mediaAttachments: null
+            message: null
+            makePublic: false
+            makeListed: false
+            makeNSFW: true
+
+The `LaboratoryComposerPost` event sends a post to the server.
+
+##  `LaboratoryComposerRemove`  ##
+
+>   - __Builder :__ `Laboratory.Composer.Remove`
+>   - __Properties :__
+>       - `callback` – The callback to disassociate from the composer.
+
+        Remove: new Constructors.LaboratoryEvent 'LaboratoryComposerRemove',
+            callback: null
+
+The `LaboratoryComposerRemove` event requests that an association between composer events and the given `callback` be broken.
+If no association has been made, the handler for this event does nothing.

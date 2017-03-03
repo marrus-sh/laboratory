@@ -1,82 +1,72 @@
 #  LABORATORY  #
 
-A custom frontend for **Mastodon/Ardipithecus**.
-Inspired by the original Mastodon frontend, but completely rewritten.
+__Laboratory__ is a client-side engine for interfacing with the API of [__Mastodon__](https://github.com/tootsuite/mastodon), a free and open-source social networking server.
+Laboratory pulls and stores data from a Mastodon server and makes it accessible to frontends through its __Event API.__
+Check out the __[source code](src)__ for more information on Laboratory and how to use it.
+Or, you can read more about the principles behind Laboratory below:
 
-Read the [docs](docs) for more information.
+##  Principles  ##
 
-##  Implementation Roadmap  ##
+ -  __Abstraction of API and data storage.__
+    Laboratory does not make its internal storage mechanisms available to users, and data is only accessible through its event interface.
+    This allows multiple components to share the same Laboratory store without conflicting with each other's operation.
 
-###  Features:
+ -  __Asynchronous, event-based operation.__
+    Because much of Laboratory's operation involves making requests to an external server, asynchronous operation is a given.
+    However, because Laboratory routes all its behaviour through events and their handlers, multiple components can easily pick up on and share the same data.
 
-- [x]  Column layout
-- [x]  Timeline columns
-- [x]  Notifications columns
-- [x]  "Getting Started" column
-- [x]  "Not found" column
-- [x]  Compose module
-- [x]  Account module
-- [x]  Column posts
-- [x]  Column notifications
-- [x]  Showing post relationships
-- [x]  Compiled version
-- [x]  Standalone functionality (?!)
-- [x]  Unhosted version
-- [ ]  Status module
-- [ ]  Hiding posts behind messages
-- [ ]  Media support
-- [ ]  Sensitive content support
-- [ ]  Post threads
-- [ ]  Handling multiple reblogs of the same post (? is this a backend issue?)
-- [ ]  Confirm? button
-- [ ]  Error messages
-- [ ]  Loading bar
-- [ ]  "Default privacy"
-- [ ]  Updating timelines and notifications
-- [ ]  Loading more from timelines and notifications
-- [ ]  Add "settings" button to profile card
-- [ ]  Logging off
-- [ ]  WebSockets support
-- [ ]  Eliminate interfaces by using events and placing handlers on components (?? if possible)
-- [ ]  Visually distinguish locked accounts
-- [ ]  Simplified colour specification
-- [ ]  Documentation!
+ -  __Literate, readable source code.__
+    Laboratory is written using __Literate CoffeeScript,__ which makes reading through its source code a breeze.
+    Each source file can be viewed in any Markdown reader, including directly from its hosted location on GitHub.
 
-###  API Support:
+ -  __Compatibility with frontend frameworks like React.__
+    Laboratory wouldn't be very useful if you couldn't use it to make stuff in your project.
+    It has been designed with technologies like React in mind, to make operation as seamless as possible.
 
-####  OAUTH.
+##  API Quick Reference  ##
 
-- [x]  OAuth client registration
-- [x]  OAuth authentication
+>  Current version: *0.1.0*
 
-####  GET.
+| Mastodon API Equivalent | Making a request | Listening for a response |
+| --- | --- | --- |
+| [**Initialization**](src/Events/Initialization.litcoffee) |  |  |
+| *No equivalent* | *N/A* | `LaboratoryInitializationLoad`
+| *No equivalent* | *N/A* | `LaboratoryInitializationReady`
+| [**Authorization**](src/Events/Authorization.litcoffee) |  |  |
+| `/api/v1/apps` | `LaboratoryAuthorizationClientRequested` | `LaboratoryAuthorizationClientReceived` |
+| `/oauth/token` | `LaboratoryAuthorizationRequested` | `LaboratoryAuthorizationReceived` |
+| `/api/v1/accounts/verify_credentials` | *N/A* | `LaboratoryAuthorizationVerified` |
+| `/api/v1/favourites` | `LaboratoryAuthorizationFavourites` | *N/A* |
+| `/api/v1/blocks` | `LaboratoryAuthorizationBlocks` | *N/A* |
+| [**Account**](src/Events/Account.litcoffee) |  |  |
+| `/api/v1/accounts/relationships` | `LaboratoryAccountRelationshipsRequested` | `LaboratoryAccountRelationshipsReceived` |
+| `/api/v1/accounts/:id` | `LaboratoryAccountRequested` | `LaboratoryAccountReceived` |
+| *No equivalent* | `LaboratoryAccountRemoved` | *N/A*  |
+| `/api/v1/accounts/:id/followers` | `LaboratoryAccountFollowers` | *N/A* |
+| `/api/v1/accounts/:id/following` | `LaboratoryAccountFollowing` | *N/A* |
+| `/api/v1/accounts/search` | `LaboratoryAccountSearch` | *N/A* |
+| `/api/v1/accounts/follow`, `/api/v1/accounts/unfollow` | `LaboratoryAccountFollow` | *N/A* |
+| `/api/v1/accounts/block`, `/api/v1/accounts/unblock` | `LaboratoryAccountBlock` | *N/A* |
+| [**Timeline**](src/Events/Timeline.litcoffee) |  |  |
+| `/api/v1/timelines/home`, `/api/v1/timelines/public`, `/api/v1/timelines/tag/:hashtag`, `/api/v1/notifications/` | `LaboratoryTimelineRequested` | `LaboratoryTimelineReceived` |
+| *No equivalent* | `LaboratoryTimelineRemoved` | *N/A*  |
+| [**Status**](src/Events/Status.litcoffee) |  |  |
+| `/api/v1/statuses/:id` | `LaboratoryStatusRequested`, `LaboratoryStatusDeletion` | `LaboratoryStatusReceived` |
+| `/api/v1/statuses/:id/reblogged_by` | `LaboratoryStatusReblogs` | *N/A* |
+| `/api/v1/statuses/:id/favourited_by` | `LaboratoryStatusFavourites` | *N/A* |
+| `/api/v1/statuses/:id/reblog`, `/api/v1/statuses/:id/unreblog` | `LaboratoryStatusSetReblog` | *N/A* |
+| `/api/v1/statuses/:id/favourite`, `/api/v1/statuses/:id/unfavourite` | `LaboratoryStatusSetFavourite` | *N/A* |
+| [**Composer**](src/Events/Composer.litcoffee) |  |  |
+| `/api/v1/media` | `LaboratoryComposerUploadRequested` | `LaboratoryComposerUploadReceived` |
+| *No equivalent* | `LaboratoryComposerRequested` | *N/A* |
+| `/api/v1/statuses` | `LaboratoryComposerPost` | *N/A* |
+| *No equivalent* | `LaboratoryComposerRemoved` | *N/A* |
 
-- [x]  Getting accounts
-- [x]  Getting account relationships
-- [x]  Getting timelines
-- [x]  Getting notifications
-- [ ]  Getting individual posts
-- [ ]  Getting a thread of posts
-- [ ]  Getting reblogs/favourites for a post
-- [ ]  Getting a user's follows
-- [ ]  Getting the people following a user
-- [ ]  Searching for content
-- [ ]  Getting an account's blocks
+<!-- Uncomment once labcoat actually gets made lol
 
-####  POST.
+##  Labcoat  ##
 
-- [ ]  Uploading media
-- [ ]  Posting new statuses
-- [ ]  Favouriting
-- [ ]  Unfavouriting
-- [ ]  Reblogging
-- [ ]  Unreblogging
-- [ ]  Following a user
-- [ ]  Unfollowing a user
-- [ ]  Blocking a user
-- [ ]  Unblocking a user
-- [ ]  Clearing notifications
+[__Labcoat__](https://github.com/marrus-sh/labcoat) is a sample frontend built with Laboratory.
+Take a look if you want to see what this framework can do!
 
-####  DELETE.
-
-- [ ]  Deleting a status
+-->

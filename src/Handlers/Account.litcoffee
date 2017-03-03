@@ -1,200 +1,187 @@
-#  `Laboratory.Handlers.Account`  #
+#  ACCOUNT HANDLERS  #
 
-##  Coverage  ##
+    Handlers.Account = Object.freeze
 
-**The following events from `Account` have handlers:**
+##  `LaboratoryAccountRelationshipsRequested`  ##
 
-- `Account.Requested`
-- `Account.Received`
-- `Account.Removed`
+When an account's relationships are requested, we just forward the request to the server, with `Events.RelationshipsReceived()` as our callback.
 
-##  Object Initialization  ##
+        RelationshipsRequested: handle Events.Account.RelationshipsRequested, (event) ->
+            return unless isFinite id = Number event.detail.id
+            serverRequest "GET", @auth.api + "/accounts/relationships?id=" + id, null, @auth.accessToken, Events.Account.RelationshipsReceived
+            return
 
-    Laboratory.Handlers.Account = {}
+##  `LaboratoryAccountRelationshipsReceived`  ##
 
-##  Handlers  ##
+When an account's relationships are received, we need to update the related accounts to reflect this.
+We also call any related callbacks with the new information.
 
-###  `Account.Requested`
+        RelationshipsReceived: handle Events.Account.RelationshipsReceived, (event) ->
 
-We have two things that we need to do when an account is requested: query the server for its information, and hold onto the component requesting access.
-We hold those here.
+            return unless (data = event.detail.data) instanceof Array
 
-    Laboratory.Handlers.Account.Requested = (event) ->
+            for relationships in data
+                continue unless isFinite(id = Number relationships.id) and @accounts[id]?
+                relationship = Enumerals.Relationship.byValue(
+                    Enumerals.Relationship.FOLLOWED_BY * relationships.followed_by +
+                    Enumerals.Relationship.FOLLOWING * relationships.following +
+                    Enumerals.Relationship.REQUESTED * relationships.requested +
+                    Enumerals.Relationship.BLOCKING * relationships.blocking +
+                    Enumerals.Relationship.SELF * (relationships.id is @auth.me)
+                ) || Enumerals.Relationship.UNKNOWN
+                if @accounts[id].relationship isnt relationship
+                    @accounts[id] = new Constructors.Profile @accounts[id], @auth.origin, relationship
+                    continue unless @interfaces.accounts[id]?
+                    callback @accounts[id] for callback in @interfaces.accounts[id]
 
-        return unless event? and this? and event.type is Laboratory.Handlers.Account.Requested.type
+            return
 
-We'll let `attributes` store the various attributes expected from the JSON response, so we can easily iterate over them.
+##  `LaboratoryAccountRequested`  ##
 
-        attributes = [
-            "id"
-            "username"
-            "acct"
-            "display_name"
-            "note"
-            "url"
-            "avatar"
-            "header"
-            "locked"
-            "followers_count"
-            "following_count"
-            "statuses_count"
-        ]
+We have two things that we need to do when an account is requested: query the server for its information, and hold onto the callback requesting access.
+We do those here.
 
-The `interfaces.accounts` object will store our account components, organized by the account ids.
-We need to create an array to store our component in if one doesn't already exist:
+        Requested: handle Events.Account.Requested, (event) ->
 
-        Object.defineProperty @interfaces.accounts, event.detail.id, {value: [], enumerable: true} unless @interfaces.accounts[event.detail.id] instanceof Array
+            return unless isFinite id = Number event.detail.id
+            callback = null unless typeof (callback = event.detail.callback) is "function"
 
-We can now add our component.
+The `interfaces.accounts` object will store our account callbacks, organized by the account ids.
+We need to create an array to store our callback in if one doesn't already exist:
 
-        @interfaces.accounts[event.detail.id].push event.detail.component if event.detail.component?
+            Object.defineProperty @interfaces.accounts, id, {value: [], enumerable: yes} unless @interfaces.accounts[id] instanceof Array
 
-If we already have information on this account loaded into our store, we can pre-fill the component with that information.
-We pass our information as a frozen shallow clone of `accounts[id]` in our store.
+We can now add our callback, if applicable.
 
-        if @accounts[event.detail.id]
-            stateData = {}
-            stateData[attribute] = @accounts[event.detail.id][attribute] for attribute in attributes
-            event.detail.component.setState {account: Object.freeze stateData}
+            @interfaces.accounts[id].push callback unless not callback? or callback in @interfaces.accounts[id]
+
+If we already have information on this account loaded into our store, we can send the callback that information right away.
+Note that accounts are stored as immutable objects.
+
+            callback @accounts[id] if @accounts[id] and callback?
 
 Next, we send the request.
-Upon completion, it should trigger an `Account.Received` event so that we can handle the data.
+Upon completion, it should trigger an `LaboratoryAccountReceived` event so that we can handle the data.
 
-        Laboratory.Functions.requestFromAPI @auth.api + "/accounts/" + event.detail.id, @auth.accessToken, Laboratory.Events.Account.Received
+            serverRequest "GET", @auth.api + "/accounts/" + id, null, @auth.accessToken, Events.Account.Received
 
-We also send a request asking for the user's relationship to the account, so that we know whether we should display "Follow", "Unfollow", or "Block".
+We also need to request the user's relationship to the account, since that doesn't come with our first request.
+We can do that with a `LaboratoryAccountRelationshipsRequested` event.
 
-        Laboratory.Functions.requestFromAPI @auth.api + "/accounts/relationships?id=" + event.detail.id, @auth.accessToken, Laboratory.Events.Account.RelationshipsReceived
+            LaboratoryAccountRelationshipsRequested {id}
 
-        return
+            return
 
-    Laboratory.Handlers.Account.Requested.type = Laboratory.Events.Account.Requested.type
-    Object.freeze Laboratory.Handlers.Account.Requested
+##  `LaboratoryAccountReceived`  ##
 
-###  `Account.Received`
+When an account's data is received, we need to update its information both inside our store, and with any callbacks which might also be depending on it.
 
-When an account's data is received, we need to update its information both inside our store, and in any components which might also be using it.
+        Received: handle Events.Account.Received, (event) ->
 
-    Laboratory.Handlers.Account.Received = (event) ->
+            return unless (data = event.detail.data) instanceof Object and isFinite id = Number data.id
 
-        return unless event? and this? and event.type is Laboratory.Handlers.Account.Received.type
+Right away, we can generate a `Profile` from our `data`.
 
-We'll let `attributes` store the various attributes expected from the JSON response, so we can easily iterate over them.
+            profile = new Constructors.Profile data
 
-        attributes = [
-            "id"
-            "username"
-            "acct"
-            "display_name"
-            "note"
-            "url"
-            "avatar"
-            "header"
-            "locked"
-            "followers_count"
-            "following_count"
-            "statuses_count"
-        ]
+If we already have a profile associated with this account id, then we need to check if anything has changed.
+If it hasn't, we have nothing more to do.
 
-The account `data` lives in `event.detail.data`, and the copy that we'll pass to our components we'll store in `stateData`.
-There are two possible cases:
-We already have the account loaded, or we don't.
-If the account is already loaded, then we need to update its data; if it isn't, then we need to create it.
+            return if @accounts[id] and profile.compare @accounts[id]
 
-        data = event.detail.data
-        return unless data instanceof Object
-        stateData = {}
+Otherwise, something has changed.
+We overwrite the previous data and fire all of our associated callback functions.
 
-When updating previous data, we should keep track if any of it has changed.
-If not, then we don't need to update our related components.
-As we're checking this, let's start copying information into `stateData` just in case.
+            @accounts[id] = profile
+            return unless @interfaces.accounts[id]?
+            callback @accounts[id] for callback in @interfaces.accounts[id]
 
-        if @accounts[data.id]
-            hasChanged = false
-            for attribute in attributes
-                stateData[attribute] = data[attribute]
-                if @accounts[data.id][attribute] isnt data[attribute]
-                    @accounts[data.id][attribute] = data[attribute]
-                    hasChanged = true
+            return
 
-Of course, if we're creating the data fresh, it obviously has changed.
-We use `Object.defineProperty` and `Object.seal` to keep our data safe.
+##  `LaboratoryAccountRemoved`  ##
 
-        else
-            Object.defineProperty @accounts, data.id,
-                value: Object.seal do (data, stateData, attributes) ->
-                    newData = {}
-                    stateData[attribute] = newData[attribute] = data[attribute] for attribute in attributes
-                    return newData
-                enumerable: true
-            hasChanged = true
+`LaboratoryAccountRemoved` has a much simpler handler than our previous two:
+We just look for the provided callback, and remove it from our account interface if it exists.
 
-If our values changed, we should iterate over our components and feed them the new account data.
+        Removed: handle Events.Account.Removed, (event) ->
 
-        if hasChanged and (@interfaces.accounts[data.id] instanceof Array)
-            component.setState {account: Object.freeze stateData} for component in @interfaces.accounts[data.id]
+Of course, if we don't have any callbacks assigned to the provided id, we can't do anything.
 
-        return
+            return unless isFinite(id = Number event.detail.id) and typeof (callback = event.detail.callback) is "function" and @interfaces.accounts[id] instanceof Array
 
-    Laboratory.Handlers.Account.Received.type = Laboratory.Events.Account.Received.type
-    Object.freeze Laboratory.Handlers.Account.Received
+This iterates over our callbacks until we find the right one, and removes it from the array.
 
-##  `Account.RelationshipsReceived`  ##
-
-When an account's relationships are received, we need to update our related components to reflect this.
-We don't keep track of relationships in our store since it is rare we need to access more than one of them at a given time.
-
-    Laboratory.Handlers.Account.RelationshipsReceived = (event) ->
-
-        return unless event? and this? and event.type is Laboratory.Handlers.Account.RelationshipsReceived.type
-
-        return unless event.detail.data instanceof Array
-
-        for relationship in event.detail.data
-            continue unless @interfaces.accounts[relationship.id] instanceof Array
-            for account in @interfaces.accounts[relationship.id]
-                account.setState
-                    relationship: switch
-                        when relationship.id is @auth.me then Laboratory.Symbols.Relationships.SELF
-                        when relationship.blocking then Laboratory.Symbols.Relationships.BLOCKING
-                        when relationship.following and relationship.followed_by then Laboratory.Symbols.Relationships.MUTUALS
-                        when relationship.following then Laboratory.Symbols.Relationships.FOLLOWING
-                        when relationship.followed_by then Laboratory.Symbols.Relationships.FOLLOWED_BY
-                        when relationship.requested and relationship.followed_by then Laboratory.Symbols.Relationships.REQUESTED_MUTUALS
-                        when relationship.requested then Laboratory.Symbols.Relationships.REQUESTED
-                        else Laboratory.Symbols.Relationships.NOT_FOLLOWING
-
-        return
-
-    Laboratory.Handlers.Account.RelationshipsReceived.type = Laboratory.Events.Account.RelationshipsReceived.type
-    Object.freeze Laboratory.Handlers.Account.RelationshipsReceived
-
-##  `Account.Removed`  ##
-
-`Account.Removed` has a much simpler handler than our previous two:
-We just look for the provided component, and remove it from our account interface.
-
-    Laboratory.Handlers.Account.Removed = (event) ->
-
-        return unless event? and this? and event.type is Laboratory.Handlers.Account.Removed.type
-
-Of course, if we don't have any components assigned to the provided id, we can't do anything.
-
-        return unless @interfaces.accounts[event.detail.id] instanceof Array
-
-This iterates over our components until we find the right one, and removes it from the array.
-
-        index = 0;
-        index++ until @interfaces.accounts[event.detail.id][index] = event.detail.component or index >= @interfaces.accounts[event.detail.id].length
-        @interfaces.accounts[event.detail.id].splice index, 1
+            index = 0;
+            index++ until @interfaces.accounts[id][index] is callback or index >= @interfaces.accounts[id].length
+            @interfaces.accounts[id].splice index, 1
 
 …And we're done!
 
-        return
+            return
 
-    Laboratory.Handlers.Account.Removed.type = Laboratory.Events.Account.Removed.type
-    Object.freeze Laboratory.Handlers.Account.Removed
+##  `LaboratoryAccountFollowers`  ##
 
-##  Object Freezing  ##
+When a `LaboratoryAccountFollowers` event is fired, we simply petition the server for a list of followers and pass this to our callback.
+We wrap the callback in a function which formats the follower list for us.
 
-    Object.freeze Laboratory.Handlers.Account
+        Followers: handle Events.Account.Followers, (event) ->
+
+            return unless isFinite(id = Number event.detail.id) and typeof (callback = event.detail.callback) is "function"
+
+            query = ""
+            query += "?max_id=" + Number event.detail.before if isFinite event.detail.before
+            query += (if query then "&" else "?") + "since_id=" + Number event.detail.after if isFinite event.detail.after
+
+            serverRequest "GET", @auth.api + "/accounts/" + id + "/followers" + query, null, @auth.accessToken, (response) -> callback(Constructors.Profile(data) for data in response.data)
+
+##  `LaboratoryAccountFollowing`  ##
+
+When a `LaboratoryAccountFollowing` event is fired, we simply petition the server for a list of people following the user and pass this to our callback.
+We wrap the callback in a function which formats the list for us.
+
+        Following: handle Events.Account.Following (event) ->
+
+            return unless isFinite(id = Number event.detail.id) and typeof (callback = event.detail.callback) is "function"
+
+            query = ""
+            query += "?max_id=" + Number event.detail.before if isFinite event.detail.before
+            query += (if query then "&" else "?") + "since_id=" + Number event.detail.after if isFinite event.detail.after
+
+            serverRequest "GET", @auth.api + "/accounts/" + id + "/following" + query, null, @auth.accessToken, (response) -> callback(Constructors.Profile(data) for data in response.data)
+
+##  `LaboratoryAccountSearch`  ##
+
+When a `LaboratoryAccountSearch` event is fired, we send the server a user search query and pass this to our callback.
+We wrap the callback in a function which formats the list of results for us.
+
+        Search: handle Events.Account.Search, (event) ->
+
+            return unless isFinite(id = Number event.detail.id) and typeof (callback = event.detail.callback) is "function"
+
+            query = ""
+            query += "?q=" + event.detail.query if event.detail.query
+            query += (if query then "&" else "?") + "limit=" + Number event.detail.limit if isFinite event.detail.limit
+
+            serverRequest "GET", @auth.api + "/accounts/" + id + "/search" + query, null, @auth.accessToken, (response) -> callback(Constructors.Profile(data) for data in response.data)
+
+##  `LaboratoryAccountFollow`  ##
+
+When a `LaboratoryAccountFollow` event is fired, we send the server a request to follow/unfollow the specified user.
+We issue `Events.Account.RelationshipsReceived()` as our callback function, since the result of this request should be an object giving the account's updated relationship to the user.
+
+        Follow: handle Events.Account.Follow, (event) ->
+
+            return unless isFinite(id = Number event.detail.id)
+
+            serverRequest "POST", @auth.api + "/accounts/" + id + (if event.detail.value then "/follow" else "/unfollow"), null, @auth.accessToken, Events.Account.RelationshipsReceived
+
+##  `LaboratoryAccountBlock`  ##
+
+When a `LaboratoryAccountBlock` event is fired, we send the server a request to block/unblock the specified user.
+We issue `Events.Account.RelationshipsReceived()` as our callback function, since the result of this request should be an object giving the account's updated relationship to the user.
+
+        Block: handle Events.Account.Block, (event) ->
+
+            return unless isFinite(id = Number event.detail.id)
+
+            serverRequest "POST", @auth.api + "/accounts/" + id + (if event.detail.value then "/block" else "/unblock"), null, @auth.accessToken, Events.Account.RelationshipsReceived

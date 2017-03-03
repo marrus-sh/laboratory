@@ -1,80 +1,76 @@
-#  `Laboratory.Events.Timeline`  #
+#  TIMELINE EVENTS  #
 
-##  Usage  ##
+    Events.Timeline = Object.freeze
 
->   ```javascript
->       //  Fires when a new timeline is requested:
->       Timeline.Requested({name: …, component: …, before: …, since: …})
->       //  Fires when a timeline is received:
->       Timeline.Received({data: …, prev: …, next: …, params: …})
->       //  Fires when a timeline is removed:
->       Timeline.Removed({name: …, component: …})
->       //  Fires when a status is added to the stream:
->       Timeline.StatusLoaded({stream: …, payload: …})
->       //  Fires when a status is deleted from the stream:
->       Timeline.StatusDeleted({stream: …, payload: …})
->   ```
->   - **`stream` :** A string identifying the stream which triggered the event.
->   - **`payload` :** The payload associated with the event.
->   - **`name` :** The name of the timeline.
->   - **`component` :** A timeline component.
->   - **`before` :** Only show posts younger than this ID.
->   - **`since` :** Only show posts older than this ID.
->   - **`data` :** The JSON timeline data.
->   - **`prev` :** The url for the previous page of the request.
->   - **`next` :** The url for the next page of the request.
->   - **`params` :** Parameters passed through the request.
+The __Timeline__ module of Laboratory Events is comprised of those events which are related to Mastodon timelines.
+Laboratory makes no external distinction between timelines of statuses and timelines of notifications, and you can use these events to interface with both.
 
-##  Object Initialization  ##
+| Event / Builder | Description |
+| :-------------- | :---------- |
+| `LaboratoryTimelineRequested` / `Laboratory.Timeline.Requested` | Fires when a connection to a timeline is requested |
+| `LaboratoryTimelineReceived` / `Laboratory.Timeline.Received` | Fires when information posts from a timeline have been received from the server. |
+| `LaboratoryTimelineRemoved` / `Laboratory.Timeline.Removed` | Fires when a connection to a timeline should be removed |
 
-    Laboratory.Events.Timeline = {}
+##  `LaboratoryTimelineRequested`  ##
 
-##  Events  ##
+>   - __Builder :__ `Laboratory.Timeline.Requested`
+>   - __Properties :__
+>       - `name` – The name of the timeline.
+>       - `callback` – The callback to associate with the timeline.
+>       - `before` – The status id at which to end the timeline request.
+>       - `after` – The status id at which to start the timeline request.
 
-###  `Timeline.Requested`:
+        Requested: new Constructors.LaboratoryEvent 'LaboratoryTimelineRequested',
+            name: null
+            callback: null
+            before: null
+            after: null
 
-The `Timeline.Requested` event has two properties: the `name` of the requested timeline and the `component` that it will be rendered in.
+The `LaboratoryTimelineRequested` event requests a timeline's data, and associates a `callback` function to be called when the data is received.
+You can optionally specify the range to pull the timeline from with `before` and `after`.
 
-    Laboratory.Events.Timeline.Requested = Laboratory.Events.newBuilder 'LaboratoryTimelineRequested',
-        name: null
-        component: null
-        before: null
-        since: null
+The `name` sent with the event is used to determine which timeline to fetch, and must take one of the following values:
 
-###  `Timeline.Received`:
+- __`home` :__ Retrieves the user's home timeline.
+- __`community` :__ Retrieves the local timeline.
+- __`global` :__ Retrieves the global timeline.
+- __`hashtag/…` :__ Retrieves the given hashtag.
+- __`user/…` :__ Retrieves the timeline for the given user.
+- __`notifications` :__ Retrieves the user's notifications timeline.
 
-The `Timeline.Received` event has one property: the `data` of the response.
+Timeline data is sent to callbacks via an immutable object with two properties.
+The first, `postOrder`, is an array of the ids of every post in the timeline, in order from newest to oldest.
+The second, `posts`, is an object whose properties are post ids and whose values are either [`Laboratory.Post`](../Constructors/Post.litcoffee) objects or (in the case of a notifications timeline) [`Laboratory.Follow`](../Constructors/Follow.litcoffee) objects.
 
-    Laboratory.Events.Timeline.Received = Laboratory.Events.newBuilder 'LaboratoryTimelineReceived',
-        data: null
-        prev: null
-        next: null
-        params: null
+##  `LaboratoryTimelineReceived`  ##
 
-###  `Timeline.Removed`:
+>   - __Builder :__ `Laboratory.Timeline.Received`
+>   - __Properties :__
+>       - `data` – The response from the server.
+>       - `params` – Parameters passed through from the request.
 
-The `Timeline.Removed` event has two properties: the `name` of the timeline and the `component` that was removed.
+        Received: new Constructors.LaboratoryEvent 'LaboratoryTimelineReceived',
+            data: null
+            params: null
 
-    Laboratory.Events.Timeline.Removed = Laboratory.Events.newBuilder 'LaboratoryTimelineRemoved',
-        name: null
-        component: null
+The `LaboratoryTimelineReceived` event contains the server's response to a request for timeline data.
+This data will be processed by the handler and sent to the associated callbacks, so it is unlikely you will need to interface with this event yourself.
+The name of the timeline (see above) is stored in `params.name`, and the timeline data is stored as described in `data`.
 
-###  `Timeline.StatusLoaded`:
+When a timeline's data is processed, any embedded accounts will be dispatched to `LaboratoryAccountReceived`.
+These will not necessarily be available in time for the callback itself (which is executed synchronously), but should be available in time for any asynchronous calls that the callback might trigger; for example, a call to the renderer.
 
-The `Timeline.StatusLoaded` event has two properties: the `stream` it was fired from, and the `payload` it was issued with.
+##  `LaboratoryTimelineRemoved`  ##
 
-    Laboratory.Events.Timeline.StatusLoaded = Laboratory.Events.newBuilder 'LaboratoryTimelineStatusLoaded',
-        stream: null
-        payload: null
+>   - __Builder :__ `Laboratory.Timeline.Removed`
+>   - __Properties :__
+>       - `name` – The name of the timeline.
+>       - `callback` – The callback to remove from the timeline.
 
-###  `Timeline.StatusDeleted`:
+        Removed: new Constructors.LaboratoryEvent 'LaboratoryTimelineRemoved',
+            name: null
+            callback: null
 
-The `Timeline.StatusDeleted` event has two properties: the `stream` it was fired from, and the `payload` it was issued with.
-
-    Laboratory.Events.Timeline.StatusDeleted = Laboratory.Events.newBuilder 'LaboratoryTimelineStatusDeleted',
-        stream: null
-        payload: null
-
-##  Object Freezing  ##
-
-    Object.freeze Laboratory.Events.Timeline
+The `LaboratoryTimelineRemoved` event requests that a callback be removed from a timeline.
+Unlike with accounts, timelines *must* have at least one callback associated with them or else their data will be deleted to free up memory.
+Of course, this data can always be re-requested from the server at a later time.
