@@ -25,7 +25,7 @@ Or, you can read more about the principles behind Laboratory below:
 
 ##  API Quick Reference  ##
 
->  Current version: *0.1.0*
+>  Current version: *0.2.0*
 
 | Mastodon API Equivalent | Making a request | Listening for a response |
 | --- | --- | --- |

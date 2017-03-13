@@ -58,7 +58,7 @@ We set the relationship last, overwriting any previous relationship if one is pr
 This code will coerce the provided relationship into an Number and then back to an enumeral if possible.
 Note that because enumerals are objects, they will always evaluate to `true` even if their value is `0x00`.
 
-        @relationship = Enumerals.Relationship.byValue(relationship) || @relationship if relationship?
+        @relationship = Enumerals.Relationship.fromValue(relationship) || @relationship if relationship?
 
         return Object.freeze this
 

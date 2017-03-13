@@ -19,7 +19,7 @@ We also get our redirect URI at this point.
 
 Now we can send our request.
 
-            serverRequest "POST", url + "/api/v1/apps", "client_name=" + encodeURIComponent(String(event.detail.name).replace " ", "+") + "&redirect_uris=" + encodeURIComponent(authURL) + "&scopes=read+write+follow", null, Events.Authorization.ClientReceived, {url, redirect: authURL}
+            serverRequest "POST", url + "/api/v1/apps", "client_name=" + encodeURIComponent(String(event.detail.name).replace " ", "+") + "&redirect_uris=" + encodeURIComponent(authURL) + "&scopes=read+write+follow", null, Events.Authorization.ClientReceived.dispatch, {url, redirect: authURL}
 
             return
 
@@ -32,7 +32,7 @@ It then fires `LaboratoryAuthorizationRequested` to attempt to authenticate the 
 
             localStorage.setItem "Laboratory | " + event.detail.params.url, event.detail.params.redirect + " " + event.detail.data.client_id + " " + event.detail.data.client_secret
 
-            Events.Authorization.Requested
+            Events.Authorization.Requested.dispatch
                 url: event.detail.params.url
                 redirect: event.detail.params.redirect
 
@@ -56,10 +56,10 @@ We also get our redirect URI at this point.
 
 If we don't have a client id or secret we need to get one.
 
-            if localStorage.getItem("Laboratory | " + url) then [redirect, clientID, clientSecret] = localStorage.getItem(url).split " ", 3
+            if localStorage.getItem("Laboratory | " + url) then [redirect, clientID, clientSecret, accessToken] = localStorage.getItem("Laboratory | " + url).split " ", 4
 
             unless (redirect and not event.detail.redirect? or redirect is authURL) and clientID? and clientSecret?
-                Events.Authorization.ClientRequested {url, name: event.detail.name}
+                Events.Authorization.ClientRequested.dispatch {url, redirect: authURL, name: event.detail.name}
                 return
 
 Otherwise, we can load our authorization data into our state for later use.
@@ -70,7 +70,15 @@ Otherwise, we can load our authorization data into our state for later use.
             @auth.clientSecret = clientSecret
             @auth.redirect = authURL
 
-We now open a popup for authorization.
+If we have an access token, then we close our window (if open) and skip straight to verification.
+
+            if accessToken
+                @auth.accessToken = accessToken
+                window.open("about:blank", "LaboratoryOAuth").close()
+                serverRequest "GET", @auth.api + "/accounts/verify_credentials", null, @auth.accessToken, Events.Authorization.Verified.dispatch
+                return
+
+Otherwise, we open a popup for authorization.
 It will fire `LaboratoryAuthorizationGranted` with the granted code if it succeeds.
 
             window.open url + "/oauth/authorize?client_id=" + clientID + "&response_type=code&redirect_uri=" + encodeURIComponent(authURL), "LaboratoryOAuth"
@@ -93,7 +101,7 @@ We can now close our popup.
 
 Finally, we can request our authorization token from the server using the code we were just given.
 
-            serverRequest "POST", @auth.origin + "/oauth/token", "client_id=" + @auth.clientID + "&client_secret=" + @auth.clientSecret + "&redirect_uri=" + encodeURIComponent(@auth.redirect) + "&grant_type=authorization_code&code=" + event.detail.code, null, Events.Authorization.Received
+            serverRequest "POST", @auth.origin + "/oauth/token", "client_id=" + @auth.clientID + "&client_secret=" + @auth.clientSecret + "&redirect_uri=" + encodeURIComponent(@auth.redirect) + "&grant_type=authorization_code&code=" + event.detail.code, null, Events.Authorization.Received.dispatch
 
             return
 
@@ -113,14 +121,15 @@ If our authorization failed, then we *sigh* have to start all over again from sc
                     clientSecret: @auth.clientSecret
                 return
 
-We can now load our tokens:
+We can now load our tokens.
+We store our access token in `localStorage` for later use as well.
 
             @auth.accessToken = event.detail.data.access_token
-            localStorage.setItem "Laboratory | " + @auth.origin, @auth.redirect + " " + @auth.clientID + " " + @auth.clientSecret
+            localStorage.setItem "Laboratory | " + @auth.origin, @auth.redirect + " " + @auth.clientID + " " + @auth.clientSecret + " " + @auth.accessToken
 
 *Finally*, we try to grab the account of the newly-signed-in user, using `Authorization.Verified` as our callback.
 
-            serverRequest "GET", @auth.api + "/accounts/verify_credentials", null, @auth.accessToken, Events.Authorization.Verified
+            serverRequest "GET", @auth.api + "/accounts/verify_credentials", null, @auth.accessToken, Events.Authorization.Verified.dispatch
 
             return
 
@@ -131,8 +140,15 @@ Its `data` contains the account information for the just-signed-in user.
 We keep track of its id, but pass the rest on to `LaboratoryAccountReceived`.
 
         Verified: handle Events.Authorization.Verified, (event) ->
+            unless isFinite event.detail.data?.id
+                localStorage.setItem "Laboratory | " + @auth.origin, ""
+                Events.Authorization.Requested
+                    url: @auth.origin
+                    clientID: @auth.clientID
+                    clientSecret: @auth.clientSecret
+                return
             @auth.me = Number event.detail.data.id
-            Events.Account.Received {data: event.detail.data}
+            Events.Account.Received.dispatch {data: event.detail.data}
             return
 
 ##  `LaboratoryAuthorizationFavourites`  ##
@@ -140,7 +156,7 @@ We keep track of its id, but pass the rest on to `LaboratoryAccountReceived`.
 When a `LaboratoryAuthorizationFavourites` event is fired, we simply petition the server for a list of favourites for the current user.
 We wrap the callback in a function which formats the list for us.
 
-        Favourites: handle Events.Authorization.Favourites (event) ->
+        Favourites: handle Events.Authorization.Favourites, (event) ->
 
             return unless typeof (callback = event.detail.callback) is "function"
 
@@ -155,7 +171,7 @@ We wrap the callback in a function which formats the list for us.
 When a `LaboratoryAuthorizationBlocks` event is fired, we simply petition the server for a list of people following the user and pass this to our callback.
 We wrap the callback in a function which formats the list for us.
 
-        Blocks: handle Events.Authorization.Blocks (event) ->
+        Blocks: handle Events.Authorization.Blocks, (event) ->
 
             return unless typeof (callback = event.detail.callback) is "function"
 

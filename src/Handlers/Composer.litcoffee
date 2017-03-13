@@ -12,7 +12,7 @@ The `LaboratoryComposerUploadRequested` handler simply uploads the provided file
 
             form = new FormData()
             form.append "file", file
-            serverRequest "POST", @auth.api + "/media", form, @auth.accessToken, Events.Composer.UploadReceived
+            serverRequest "POST", @auth.api + "/media", form, @auth.accessToken, Events.Composer.UploadReceived.dispatch
 
             return
 
@@ -51,7 +51,7 @@ The `LaboratoryComposerPost` handler posts the given status, with the provided s
                 when not event.detail.makePublic then "private"
                 when not event.detail.makeListed then "unlisted"
                 else "public"
-            serverRequest "POST", @auth.api + "/statuses", form, @auth.accessToken, Events.Status.Received
+            serverRequest "POST", @auth.api + "/statuses", form, @auth.accessToken, Events.Status.Received.dispatch
 
             return
 

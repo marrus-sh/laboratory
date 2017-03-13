@@ -94,8 +94,9 @@ Now we can set the rest of our properties.
             unlisted: Enumerals.Visibility.UNLISTED
             public: Enumerals.Visibility.PUBLIC
         }[data.visibility] || Enumerals.Visibility.UNLISTED
-        @mediaAttachments = (new MediaAttachment item for item in data.media_attachments)
-        @application = new Application data.application
+        @mediaAttachments = (new Constructors.MediaAttachment item for item in data.media_attachments)
+        @mentions = (new Constructors.Mention item for item in data.mentions)
+        @application = new Constructors.Application data.application
 
         return Object.freeze this
 

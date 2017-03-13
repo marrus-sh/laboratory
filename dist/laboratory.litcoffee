@@ -209,7 +209,7 @@ This is the first file in our compiled source, so let's identify ourselves real 
                Source code available at:
         https://github.com/marrus-sh/laboratory
 
-                    Version 0.1.0
+                    Version 0.2.0
 
     ###
 
@@ -223,9 +223,23 @@ If this is a popup (`window.opener.Laboratory` exists) and an API redirect (a `c
     do ->
         codesearch = location.search.match /code=([^&]*)/
         code = codesearch[1] if codesearch?
-        window.opener.Laboratory.Authorization.Granted {window: window, code: code} if code? and window.opener.Laboratory
+        window.opener.Laboratory.Authorization.Granted.dispatch {window: window, code: code} if code? and window.opener.Laboratory
 
 When the `LaboratoryAuthorizationGranted` event gets processed, this window will be closed.
+
+###  Exposed properties:
+
+Although Laboratory does not expose its store to outsiders, it does carefully reveal a few key properties.
+These are:
+
+- `ready`, which indicates whether `LaboratoryInitializationReady` has fired yet
+- `user`, which gives the id of the currently-logged-in user, or `null` if no user is logged in
+
+For now, we'll keep these properties in the `Exposed` object.
+
+    Exposed =
+        ready: no
+        user: null
 
 
 #  LABORATORY CONSTRUCTORS  #
@@ -363,7 +377,7 @@ In order to ensure that `Follow`s always have the most recent account data, they
 
         return unless this and (this instanceof Constructors.Follow) and data?
 
-        follower = data.account.id
+        @follower = data.account.id
 
         @id = data.id
         Object.defineProperty this, "follower",
@@ -402,6 +416,11 @@ It adds `_builder` as a default property, which is a reference to itself.
             value: this
             enumerable: yes
         Object.freeze @defaultProps
+        Object.defineProperties this,
+            new:
+                value: Constructors.LaboratoryEvent.prototype.new.bind this
+            dispatch:
+                value: Constructors.LaboratoryEvent.prototype.dispatch.bind this
 
         return Object.freeze this
 
@@ -616,8 +635,9 @@ Now we can set the rest of our properties.
             unlisted: Enumerals.Visibility.UNLISTED
             public: Enumerals.Visibility.PUBLIC
         }[data.visibility] || Enumerals.Visibility.UNLISTED
-        @mediaAttachments = (new MediaAttachment item for item in data.media_attachments)
-        @application = new Application data.application
+        @mediaAttachments = (new Constructors.MediaAttachment item for item in data.media_attachments)
+        @mentions = (new Constructors.Mention item for item in data.mentions)
+        @application = new Constructors.Application data.application
 
         return Object.freeze this
 
@@ -706,7 +726,7 @@ We set the relationship last, overwriting any previous relationship if one is pr
 This code will coerce the provided relationship into an Number and then back to an enumeral if possible.
 Note that because enumerals are objects, they will always evaluate to `true` even if their value is `0x00`.
 
-        @relationship = Enumerals.Relationship.byValue(relationship) || @relationship if relationship?
+        @relationship = Enumerals.Relationship.fromValue(relationship) || @relationship if relationship?
 
         return Object.freeze this
 
@@ -784,7 +804,7 @@ The provided `data` should be an object whose enumerable own properties associat
 First, we need to "fork" the main `Enumeral` constructor so that typechecking will work.
 We create a new constructor that just passes everything on.
 
-        type = (n) -> Constructors.Enumeral.call(n)
+        type = (n) -> Constructors.Enumeral.call(this, n)
         type.prototype = Object.create Constructors.Enumeral.prototype
 
 Next, we define our enumerals.
@@ -793,8 +813,8 @@ Note that since values are not guaranteed to be unique, this object may not cont
 
         byValue = {}
         for own enumeral, value of data
-            type.enumeral = new type value
-            byValue[value] = type.enumeral
+            type[enumeral] = new type value
+            byValue[value] = type[enumeral]
 
 This function allows quick conversion from value to enumeral.
 
@@ -1409,7 +1429,7 @@ The handler for `LaboratoryComposerUploadReceived` will call any composer callba
 >   - __Properties :__
 >       - `callback` – The callback to associate with the composer.
 
-        ComposerRequested: new Constructors.LaboratoryEvent 'LaboratoryComposerRequested',
+        Requested: new Constructors.LaboratoryEvent 'LaboratoryComposerRequested',
             file: null
 
 The `LaboratoryComposerRequested` event requests an association between composer events and a provided `callback`.
@@ -1420,6 +1440,8 @@ This `callback` will receive media uploads from the handler for `LaboratoryCompo
 >   - __Builder :__ `Laboratory.Composer.Post`
 >   - __Properties :__
 >       - `text` – The text of the post.
+>       - `inReplyTo` – The id of the post this post is replying to.
+>       - `mediaAttachments` – An array of `Laboratory.MediaAttachment`s.
 >       - `message` – A message to hide the post behind.
 >       - `makePublic` – Whether to make the post public.
 >       - `makeListed` – Whether to make the post listed.
@@ -1455,6 +1477,10 @@ If no association has been made, the handler for this event does nothing.
 
 The __Initialization__ module of Laboratory Events is comprised of those events which are related to initialization of the Laboratory store and handlers.
 It is comprised of two events: `LaboratoryInitializationLoaded` and `LaboratoryInitializationReady`.
+
+You can check `window.Laboratory.ready` as a means of verifying if these events have fired after-the-fact:
+If `window.Laboratory.ready` exists, then `LaboratoryInitializationLoaded` has fired.
+If it is `true`, then `LaboratoryInitializationReady` has fired as well.
 
 **You should not fire Laboratory Initialization Events yourself.**
 They will be ignored by Laboratory proper, but may confuse other components which you might have loaded.
@@ -1546,7 +1572,7 @@ Generally speaking, this isn't something you need to listen for yourself, as the
 >       - `before` – The id at which to end the request.
 >       - `after` – The id at which to start the request.
 
-        ReblogsRequested: new Constructors.LaboratoryEvent "LaboratoryStatusReblogs",
+        Reblogs: new Constructors.LaboratoryEvent "LaboratoryStatusReblogs",
             id: null
             callback: null
             before: null
@@ -1565,7 +1591,7 @@ The range of ids covered by this list can be provided through `before` and `afte
 >       - `before` – The id at which to end the request.
 >       - `after` – The id at which to start the request.
 
-        FavouritesRequested: new Constructors.LaboratoryEvent "LaboratoryStatusFavouritesRequested",
+        Favourites: new Constructors.LaboratoryEvent "LaboratoryStatusFavourites",
             id: null
             callback: null
             before: null
@@ -1712,9 +1738,10 @@ It sets things up so we can easily add our handlers to the document later.
 We also do a few checks before running the callback to make sure it actually is receiving an appropriate event response.
 
     handle = (builder, callback) ->
+        console.log callback if not builder
         typedCallback = (event) ->
             return unless event? and this? and event.type is builder.type
-            callback event
+            callback.call this, event
         typedCallback.type = builder.type
         return Object.freeze typedCallback
 
@@ -1733,7 +1760,8 @@ You can see we set the `Authorization` header using our access token, if one was
         return unless method is "GET" or method is "POST" or method is "DELETE"
         request = new XMLHttpRequest()
         request.open method, location
-        if method is "POST" and not (contents instanceof FormData) then request.setRequestHeader "Content-type", "application/x-www-form-urlencoded" else contents = undefined
+        if method is "POST" and not (contents instanceof FormData) then request.setRequestHeader "Content-type", "application/x-www-form-urlencoded"
+        else if method isnt "POST" then contents = undefined
         request.setRequestHeader "Authorization", "Bearer " + accessToken if accessToken
 
 ####  The callback.
@@ -1773,7 +1801,7 @@ When an account's relationships are requested, we just forward the request to th
 
         RelationshipsRequested: handle Events.Account.RelationshipsRequested, (event) ->
             return unless isFinite id = Number event.detail.id
-            serverRequest "GET", @auth.api + "/accounts/relationships?id=" + id, null, @auth.accessToken, Events.Account.RelationshipsReceived
+            serverRequest "GET", @auth.api + "/accounts/relationships?id=" + id, null, @auth.accessToken, Events.Account.RelationshipsReceived.dispatch
             return
 
 ##  `LaboratoryAccountRelationshipsReceived`  ##
@@ -1787,7 +1815,7 @@ We also call any related callbacks with the new information.
 
             for relationships in data
                 continue unless isFinite(id = Number relationships.id) and @accounts[id]?
-                relationship = Enumerals.Relationship.byValue(
+                relationship = Enumerals.Relationship.fromValue(
                     Enumerals.Relationship.FOLLOWED_BY * relationships.followed_by +
                     Enumerals.Relationship.FOLLOWING * relationships.following +
                     Enumerals.Relationship.REQUESTED * relationships.requested +
@@ -1828,12 +1856,12 @@ Note that accounts are stored as immutable objects.
 Next, we send the request.
 Upon completion, it should trigger an `LaboratoryAccountReceived` event so that we can handle the data.
 
-            serverRequest "GET", @auth.api + "/accounts/" + id, null, @auth.accessToken, Events.Account.Received
+            serverRequest "GET", @auth.api + "/accounts/" + id, null, @auth.accessToken, Events.Account.Received.dispatch
 
 We also need to request the user's relationship to the account, since that doesn't come with our first request.
 We can do that with a `LaboratoryAccountRelationshipsRequested` event.
 
-            LaboratoryAccountRelationshipsRequested {id}
+            Events.Account.RelationshipsRequested.dispatch {id}
 
             return
 
@@ -1847,7 +1875,7 @@ When an account's data is received, we need to update its information both insid
 
 Right away, we can generate a `Profile` from our `data`.
 
-            profile = new Constructors.Profile data
+            profile = new Constructors.Profile data, @auth.origin
 
 If we already have a profile associated with this account id, then we need to check if anything has changed.
 If it hasn't, we have nothing more to do.
@@ -1904,7 +1932,7 @@ We wrap the callback in a function which formats the follower list for us.
 When a `LaboratoryAccountFollowing` event is fired, we simply petition the server for a list of people following the user and pass this to our callback.
 We wrap the callback in a function which formats the list for us.
 
-        Following: handle Events.Account.Following (event) ->
+        Following: handle Events.Account.Following, (event) ->
 
             return unless isFinite(id = Number event.detail.id) and typeof (callback = event.detail.callback) is "function"
 
@@ -1938,7 +1966,7 @@ We issue `Events.Account.RelationshipsReceived()` as our callback function, sinc
 
             return unless isFinite(id = Number event.detail.id)
 
-            serverRequest "POST", @auth.api + "/accounts/" + id + (if event.detail.value then "/follow" else "/unfollow"), null, @auth.accessToken, Events.Account.RelationshipsReceived
+            serverRequest "POST", @auth.api + "/accounts/" + id + (if event.detail.value then "/follow" else "/unfollow"), null, @auth.accessToken, Events.Account.RelationshipsReceived.dispatch
 
 ##  `LaboratoryAccountBlock`  ##
 
@@ -1949,7 +1977,7 @@ We issue `Events.Account.RelationshipsReceived()` as our callback function, sinc
 
             return unless isFinite(id = Number event.detail.id)
 
-            serverRequest "POST", @auth.api + "/accounts/" + id + (if event.detail.value then "/block" else "/unblock"), null, @auth.accessToken, Events.Account.RelationshipsReceived
+            serverRequest "POST", @auth.api + "/accounts/" + id + (if event.detail.value then "/block" else "/unblock"), null, @auth.accessToken, Events.Account.RelationshipsReceived.dispatch
 
 
 #  AUTHORIZATION HANDLERS  #
@@ -1973,7 +2001,7 @@ We also get our redirect URI at this point.
 
 Now we can send our request.
 
-            serverRequest "POST", url + "/api/v1/apps", "client_name=" + encodeURIComponent(String(event.detail.name).replace " ", "+") + "&redirect_uris=" + encodeURIComponent(authURL) + "&scopes=read+write+follow", null, Events.Authorization.ClientReceived, {url, redirect: authURL}
+            serverRequest "POST", url + "/api/v1/apps", "client_name=" + encodeURIComponent(String(event.detail.name).replace " ", "+") + "&redirect_uris=" + encodeURIComponent(authURL) + "&scopes=read+write+follow", null, Events.Authorization.ClientReceived.dispatch, {url, redirect: authURL}
 
             return
 
@@ -1986,7 +2014,7 @@ It then fires `LaboratoryAuthorizationRequested` to attempt to authenticate the 
 
             localStorage.setItem "Laboratory | " + event.detail.params.url, event.detail.params.redirect + " " + event.detail.data.client_id + " " + event.detail.data.client_secret
 
-            Events.Authorization.Requested
+            Events.Authorization.Requested.dispatch
                 url: event.detail.params.url
                 redirect: event.detail.params.redirect
 
@@ -2010,10 +2038,10 @@ We also get our redirect URI at this point.
 
 If we don't have a client id or secret we need to get one.
 
-            if localStorage.getItem("Laboratory | " + url) then [redirect, clientID, clientSecret] = localStorage.getItem(url).split " ", 3
+            if localStorage.getItem("Laboratory | " + url) then [redirect, clientID, clientSecret, accessToken] = localStorage.getItem("Laboratory | " + url).split " ", 4
 
             unless (redirect and not event.detail.redirect? or redirect is authURL) and clientID? and clientSecret?
-                Events.Authorization.ClientRequested {url, name: event.detail.name}
+                Events.Authorization.ClientRequested.dispatch {url, redirect: authURL, name: event.detail.name}
                 return
 
 Otherwise, we can load our authorization data into our state for later use.
@@ -2024,7 +2052,15 @@ Otherwise, we can load our authorization data into our state for later use.
             @auth.clientSecret = clientSecret
             @auth.redirect = authURL
 
-We now open a popup for authorization.
+If we have an access token, then we close our window (if open) and skip straight to verification.
+
+            if accessToken
+                @auth.accessToken = accessToken
+                window.open("about:blank", "LaboratoryOAuth").close()
+                serverRequest "GET", @auth.api + "/accounts/verify_credentials", null, @auth.accessToken, Events.Authorization.Verified.dispatch
+                return
+
+Otherwise, we open a popup for authorization.
 It will fire `LaboratoryAuthorizationGranted` with the granted code if it succeeds.
 
             window.open url + "/oauth/authorize?client_id=" + clientID + "&response_type=code&redirect_uri=" + encodeURIComponent(authURL), "LaboratoryOAuth"
@@ -2047,7 +2083,7 @@ We can now close our popup.
 
 Finally, we can request our authorization token from the server using the code we were just given.
 
-            serverRequest "POST", @auth.origin + "/oauth/token", "client_id=" + @auth.clientID + "&client_secret=" + @auth.clientSecret + "&redirect_uri=" + encodeURIComponent(@auth.redirect) + "&grant_type=authorization_code&code=" + event.detail.code, null, Events.Authorization.Received
+            serverRequest "POST", @auth.origin + "/oauth/token", "client_id=" + @auth.clientID + "&client_secret=" + @auth.clientSecret + "&redirect_uri=" + encodeURIComponent(@auth.redirect) + "&grant_type=authorization_code&code=" + event.detail.code, null, Events.Authorization.Received.dispatch
 
             return
 
@@ -2067,14 +2103,15 @@ If our authorization failed, then we *sigh* have to start all over again from sc
                     clientSecret: @auth.clientSecret
                 return
 
-We can now load our tokens:
+We can now load our tokens.
+We store our access token in `localStorage` for later use as well.
 
             @auth.accessToken = event.detail.data.access_token
-            localStorage.setItem "Laboratory | " + @auth.origin, @auth.redirect + " " + @auth.clientID + " " + @auth.clientSecret
+            localStorage.setItem "Laboratory | " + @auth.origin, @auth.redirect + " " + @auth.clientID + " " + @auth.clientSecret + " " + @auth.accessToken
 
 *Finally*, we try to grab the account of the newly-signed-in user, using `Authorization.Verified` as our callback.
 
-            serverRequest "GET", @auth.api + "/accounts/verify_credentials", null, @auth.accessToken, Events.Authorization.Verified
+            serverRequest "GET", @auth.api + "/accounts/verify_credentials", null, @auth.accessToken, Events.Authorization.Verified.dispatch
 
             return
 
@@ -2085,8 +2122,15 @@ Its `data` contains the account information for the just-signed-in user.
 We keep track of its id, but pass the rest on to `LaboratoryAccountReceived`.
 
         Verified: handle Events.Authorization.Verified, (event) ->
+            unless isFinite event.detail.data?.id
+                localStorage.setItem "Laboratory | " + @auth.origin, ""
+                Events.Authorization.Requested
+                    url: @auth.origin
+                    clientID: @auth.clientID
+                    clientSecret: @auth.clientSecret
+                return
             @auth.me = Number event.detail.data.id
-            Events.Account.Received {data: event.detail.data}
+            Events.Account.Received.dispatch {data: event.detail.data}
             return
 
 ##  `LaboratoryAuthorizationFavourites`  ##
@@ -2094,7 +2138,7 @@ We keep track of its id, but pass the rest on to `LaboratoryAccountReceived`.
 When a `LaboratoryAuthorizationFavourites` event is fired, we simply petition the server for a list of favourites for the current user.
 We wrap the callback in a function which formats the list for us.
 
-        Favourites: handle Events.Authorization.Favourites (event) ->
+        Favourites: handle Events.Authorization.Favourites, (event) ->
 
             return unless typeof (callback = event.detail.callback) is "function"
 
@@ -2109,7 +2153,7 @@ We wrap the callback in a function which formats the list for us.
 When a `LaboratoryAuthorizationBlocks` event is fired, we simply petition the server for a list of people following the user and pass this to our callback.
 We wrap the callback in a function which formats the list for us.
 
-        Blocks: handle Events.Authorization.Blocks (event) ->
+        Blocks: handle Events.Authorization.Blocks, (event) ->
 
             return unless typeof (callback = event.detail.callback) is "function"
 
@@ -2134,7 +2178,7 @@ The `LaboratoryComposerUploadRequested` handler simply uploads the provided file
 
             form = new FormData()
             form.append "file", file
-            serverRequest "POST", @auth.api + "/media", form, @auth.accessToken, Events.Composer.UploadReceived
+            serverRequest "POST", @auth.api + "/media", form, @auth.accessToken, Events.Composer.UploadReceived.dispatch
 
             return
 
@@ -2173,7 +2217,7 @@ The `LaboratoryComposerPost` handler posts the given status, with the provided s
                 when not event.detail.makePublic then "private"
                 when not event.detail.makeListed then "unlisted"
                 else "public"
-            serverRequest "POST", @auth.api + "/statuses", form, @auth.accessToken, Events.Status.Received
+            serverRequest "POST", @auth.api + "/statuses", form, @auth.accessToken, Events.Status.Received.dispatch
 
             return
 
@@ -2225,7 +2269,7 @@ We just call a `LaboratoryTimelineReceived` event for each affected timeline wit
         Received: handle Events.Status.Received, (event) ->
 
             timelinesToUpdate = (name for name, timeline of @timelines when event.detail.data.id in timeline.postOrder)
-            Events.Timeline.Received {data: [event.detail.data], params: {name}} for name in timelinesToUpdate
+            Events.Timeline.Received.dispatch {data: [event.detail.data], params: {name}} for name in timelinesToUpdate
 
             return
 
@@ -2249,7 +2293,7 @@ We wrap the callback in a function which formats the user list for us.
 When a `LaboratoryStatusFavourites` event is fired, we simply petition the server for a list of users who favourited the given status, and pass this to our callback.
 We wrap the callback in a function which formats the list for us.
 
-        Favourites: handle Events.Status.Favourites (event) ->
+        Favourites: handle Events.Status.Favourites, (event) ->
 
             return unless isFinite(id = Number event.detail.id) and typeof (callback = event.detail.callback) is "function"
 
@@ -2269,7 +2313,7 @@ This will be (in the case of a reblog) a new reblog-post, or (in the case of an 
 
             return unless isFinite(id = Number event.detail.id)
 
-            serverRequest "POST", @auth.api + "/statuses/" + id + (if event.detail.value then "/reblog" else "/unreblog"), null, @auth.accessToken, Events.Status.Received
+            serverRequest "POST", @auth.api + "/statuses/" + id + (if event.detail.value then "/reblog" else "/unreblog"), null, @auth.accessToken, Events.Status.Received.dispatch
 
 ##  `LaboratoryStatusSetFavourite`  ##
 
@@ -2280,7 +2324,7 @@ We issue `Events.Status.Received()` as our callback function, since the result o
 
             return unless isFinite(id = Number event.detail.id)
 
-            serverRequest "POST", @auth.api + "/statuses/" + id + (if event.detail.value then "/favourite" else "/unfavourite"), null, @auth.accessToken, Events.Status.Received
+            serverRequest "POST", @auth.api + "/statuses/" + id + (if event.detail.value then "/favourite" else "/unfavourite"), null, @auth.accessToken, Events.Status.Received.dispatch
 
 ##  `LaboratoryStatusDeletion`  ##
 
@@ -2294,7 +2338,7 @@ We also need to update any timelines which used to contain the status such that 
             serverRequest "DELETE", @auth.api + "/statuses/" + id, null, @auth.accessToken
 
             timelinesToUpdate = (name for name, timeline of @timelines when id in timeline.postOrder)
-            Events.Timeline.Received {data: [{id}], params: {name}} for name in timelinesToUpdate
+            Events.Timeline.Received.dispatch {data: [{id}], params: {name}} for name in timelinesToUpdate
 
 
 #  TIMELINE HANDLERS  #
@@ -2339,7 +2383,7 @@ We can now add our callback.
 Next, we send the request.
 Upon completion, it should trigger an `LaboratoryTimelineReceived` event so that we can handle the data.
 
-            serverRequest "GET", url, null, @auth.accessToken, Events.Timeline.Received, {name}
+            serverRequest "GET", url, null, @auth.accessToken, Events.Timeline.Received.dispatch, {name}
 
             return
 
@@ -2377,18 +2421,18 @@ We also fire an `LaboratoryAccountReceived` event containing the account data we
                     posts[id] = null
                     continue
                 unless item.id in postOrder
-                    post = if item.type is "follow" then new Follow(item, @accounts) else new Post item, @accounts
+                    post = if item.type is "follow" then new Constructors.Follow(item, @accounts) else new Constructors.Post item, @accounts
                     postOrder.push item.id
                     posts[item.id] = post
                 unless item.account.id in receivedAccounts
-                    receivedAccounts.push post.account.id
-                    Events.Account.Received {data: post.account}
+                    receivedAccounts.push item.account.id
+                    Events.Account.Received.dispatch {data: item.account}
                 unless not item.status? or item.status.account.id in receivedAccounts
                     receivedAccounts.push item.status.account.id
-                    Events.Account.Received {data: item.status.account}
+                    Events.Account.Received.dispatch {data: item.status.account}
                 unless not item.reblog? or item.reblog.account.id in receivedAccounts
                     receivedAccounts.push item.reblog.account.id
-                    Events.Account.Received {data: item.reblog.account}
+                    Events.Account.Received.dispatch {data: item.reblog.account}
 
 Then we load any previously-existing posts if they haven't already been loaded.
 
@@ -2445,6 +2489,7 @@ This file is available in [`/dist/laboratory.min.js`](../dist/laboratory.min.js)
 If for some reason you feel the need to compile Laboratory from source yourself, the [`Cakefile`](../Cakefile) can be used to do so.
 
 All of Laboratory's components are available through the `window.Laboratory` object, which this file provides.
+Additionally, the `window.Laboratory.ready` property can be used to check if `LaboratoryInitializationReady` has already fired, and the `window.Laboratory.user` property can be used to obtain the id of the currently-logged-in user.
 Laboratory doesn't have any external dependencies, and should run in any modern (ECMAScript 5–compliant; eg IE9) browser.
 
 ##  Implementation  ##
@@ -2470,9 +2515,9 @@ Laboratory thus assures that minor and patch numbers will never exceed `99` (ind
                        Source code available at:
                 https://github.com/marrus-sh/laboratory
 
-                            Version 0.1.0
+                            Version 0.2.0
             """
-        Nº: 1.0
+        Nº: 2.0
 
 ####  Exposing Laboratory objects.
 
@@ -2490,9 +2535,11 @@ The following parts are *not* exposed:
 
 To keep things compact, we merge everything onto a single `Laboratory` object.
 This of course means that none of the submodules in `Constructors`, `Events`, or `Enumerals` can share the same name.
+We also merge in our `Exposed` properties at this time.
 
     for module in [Constructors, Events, Enumerals]
         Object.defineProperty Laboratory, name, {value: submodule, enumerable: yes} for own name, submodule of module
+    Object.defineProperty Laboratory, prop, {get: (-> Exposed[prop]), enumerable: yes} for prop of Exposed
     Object.defineProperty window, "Laboratory",
         value: Object.freeze Laboratory
         enumerable: yes
@@ -2501,7 +2548,7 @@ This of course means that none of the submodules in `Constructors`, `Events`, or
 
 Now that the `Laboratory` object is available to the `window`, we can fire our `Initialization.Loaded` event.
 
-    Initialization.Loaded.dispatch()
+    Events.Initialization.Loaded.dispatch()
 
 ###  The Store:
 
@@ -2547,8 +2594,14 @@ It's pretty easy; we just enumerate over `Handlers`.
 ####  Starting operations.
 
 Finally, we fire our `Initialization.Ready` event, signalling that our handlers are ready to go.
+We also set `Exposed.ready` to `true` so that scripts can tell Laboratory is running after-the fact, and make `Exposed.user` just point to `auth.me` in our `store`.
 
-        Initialization.Ready.dispatch()
+        Exposed.ready = yes
+        Object.defineProperty Exposed, "user",
+            get: -> store.auth.me
+            enumerable: yes
+            configurable: no
+        Events.Initialization.Ready.dispatch()
 
         return
 

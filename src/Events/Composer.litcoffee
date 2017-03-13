@@ -48,7 +48,7 @@ The handler for `LaboratoryComposerUploadReceived` will call any composer callba
 >   - __Properties :__
 >       - `callback` – The callback to associate with the composer.
 
-        ComposerRequested: new Constructors.LaboratoryEvent 'LaboratoryComposerRequested',
+        Requested: new Constructors.LaboratoryEvent 'LaboratoryComposerRequested',
             file: null
 
 The `LaboratoryComposerRequested` event requests an association between composer events and a provided `callback`.
@@ -59,6 +59,8 @@ This `callback` will receive media uploads from the handler for `LaboratoryCompo
 >   - __Builder :__ `Laboratory.Composer.Post`
 >   - __Properties :__
 >       - `text` – The text of the post.
+>       - `inReplyTo` – The id of the post this post is replying to.
+>       - `mediaAttachments` – An array of `Laboratory.MediaAttachment`s.
 >       - `message` – A message to hide the post behind.
 >       - `makePublic` – Whether to make the post public.
 >       - `makeListed` – Whether to make the post listed.

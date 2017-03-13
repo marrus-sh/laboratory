@@ -5,6 +5,10 @@
 The __Initialization__ module of Laboratory Events is comprised of those events which are related to initialization of the Laboratory store and handlers.
 It is comprised of two events: `LaboratoryInitializationLoaded` and `LaboratoryInitializationReady`.
 
+You can check `window.Laboratory.ready` as a means of verifying if these events have fired after-the-fact:
+If `window.Laboratory.ready` exists, then `LaboratoryInitializationLoaded` has fired.
+If it is `true`, then `LaboratoryInitializationReady` has fired as well.
+
 **You should not fire Laboratory Initialization Events yourself.**
 They will be ignored by Laboratory proper, but may confuse other components which you might have loaded.
 However, you should listen for these events to know when proper communication with the Laboratory framework should begin.

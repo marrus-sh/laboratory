@@ -20,6 +20,11 @@ It adds `_builder` as a default property, which is a reference to itself.
             value: this
             enumerable: yes
         Object.freeze @defaultProps
+        Object.defineProperties this,
+            new:
+                value: Constructors.LaboratoryEvent.prototype.new.bind this
+            dispatch:
+                value: Constructors.LaboratoryEvent.prototype.dispatch.bind this
 
         return Object.freeze this
 

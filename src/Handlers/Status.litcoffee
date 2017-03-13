@@ -25,7 +25,7 @@ We just call a `LaboratoryTimelineReceived` event for each affected timeline wit
         Received: handle Events.Status.Received, (event) ->
 
             timelinesToUpdate = (name for name, timeline of @timelines when event.detail.data.id in timeline.postOrder)
-            Events.Timeline.Received {data: [event.detail.data], params: {name}} for name in timelinesToUpdate
+            Events.Timeline.Received.dispatch {data: [event.detail.data], params: {name}} for name in timelinesToUpdate
 
             return
 
@@ -49,7 +49,7 @@ We wrap the callback in a function which formats the user list for us.
 When a `LaboratoryStatusFavourites` event is fired, we simply petition the server for a list of users who favourited the given status, and pass this to our callback.
 We wrap the callback in a function which formats the list for us.
 
-        Favourites: handle Events.Status.Favourites (event) ->
+        Favourites: handle Events.Status.Favourites, (event) ->
 
             return unless isFinite(id = Number event.detail.id) and typeof (callback = event.detail.callback) is "function"
 
@@ -69,7 +69,7 @@ This will be (in the case of a reblog) a new reblog-post, or (in the case of an 
 
             return unless isFinite(id = Number event.detail.id)
 
-            serverRequest "POST", @auth.api + "/statuses/" + id + (if event.detail.value then "/reblog" else "/unreblog"), null, @auth.accessToken, Events.Status.Received
+            serverRequest "POST", @auth.api + "/statuses/" + id + (if event.detail.value then "/reblog" else "/unreblog"), null, @auth.accessToken, Events.Status.Received.dispatch
 
 ##  `LaboratoryStatusSetFavourite`  ##
 
@@ -80,7 +80,7 @@ We issue `Events.Status.Received()` as our callback function, since the result o
 
             return unless isFinite(id = Number event.detail.id)
 
-            serverRequest "POST", @auth.api + "/statuses/" + id + (if event.detail.value then "/favourite" else "/unfavourite"), null, @auth.accessToken, Events.Status.Received
+            serverRequest "POST", @auth.api + "/statuses/" + id + (if event.detail.value then "/favourite" else "/unfavourite"), null, @auth.accessToken, Events.Status.Received.dispatch
 
 ##  `LaboratoryStatusDeletion`  ##
 
@@ -94,4 +94,4 @@ We also need to update any timelines which used to contain the status such that 
             serverRequest "DELETE", @auth.api + "/statuses/" + id, null, @auth.accessToken
 
             timelinesToUpdate = (name for name, timeline of @timelines when id in timeline.postOrder)
-            Events.Timeline.Received {data: [{id}], params: {name}} for name in timelinesToUpdate
+            Events.Timeline.Received.dispatch {data: [{id}], params: {name}} for name in timelinesToUpdate

@@ -5,6 +5,7 @@ This file is available in [`/dist/laboratory.min.js`](../dist/laboratory.min.js)
 If for some reason you feel the need to compile Laboratory from source yourself, the [`Cakefile`](../Cakefile) can be used to do so.
 
 All of Laboratory's components are available through the `window.Laboratory` object, which this file provides.
+Additionally, the `window.Laboratory.ready` property can be used to check if `LaboratoryInitializationReady` has already fired, and the `window.Laboratory.user` property can be used to obtain the id of the currently-logged-in user.
 Laboratory doesn't have any external dependencies, and should run in any modern (ECMAScript 5–compliant; eg IE9) browser.
 
 ##  Implementation  ##
@@ -30,9 +31,9 @@ Laboratory thus assures that minor and patch numbers will never exceed `99` (ind
                        Source code available at:
                 https://github.com/marrus-sh/laboratory
 
-                            Version 0.1.0
+                            Version 0.2.0
             """
-        Nº: 1.0
+        Nº: 2.0
 
 ####  Exposing Laboratory objects.
 
@@ -50,9 +51,11 @@ The following parts are *not* exposed:
 
 To keep things compact, we merge everything onto a single `Laboratory` object.
 This of course means that none of the submodules in `Constructors`, `Events`, or `Enumerals` can share the same name.
+We also merge in our `Exposed` properties at this time.
 
     for module in [Constructors, Events, Enumerals]
         Object.defineProperty Laboratory, name, {value: submodule, enumerable: yes} for own name, submodule of module
+    Object.defineProperty Laboratory, prop, {get: (-> Exposed[prop]), enumerable: yes} for prop of Exposed
     Object.defineProperty window, "Laboratory",
         value: Object.freeze Laboratory
         enumerable: yes
@@ -61,7 +64,7 @@ This of course means that none of the submodules in `Constructors`, `Events`, or
 
 Now that the `Laboratory` object is available to the `window`, we can fire our `Initialization.Loaded` event.
 
-    Initialization.Loaded.dispatch()
+    Events.Initialization.Loaded.dispatch()
 
 ###  The Store:
 
@@ -107,8 +110,14 @@ It's pretty easy; we just enumerate over `Handlers`.
 ####  Starting operations.
 
 Finally, we fire our `Initialization.Ready` event, signalling that our handlers are ready to go.
+We also set `Exposed.ready` to `true` so that scripts can tell Laboratory is running after-the fact, and make `Exposed.user` just point to `auth.me` in our `store`.
 
-        Initialization.Ready.dispatch()
+        Exposed.ready = yes
+        Object.defineProperty Exposed, "user",
+            get: -> store.auth.me
+            enumerable: yes
+            configurable: no
+        Events.Initialization.Ready.dispatch()
 
         return
 

@@ -40,7 +40,7 @@ The provided `data` should be an object whose enumerable own properties associat
 First, we need to "fork" the main `Enumeral` constructor so that typechecking will work.
 We create a new constructor that just passes everything on.
 
-        type = (n) -> Constructors.Enumeral.call(n)
+        type = (n) -> Constructors.Enumeral.call(this, n)
         type.prototype = Object.create Constructors.Enumeral.prototype
 
 Next, we define our enumerals.
@@ -49,8 +49,8 @@ Note that since values are not guaranteed to be unique, this object may not cont
 
         byValue = {}
         for own enumeral, value of data
-            type.enumeral = new type value
-            byValue[value] = type.enumeral
+            type[enumeral] = new type value
+            byValue[value] = type[enumeral]
 
 This function allows quick conversion from value to enumeral.
 

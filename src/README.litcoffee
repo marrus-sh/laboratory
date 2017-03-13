@@ -209,7 +209,7 @@ This is the first file in our compiled source, so let's identify ourselves real 
                Source code available at:
         https://github.com/marrus-sh/laboratory
 
-                    Version 0.1.0
+                    Version 0.2.0
 
     ###
 
@@ -223,6 +223,20 @@ If this is a popup (`window.opener.Laboratory` exists) and an API redirect (a `c
     do ->
         codesearch = location.search.match /code=([^&]*)/
         code = codesearch[1] if codesearch?
-        window.opener.Laboratory.Authorization.Granted {window: window, code: code} if code? and window.opener.Laboratory
+        window.opener.Laboratory.Authorization.Granted.dispatch {window: window, code: code} if code? and window.opener.Laboratory
 
 When the `LaboratoryAuthorizationGranted` event gets processed, this window will be closed.
+
+###  Exposed properties:
+
+Although Laboratory does not expose its store to outsiders, it does carefully reveal a few key properties.
+These are:
+
+- `ready`, which indicates whether `LaboratoryInitializationReady` has fired yet
+- `user`, which gives the id of the currently-logged-in user, or `null` if no user is logged in
+
+For now, we'll keep these properties in the `Exposed` object.
+
+    Exposed =
+        ready: no
+        user: null

@@ -40,7 +40,7 @@ We can now add our callback.
 Next, we send the request.
 Upon completion, it should trigger an `LaboratoryTimelineReceived` event so that we can handle the data.
 
-            serverRequest "GET", url, null, @auth.accessToken, Events.Timeline.Received, {name}
+            serverRequest "GET", url, null, @auth.accessToken, Events.Timeline.Received.dispatch, {name}
 
             return
 
@@ -78,18 +78,18 @@ We also fire an `LaboratoryAccountReceived` event containing the account data we
                     posts[id] = null
                     continue
                 unless item.id in postOrder
-                    post = if item.type is "follow" then new Follow(item, @accounts) else new Post item, @accounts
+                    post = if item.type is "follow" then new Constructors.Follow(item, @accounts) else new Constructors.Post item, @accounts
                     postOrder.push item.id
                     posts[item.id] = post
                 unless item.account.id in receivedAccounts
-                    receivedAccounts.push post.account.id
-                    Events.Account.Received {data: post.account}
+                    receivedAccounts.push item.account.id
+                    Events.Account.Received.dispatch {data: item.account}
                 unless not item.status? or item.status.account.id in receivedAccounts
                     receivedAccounts.push item.status.account.id
-                    Events.Account.Received {data: item.status.account}
+                    Events.Account.Received.dispatch {data: item.status.account}
                 unless not item.reblog? or item.reblog.account.id in receivedAccounts
                     receivedAccounts.push item.reblog.account.id
-                    Events.Account.Received {data: item.reblog.account}
+                    Events.Account.Received.dispatch {data: item.reblog.account}
 
 Then we load any previously-existing posts if they haven't already been loaded.
 

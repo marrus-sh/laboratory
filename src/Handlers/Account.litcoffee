@@ -8,7 +8,7 @@ When an account's relationships are requested, we just forward the request to th
 
         RelationshipsRequested: handle Events.Account.RelationshipsRequested, (event) ->
             return unless isFinite id = Number event.detail.id
-            serverRequest "GET", @auth.api + "/accounts/relationships?id=" + id, null, @auth.accessToken, Events.Account.RelationshipsReceived
+            serverRequest "GET", @auth.api + "/accounts/relationships?id=" + id, null, @auth.accessToken, Events.Account.RelationshipsReceived.dispatch
             return
 
 ##  `LaboratoryAccountRelationshipsReceived`  ##
@@ -22,7 +22,7 @@ We also call any related callbacks with the new information.
 
             for relationships in data
                 continue unless isFinite(id = Number relationships.id) and @accounts[id]?
-                relationship = Enumerals.Relationship.byValue(
+                relationship = Enumerals.Relationship.fromValue(
                     Enumerals.Relationship.FOLLOWED_BY * relationships.followed_by +
                     Enumerals.Relationship.FOLLOWING * relationships.following +
                     Enumerals.Relationship.REQUESTED * relationships.requested +
@@ -63,12 +63,12 @@ Note that accounts are stored as immutable objects.
 Next, we send the request.
 Upon completion, it should trigger an `LaboratoryAccountReceived` event so that we can handle the data.
 
-            serverRequest "GET", @auth.api + "/accounts/" + id, null, @auth.accessToken, Events.Account.Received
+            serverRequest "GET", @auth.api + "/accounts/" + id, null, @auth.accessToken, Events.Account.Received.dispatch
 
 We also need to request the user's relationship to the account, since that doesn't come with our first request.
 We can do that with a `LaboratoryAccountRelationshipsRequested` event.
 
-            LaboratoryAccountRelationshipsRequested {id}
+            Events.Account.RelationshipsRequested.dispatch {id}
 
             return
 
@@ -82,7 +82,7 @@ When an account's data is received, we need to update its information both insid
 
 Right away, we can generate a `Profile` from our `data`.
 
-            profile = new Constructors.Profile data
+            profile = new Constructors.Profile data, @auth.origin
 
 If we already have a profile associated with this account id, then we need to check if anything has changed.
 If it hasn't, we have nothing more to do.
@@ -139,7 +139,7 @@ We wrap the callback in a function which formats the follower list for us.
 When a `LaboratoryAccountFollowing` event is fired, we simply petition the server for a list of people following the user and pass this to our callback.
 We wrap the callback in a function which formats the list for us.
 
-        Following: handle Events.Account.Following (event) ->
+        Following: handle Events.Account.Following, (event) ->
 
             return unless isFinite(id = Number event.detail.id) and typeof (callback = event.detail.callback) is "function"
 
@@ -173,7 +173,7 @@ We issue `Events.Account.RelationshipsReceived()` as our callback function, sinc
 
             return unless isFinite(id = Number event.detail.id)
 
-            serverRequest "POST", @auth.api + "/accounts/" + id + (if event.detail.value then "/follow" else "/unfollow"), null, @auth.accessToken, Events.Account.RelationshipsReceived
+            serverRequest "POST", @auth.api + "/accounts/" + id + (if event.detail.value then "/follow" else "/unfollow"), null, @auth.accessToken, Events.Account.RelationshipsReceived.dispatch
 
 ##  `LaboratoryAccountBlock`  ##
 
@@ -184,4 +184,4 @@ We issue `Events.Account.RelationshipsReceived()` as our callback function, sinc
 
             return unless isFinite(id = Number event.detail.id)
 
-            serverRequest "POST", @auth.api + "/accounts/" + id + (if event.detail.value then "/block" else "/unblock"), null, @auth.accessToken, Events.Account.RelationshipsReceived
+            serverRequest "POST", @auth.api + "/accounts/" + id + (if event.detail.value then "/block" else "/unblock"), null, @auth.accessToken, Events.Account.RelationshipsReceived.dispatch

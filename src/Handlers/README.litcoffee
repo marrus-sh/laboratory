@@ -20,9 +20,10 @@ It sets things up so we can easily add our handlers to the document later.
 We also do a few checks before running the callback to make sure it actually is receiving an appropriate event response.
 
     handle = (builder, callback) ->
+        console.log callback if not builder
         typedCallback = (event) ->
             return unless event? and this? and event.type is builder.type
-            callback event
+            callback.call this, event
         typedCallback.type = builder.type
         return Object.freeze typedCallback
 
@@ -41,7 +42,8 @@ You can see we set the `Authorization` header using our access token, if one was
         return unless method is "GET" or method is "POST" or method is "DELETE"
         request = new XMLHttpRequest()
         request.open method, location
-        if method is "POST" and not (contents instanceof FormData) then request.setRequestHeader "Content-type", "application/x-www-form-urlencoded" else contents = undefined
+        if method is "POST" and not (contents instanceof FormData) then request.setRequestHeader "Content-type", "application/x-www-form-urlencoded"
+        else if method isnt "POST" then contents = undefined
         request.setRequestHeader "Authorization", "Bearer " + accessToken if accessToken
 
 ####  The callback.

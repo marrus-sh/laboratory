@@ -51,7 +51,7 @@ Generally speaking, this isn't something you need to listen for yourself, as the
 >       - `before` – The id at which to end the request.
 >       - `after` – The id at which to start the request.
 
-        ReblogsRequested: new Constructors.LaboratoryEvent "LaboratoryStatusReblogs",
+        Reblogs: new Constructors.LaboratoryEvent "LaboratoryStatusReblogs",
             id: null
             callback: null
             before: null
@@ -70,7 +70,7 @@ The range of ids covered by this list can be provided through `before` and `afte
 >       - `before` – The id at which to end the request.
 >       - `after` – The id at which to start the request.
 
-        FavouritesRequested: new Constructors.LaboratoryEvent "LaboratoryStatusFavouritesRequested",
+        Favourites: new Constructors.LaboratoryEvent "LaboratoryStatusFavourites",
             id: null
             callback: null
             before: null

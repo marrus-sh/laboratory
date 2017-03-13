@@ -20,7 +20,7 @@ In order to ensure that `Follow`s always have the most recent account data, they
 
         return unless this and (this instanceof Constructors.Follow) and data?
 
-        follower = data.account.id
+        @follower = data.account.id
 
         @id = data.id
         Object.defineProperty this, "follower",
