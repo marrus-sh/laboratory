@@ -61,7 +61,7 @@ If your system doesn't support these features, you should still be able to safel
 ###  Request pipelines:
 
 | Mastodon API | Request | Response | Failure |
-| --- | --- | --- |
+| --- | --- | --- | --- |
 | [__Initialization__](src/API/Initialization.litcoffee) |  |  |  |
 | [__Request__](src/API/Request.litcoffee) |  |  |  |
 | [__Client__](src/API/Client.litcoffee) |  |  |  |
@@ -82,7 +82,7 @@ If your system doesn't support these features, you should still be able to safel
 ###  Other events:
 
 | Mastodon API | Event |
-| --- | --- | --- |
+| --- | --- |
 | [__Initialization__](src/API/Initialization.litcoffee) |  |
 | *N/A* | `LaboratoryInitializationLoaded` |
 | *N/A* | `LaboratoryInitializationReady` |
