@@ -70,7 +70,7 @@ If this is a popup (`window.opener.Laboratory` exists) and an API redirect (a `c
 
     do ->
         return unless (code = (location.search.match(/code=([^&]*)/) || [])[1]) and Mommy = window.opener.Laboratory
-        Mommy.dispatch "LaboratoryAuthorizationGranted", {window, code}
+        Mommy.dispatch "LaboratoryAuthorizationGranted", {code}
         return
 
 ###  API and exposed properties:

@@ -1852,11 +1852,12 @@ Here we try to access that data if present:
 If we have an access token which supports our requested `scope` then we can immediately try using it.
 We'll just forward it to `LaboratoryAuthorizationGranted`.
 
-                dispatch "LaboratoryAuthorizationGranted", {
-                    accessToken: accessToken
-                    origin: origin
-                    scope: scope
-                } if accessToken and (scope & storedScope) is +scope
+                if accessToken and (scope & storedScope) is +scope
+                    dispatch "LaboratoryAuthorizationGranted",
+                        accessToken: accessToken
+                        origin: origin
+                        scope: scope
+                    return
 
 If we have client credentials and they are properly associated with our `redirect` and `scope`, we can go ahead and `makeRequest()`.
 

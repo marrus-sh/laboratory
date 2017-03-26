@@ -4,7 +4,17 @@
 
 ###  0.3:
 
-####  0.3.0 – “ayes and ers”.
+####  0.3.1 [IN PROGRESS].
+
+#####  CHANGED
+
+* Fixed [Issue #3](https://github.com/marrus-sh/laboratory/issues/3) where Laboratory would request an access token even when it had a perfectly good one already
+
+#####  REMOVED
+
+- `LaboratoryClientGranted` no longer takes a `window` parameter, and instead automatically closes any `LaboratoryOAuth` window currently open
+
+####  0.3.0.
 
 #####  NEW
 
@@ -29,7 +39,7 @@
 
 ###  0.2:
 
-####  0.2.0 – “im ready it”.
+####  0.2.0.
 
 #####  NEW
 
@@ -43,7 +53,7 @@
 
 ###  0.1:
 
-####  0.1.0 – “untested unmastered.”.
+####  0.1.0.
 
 #####  NEW
 

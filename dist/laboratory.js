@@ -1080,6 +1080,7 @@
           origin: origin,
           scope: scope
         });
+        return;
       }
       if (storedRedirect === redirect && (scope & storedScope) === +scope && (clientID != null) && (clientSecret != null)) {
         makeRequest();
