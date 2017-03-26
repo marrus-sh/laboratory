@@ -13,111 +13,54 @@ Laboratory doesn't have any external dependencies, and should run in any modern 
 This script loads and runs the Laboratory engine.
 Consequently, it is the last thing we load.
 
-###  First steps:
-
-We include informative text about the `Laboratory` package on `Laboratory.ℹ` and give the version number on `Laboratory.Nº` for intersted parties.
-Laboratory follows semantic versioning, which translates into `Nº` as follows: `Major * 100 + Minor + Patch / 100`.
-Laboratory thus assures that minor and patch numbers will never exceed `99` (indeed this would be quite excessive!).
-
-    Laboratory =
-        ℹ: """
-                ............. LABORATORY ..............
-
-                A client-side API for Mastodon, a free,
-                   open-source social network server
-                          - - by Kibigo! - -
-
-                    Licensed under the MIT License.
-                       Source code available at:
-                https://github.com/marrus-sh/laboratory
-
-                            Version 0.2.0
-            """
-        Nº: 2.0
-
-####  Exposing Laboratory objects.
-
-We don't expose *all* of Laboratory to the `window`—just the useful bits for extensions.
-Thus, the following parts are exposed:
-
-- `Constructors`
-- `Events`
-- `Enumerals`
-
-The following parts are *not* exposed:
-
-- Local functions/variables
-- `Handlers`
-
-To keep things compact, we merge everything onto a single `Laboratory` object.
-This of course means that none of the submodules in `Constructors`, `Events`, or `Enumerals` can share the same name.
-We also merge in our `Exposed` properties at this time.
-
-    for module in [Constructors, Events, Enumerals]
-        Object.defineProperty Laboratory, name, {value: submodule, enumerable: yes} for own name, submodule of module
-    Object.defineProperty Laboratory, prop, {get: (-> Exposed[prop]), enumerable: yes} for prop of Exposed
-    Object.defineProperty window, "Laboratory",
-        value: Object.freeze Laboratory
-        enumerable: yes
-
-####  Declaring our objects have loaded.
-
-Now that the `Laboratory` object is available to the `window`, we can fire our `Initialization.Loaded` event.
-
-    Events.Initialization.Loaded.dispatch()
-
 ###  The Store:
 
-Laboratory data is all stored in a single store, and then acted upon through events and event listeners.
-The store is not available outside of those events specified below.
+Laboratory data is all stored in a single `Store`, and then acted upon through events and event listeners.
+The store is not exposed to the window.
 
-####  Loading the store.
-
-We can now load the store.
-We'll wrap this all in a closure to make extra sure that nobody has access to it except our handlers.
-
-    run = ->
-
-        store = Object.freeze
-            accounts: {}
-            auth: Object.seal
-                accessToken: null
-                api: null
-                clientID: null
-                clientSecret: null
-                me: null
-                origin: null
-                redirect: null
-            interfaces: Object.freeze
-                accounts: {}
-                composer: []
-                timelines: {}
-            timelines: {}
+    Store =
+        auth: null
+        notifications: {}
+        profiles: {}
+        statuses: {}
 
 Because Laboratory is still in active development, `window["🏪"]` can be used to gain convenient access to our store.
 Obviously, you shouldn't expect this to last.
 
-        window["🏪"] = store
+    window["🏪"] = Store
+
+###  Loading Laboratory:
+
+We now make our `Laboratory` object available to the window.
+
+    Object.defineProperty window, "Laboratory",
+        value: Object.freeze Laboratory
+        enumerable: yes
+
+Now that the `Laboratory` object is available to the `window`, we can fire our `LaboratoryInitializationLoaded` event.
+
+    dispatch "LaboratoryInitializationLoaded"
+
+###  Running Laboratory:
+
+The `run()` function runs Laboratory once the document has finished loaded.
+
+    run = ->
 
 ####  Adding our listeners.
 
-Now that our store is created, we can initialize our event handlers, binding them to its value.
-It's pretty easy; we just enumerate over `Handlers`.
+Our first task is to initialize our event handlers.
+It's pretty easy; we just enumerate over `LaboratoryEvent.Handlers`.
 
-        for category, object of Handlers
-            document.addEventListener handler.type, handler.bind store for name, handler of object
+        listen handler.type, handler for handler in LaboratoryEvent.Handlers
 
 ####  Starting operations.
 
-Finally, we fire our `Initialization.Ready` event, signalling that our handlers are ready to go.
-We also set `Exposed.ready` to `true` so that scripts can tell Laboratory is running after-the fact, and make `Exposed.user` just point to `auth.me` in our `store`.
+Finally, we fire our `LaboratoryInitializationReady` event, signalling that our handlers are ready to go.
+We also set `Exposed.ready` to `true` so that scripts can tell Laboratory is running after-the fact.
 
         Exposed.ready = yes
-        Object.defineProperty Exposed, "user",
-            get: -> store.auth.me
-            enumerable: yes
-            configurable: no
-        Events.Initialization.Ready.dispatch()
+        dispatch "LaboratoryInitializationReady"
 
         return
 

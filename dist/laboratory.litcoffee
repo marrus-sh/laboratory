@@ -1,3 +1,5 @@
+> From [/src/README.litcoffee](../src/README.litcoffee) :
+
 #  README  #
 
 Welcome to the Laboratory source code!
@@ -6,192 +8,30 @@ Its source files are parseable as regular Markdown documents, and this file is i
 
 ##  How to Read Laboratory Source Code  ##
 
-With the exception of the [Events](Events/) and [Handlers](Handlers/) of the __Laboratory Event API,__ each Laboratory source code file is broadly split up into two parts: the *description*, which describes what the file does and how to use it, and the *implementation*, which actually implements the described algorithms and processes.
+Each Laboratory source code file is broadly split up into two parts: the *description*, which describes what the file does and how to use it, and the *implementation*, which actually implements the described algorithms and processes.
 The implementation will always be the last section in the document, and it is the one that it is safest to ignore—any important information should have already been covered in the description of what goes on in the file.
 However, you can turn to the implementation if you are curious on how specific Laboratory features are actually coded.
 (And, of course, if you are a computer, the compiled implementation is the only part of this file you will ever see!)
 
 ###  What to read:
 
-If you're looking to use Laboratory in your project, then you should definitely familiarize yourself with the [Events API](Events/), as this is the primary means of interfacing with the Laboratory engine.
-You might also be interested in the Laboratory [Constructors](Constructors/) and [Enumerals](Enumerals/), as these describe the data types which you are likely to encounter in your adventures.
+If you're looking to use Laboratory in your project, then you should definitely familiarize yourself with the [Events API](API/), as this is the primary means of interfacing with the Laboratory engine.
+Each file of the API provides a different module, and you should probably take a look at the descriptions for each.
+These will give you an overview of each API component and direct you towards further information.
 
-The [Handlers](Handlers/) folder contains details on the specific details of the Laboratory Event Handlers.
-Generally you can get along fine without knowing all of these specifics, but if you want to know exactly what Laboratory does when you issue an event, this is the place to go.
-
-##  Contributing  ##
-
-Want to contribute to Laboratory?
-That's great!
-Feel free to submit a Pull Request through Github.
-However, here are some guidelines to help your work be successful:
-
-###  Document your code:
-
-Laboratory is written in Literate CoffeeScript, so be literate about it!
-Code should be written in a manner that flows well narratively, and written documentation explaining what it does in plain English should accompany any code.
-It should be possible to understand *what* a file does by only reading the Markdown; the code exists to describe to a computer *how*.
-
-###  Be mindful of data mutability:
-
-If a property shouldn't be overwritten, you should define it with `Object.definePropery()`.
-If an object should be considered immutable, use `Object.freeze()`.
-You will find that most of the time when defining objects in our code one or both of these functions will come into play.
-
-###  Be concise and elegant:
-
-CoffeeScript is a very powerful language for writing code that is elegant and easy-to-read.
-Take advantage of this!
-Having text explanations above and below doesn't excuse messy code.
-
-##  Style Guide  ##
-
-This section describes the style conventions you are likely to encounter when reading Laboratory source.
-
-###  Markdown:
-
-Except where otherwise noted, prose should attempt to follow the Chicago Manual of Style.
-Em dashes with no surrounding spaces are used for parantheticals.
-Abbreviations are written either all-lowercase or all-uppercase, with the former preferred except at the beginning of sentences, and no trailing period (eg: url, id, html).
-The following sections provide more information on Markdown-specific conventions.
-
-####  Headings.
-
-Headings should always be indicated using hash marks, as shown in the code below.
-Place two spaces between the hash marks and the heading text.
-
-```markdown
-    #  THIS IS A TITLE  #
-    ##  This Is A H2 Heading  ##
-    ###  This is a H3 heading:
-    ####  This is a H4 heading.
-    #####  THIS IS A H5 HEADING
-    ######  this is a h6 heading
-```
-
-####  Paragraphs.
-
-Markdown paragraphs are written with one sentence per line.
-This helps document which sentences have changed when looking at git diffs.
-Don't break a sentence across multiple lines; similarly, don't put more than one sentence on the same line.
-
-####  Lists.
-
-Markdown lists come in two forms: expanded and condensed.
-Condensed lists look like this:
-
-- This is an unnumbered list item.
-    - This is a sub-item.
-- Note that there is a space before and after the list, but not in-between items.
-- Never use a condensed list for something more than one sentence long.
-
-Expanded lists look like this:
-
- -  This is an expanded list.
-    Use this for lists that contain multiple sentences.
-
- -  You'll notice that there is a blank line between each list item.
-    This renders each list as a paragraph.
-
-1.  Numbered lists should always be rendered in an expanded form.
-
-2.  Even though Markdown doesn't require it, try to keep numbering accurate for numbered lists.
-
-####  Code blocks.
-
-Code blocks in source code files should always be placed inside blockquotes using GFM fenced code syntax, like this:
-
->   ```coffeescript
->       -> "Here is some CoffeeScript code."
->   ```
-
-Literate CoffeeScript will interpret any indented lines as source code, so encapsulating documentation code in blockquotes helps keep everything nicely separated.
-
-#####  LANGUAGES
-
-Laboratory is written in CoffeeScript, but documentation code should be written instead using plain JavaScript.
-Knowledge of CoffeeScript should not be a prerequisite for interfacing with the Laboratory engine.
-
-####  Issues and notes.
-
-If you want to reference an open issue, or make a note, the syntax for this is as follows:
-
->   __Note :__
->   This is a note.
-
-Note the space between the colon and the word "Note".
-Again, each sentence should be on its own line.
-If the issue has a GitHub link, you might include that:
-
->   __[Issue #XX](https://github.com/marrus-sh/laboratory/issues/XX) :__
->   Here is a comment regarding that issue
-
-Following this syhtax will make finding references to notes and issues easy when searching through pages of source.
-
-####  Other considerations.
-
-If you need to make a line-break, **always** use a `<br>` element.
-**Never** use blank spaces at the end of a line to indicate a manual break.
-
-Two asterisks are used for **important content**, while one asterisk is used for *emphasis*.
-Use underscores if you need __boldfaced__ or _italicized_ text without these semantics.
-
-References to code should use `backticks`.
-HTML elements should be lowercase and surrounded by angle brackets, like `<this>`.
-You may optionally specify attributes as well; `<div class="so">` refers to `<div>` elements with the class `so`.
-Functions and constructors should be followed by parentheses, like `this()`.
-However, when referring to instances and prototypes, no parentheses are used; for example, one might say `something` is an instance of `ThisOne` even though it was created using the constructor `ThisOne()`.
-
-###  CoffeeScript:
-
-####  Variable naming.
-
-Variables and functions are named using `camelCase`, with the first letter lowercase.
-Functions which are meant to serve as constructors, objects which act as modules, and event builders are named using `CamelCase`, with the first letter capitalized.
-Enumerals and other constants are named using `UPPERCASE_LETTERS_WITH_UNDERSCORES`.
-
-The Mastodon API frequently makes use of `lowercase_letters_with_underscores` for its parameter names, although we rarely have to deal with this directly.
-Event types should follow the syntax `LaboratoryModuleEventName`, where this is a reference to an event dispatched by `Laboratory.Module.EventName`.
-
-####  Spacing.
-
-Lines should be indented using 4 spaces.
-This is very important as it keeps code readable even when it is broken up by long paragraphs of text documentation.
-
-####  Strings.
-
-Strings are double-quoted where possible.
-Generally speaking, try to avoid performing substitutions in stings using the `"#{}"` syntax; instead concatenate multiple strings with your code using `+`.
-
-####  Functions.
-
-Generally speaking, if you can avoid using parentheses when calling a function, do.
-Include parentheses only if the code becomes very ambiguous to readers otherwise.
-
-####  Objects.
-
-Only wrap an object in `{}` if you are declaring it all on one line; using the multi-line YAML-like syntax is greatly preffered.
-This includes in function calls—you don't need parentheses around the object either in this case.
-
-####  Constructors.
-
-Constructors should be written as functions with separate prototypes.
-**Do not use CoffeeScript's `class` syntax to write constructors.**
-Constructors and their prototypes should always be frozen using `Object.freeze` to prevent them from being modified after creation.
-
-####  Local variables and closure.
-
-Because our CoffeeScript files are concatenated into a single file before compilation, local variables from one file are also available in another.
-In general, **you should not use local variables**, and whenever you need to declare a variable outside of the scope of a function you should encapsulate it in a `do ->` statement.
-
-####  Postfix forms.
-
-Generally speaking, you should use the postfix forms of `if`, `unless`, `for`, `while`, etc. where possible.
+The [Constructors](Constructors/) documentation provides details on the various data types you might encounter while interacting with Laboratory.
+You should turn to these files whenever you are unclear on what specific properties or methods an object provides.
 
 ##  Implementation  ##
 
 This file doesn't actually do much, but it's the first thing that our Laboratory script runs.
 In case this is a popup generated by an OAuth request, we handle the information quickly now so that the user can proceed uninterrupted.
+
+###  Strict mode:
+
+Laboratory runs in strict mode.
+
+    "use strict"
 
 ###  Introduction:
 
@@ -209,78 +49,59 @@ This is the first file in our compiled source, so let's identify ourselves real 
                Source code available at:
         https://github.com/marrus-sh/laboratory
 
-                    Version 0.2.0
+                    Version 0.3.0
 
     ###
 
 Laboratory uses an [MIT License](../LICENSE.md) because it's designed to be included in other works.
 Feel free to make it your own!
 
+###  First steps:
+
+We include an informative url for the `Laboratory` package on `Laboratory.ℹ` and give the version number on `Laboratory.Nº` for intersted parties.
+Laboratory follows semantic versioning, which translates into `Nº` as follows: `Major * 100 + Minor + Patch / 100`.
+Laboratory thus assures that minor and patch numbers will never exceed `99` (indeed this would be quite excessive!).
+
+    Laboratory =
+        ℹ: "https://github.com/marrus-sh/laboratory"
+        Nº: 3.0
+
 ###  Popup handling:
 
 If this is a popup (`window.opener.Laboratory` exists) and an API redirect (a `code` parameter exists in our query), then we hand our opener our code.
 
     do ->
-        codesearch = location.search.match /code=([^&]*)/
-        code = codesearch[1] if codesearch?
-        window.opener.Laboratory.Authorization.Granted.dispatch {window: window, code: code} if code? and window.opener.Laboratory
+        return unless (code = (location.search.match(/code=([^&]*)/) || [])[1]) and Mommy = window.opener.Laboratory
+        Mommy.dispatch "LaboratoryAuthorizationGranted", {window, code}
+        return
 
-When the `LaboratoryAuthorizationGranted` event gets processed, this window will be closed.
+###  API and exposed properties:
 
-###  Exposed properties:
+The Laboratory API is available through the `Laboratory` object.
 
 Although Laboratory does not expose its store to outsiders, it does carefully reveal a few key properties.
 These are:
 
 - `ready`, which indicates whether `LaboratoryInitializationReady` has fired yet
-- `user`, which gives the id of the currently-logged-in user, or `null` if no user is logged in
+- `auth`, which gives the `Authorization` object that `Laboratory` is currently using.
 
-For now, we'll keep these properties in the `Exposed` object.
+For now, we'll keep these properties in the `Exposed` object, and define getters on `Laboratory` for accessing them.
 
     Exposed =
         ready: no
-        user: null
+        auth: null
 
-
-#  LABORATORY CONSTRUCTORS  #
-
-Laboratory has a number of constructors for various objects that you might encounter through interacting with the engine.
-Using constructors makes it easy to check if an object is of the requested type; simply use `instanceof`.
-However Laboratory never expects you to make use of its constructors in your own code.
-This documentation exists to give you an idea of what properties and methods are available for Laboratory objects.
-
-Of the Laboratory constructors, there is one which is mostly just for internal use; namely [`LaboratoryEvent()`](LaboratoryEvent.litcoffee).
-You are welcome to use this constructor for your own purposes if you want, but note that any events you create using `LaboratoryEvent()` won't be picked up on by the Laboratory engine proper.
-
-The other constructors all represent objects which you are likely to see in your callbacks and responses.
-These are:
-
-- [**Application**](Application.litcoffee)
-- [**Enumeral**](Enumeral.litcoffee)
-- [**Follow**](Follow.litcoffee)
-- [**MediaAttachment**](MediaAttachment.litcoffee)
-- [**Mention**](Mention.litcoffee)
-- [**Post**](Post.litcoffee)
-- [**Profile**](Profile.litcoffee)
-
-##  Implementation  ##
-
-Here we set up our internal `Constructors` object.
-The own properties of this object will be copied to our global `window.Laboratory` object later.
-
-    Constructors = {}
+    (do (prop) -> Object.defineProperty Laboratory, prop, {get: (-> Exposed[prop]), enumerable: yes}) for prop of Exposed
 
 ###  `CustomEvent()`:
 
-`CustomEvent()` is required for our `LaboratoryEvent()` constructor.
+`CustomEvent()` is required for our event handling.
 This is a CoffeeScript re-implementation of the polyfill available on [the MDN](https://developer.mozilla.org/en-US/docs/Web/API/CustomEvent/CustomEvent).
 
     do ->
-
         return if typeof CustomEvent is "function"
-
         CustomEvent = (event, params) ->
-            params = params or {bubbles: false, cancelable: false, detail: undefined}
+            params = params or {bubbles: no, cancelable: no, detail: undefined}
             e = document.createEvent "CustomEvent"
             e.initCustomEvent event, params.bubbles, params.cancelable, params.detail
             return e
@@ -288,8 +109,257 @@ This is a CoffeeScript re-implementation of the polyfill available on [the MDN](
         Object.freeze CustomEvent
         Object.freeze CustomEvent.prototype
 
+###  `serverRequest()`:
+
+`serverRequest()` is a convenience function for dealing with XMLHttpRequest.
+We will use it in our handlers to actually send our requests to the API.
+It isn't exposed to the window.
+
+    serverRequest = (method, location, data, accessToken, onComplete, onError) ->
+
+####  Creating the request.
+
+This is fairly simple; we just create an XMLHttpRequest.
+You can see we set the `Authorization` header using our access token, if one was provided.
+
+        return unless method is "GET" or method is "POST" or method is "DELETE"
+        location = String location
+        data = Object data
+        request = new XMLHttpRequest
+
+####  Setting the contents.
+
+Note that `FormData` isn't supported in IE 9.
+
+        contents = if method is "POST" and FormData? and data instanceof FormData then data else (
+            (
+                for key, value of data when value?
+                    if value instanceof Array then (
+                        (encodeURIComponent key) + "[]=" + (encodeURIComponent subvalue) for subvalue in value
+                    ).join "&"
+                    else (encodeURIComponent key) + "=" + (encodeURIComponent value)
+            ).join "&"
+        ).replace /%20/g, '+'
+
+####  Opening the request.
+
+If our `method` isn't `"POST"` then we need to append our `contents` to our `location`.
+
+        location += (if (location.indexOf "?") isnt -1 then "&" else "?") + contents unless contents is "" or method is "POST"
+        request.open method, location
+        request.setRequestHeader "Content-type", "application/x-www-form-urlencoded" if method is "POST" and not (FormData? and contents instanceof FormData)
+        request.setRequestHeader "Authorization", "Bearer " + accessToken if accessToken
+
+####  The callback.
+
+This is the function that is called once the request finishes loading.
+We will consider a status code in the range `200` to `205` (inclusive) to be a success, and anything else to be an error.
+Laboratory doesn't support HTTP status codes like `206 PARTIAL CONTENT`.
+
+>   __Note :__
+>   We use numbers instead of the easier-to-read state names because state names are different in IE.
+>   However, the standard names are as follows:
+>
+>   - `XMLHttpRequest.UNSENT` (`0`)
+>   - `XMLHttpRequest.OPENED` (`1`)
+>   - `XMLHttpRequest.HEADERS_RECEIVED` (`2`)
+>   - `XMLHttpRequest.LOADING` (`3`)
+>   - `XMLHttpRequest.DONE` (`4`)
+
+        callback = ->
+            switch request.readyState
+                when 0 then  #  Do nothing
+                when 1 then dispatch "LaboratoryRequestOpen", request
+                when 2, 3 then dispatch "LaboratoryRequestUpdate", request
+                when 4
+                    status = request.status
+                    response =
+                        try if request.responseText then JSON.parse request.responseText else null
+                        catch
+                            error: "The response could not be parsed."
+                    params =
+                        status: status
+                        url: location
+                        prev: (((request.getResponseHeader "Link")?.match /<\s*([^,]*)\s*>\s*;[^,]*[;\s]rel="?prev(?:ious)?"?/) or [])[1]
+                        next: (((request.getResponseHeader "Link")?.match /<\s*([^,]*)\s*>\s*;[^,]*[;\s]rel="?next"?/) or [])[1]
+                    switch
+                        when 200 <= status <= 205
+                            if response?.error?
+                                onError response, data, params
+                                dispatch "LaboratoryRequestError", request
+                            else
+                                onComplete response, data, params
+                                dispatch "LaboratoryRequestComplete", request
+                        else
+                            onError response, data, params
+                            dispatch "LaboratoryRequestError", request
+                    request.removeEventListener "readystatechange", callback
+            return
+
+####  Sending the request.
+
+We can now add our event listener and send the request.
+
+        request.addEventListener "readystatechange", callback
+        if method is "POST" then request.send contents else do request.send
+
+        return
+
+
+- - -
+
+> From [/src/Constructors/README.litcoffee](../src/Constructors/README.litcoffee) :
+
+#  LABORATORY CONSTRUCTORS  #
+
+The data received from Laboratory event responses is processed and converted into one of several object types before it makes its way to users.
+This process is handled by __Laboratory constructors,__ which define the basic data types used when interacting with the API.
+Many Laboratory constructors are also API modules; however, some are more "passive" and don't have events directly associated with them.
+
+The Laboratory constructors are as follows:
+
+- [__Application__](Application.litcoffee)
+- [__Attachment__](Attachment.litcoffee)
+- [__Authorization__](Authorization.litcoffee)
+- [__Client__](Client.litcoffee)
+- [__Enumeral__](Enumeral.litcoffee)
+- [__Failure__](Failure.litcoffee)
+- [__Post__](Post.litcoffee)
+- [__Profile__](Profile.litcoffee)
+- [__Rolodex__](Rolodex.litcoffee)
+- [__Timeline__](Timeline.litcoffee)
+
+##  Implementation  ##
+
+See specific constructor pages for details on their implementation.
+
+- - -
+
+> From [/src/Constructors/Enumeral.litcoffee](../src/Constructors/Enumeral.litcoffee) :
+
+#  LABORATORY ENUMERALS  #
+
+##  Introduction  ##
+
+If you have experience working with JavaScript and the DOM, you may have encountered DOM attributes whose values are described by an enumerated type.
+For example, `Node.NodeType` can have values which include `Node.ELEMENT_NODE`, with a value of `1`, and `Node.TEXT_NODE`, with a value of `3`.
+__Laboratory enumerals__ are an extension of this principle.
+They aim to accomplish these things:
+
+1.  **Provide a unique, static identifier for a response value.**
+    Laboratory enumerals are unique, immutable objects that do not equate to anything but themselves under strict (`===`) equality.
+
+2.  **Allow checking of specific properties using binary flags.**
+    Laboratory enumerals compute to numbers which are non-arbitrary in their meaning.
+    You can use binary tests to check for specific enumeral properties; for example, `visibility & Laboratory.Post.Visibility.LISTED` can be used to tell if a given `visibility` is listed or not.
+
+3.  **Provide easy type identification.**
+    Each Laboratory enumeral is an instance of the object in which it is contained.
+    Thus, `Laboratory.PostType.STATUS instanceof Laboratory.PostType` evaluates to `true`.
+
+4.  **Guarantee uniqueness of value.**
+    It is guaranteed that no two enumerals of a given type will share the same value.
+
+##  Enumeral Types  ##
+
+Enumeral types can be created by calling `Enumeral.generate()` with an object whose properties and values give the names and values for the resultant enumerals, like so:
+
+>   ```javascript
+>   MyType = Enumeral.generate({
+>       TYPE_A: 1
+>       TYPE_B: 2
+>       TYPE_AB: 3
+>       TYPE_C: 4
+>       TYPE_F: 32
+>   });
+>   console.log(MyType.TYPE_A instanceof MyType && MyType.TYPE_A == 1 && !(MyType.TYPE_A === 1)); // -> `true`
+>   ```
+
+Further discussion of specific enumeral types takes place in the various files in which they are defined.
+
+###  `fromValue()`:
+
+>   ```javascript
+>       Type.fromValue(n);
+>   ```
+>
+>   - __`n` :__ An integer value
+
+The `fromValue()` method of an enumeral type can be used to get the enumeral associated with the given value.
+
+##  Implementation  ##
+
+We implement `Enumeral` inside of a closure to prevent it from functioning outside of the context of `Enumeral.generate()`.
+
+    Laboratory.Enumeral = Enumeral = null
+    do ->
+
+        generator = off
+
+###  The constructor:
+
+The `Enumeral()` constructor takes a numeric `value`, which the resultant enumeral will compute to.
+
+        Laboratory.Enumeral = Enumeral = (value) ->
+
+            throw new Error "Laboratory Error : The `Enumeral()` constructor cannot be called directly—try `Enumeral.generate()` instead" unless generator
+            throw new Error "Laboratory Error : `Enumeral()` must be called as a constructor" unless this and this instanceof Enumeral
+
+            @value = value | 0
+            return Object.freeze this
+
+###  The prototype:
+
+The `Enumeral` prototype overwrites `valueOf()` to allow for easy numeric conversion.
+It also adjusts `toString()` and `toSource()` slightly.
+
+        Object.defineProperty Enumeral, "prototype",
+            value: Object.freeze
+                toString: -> "Enumeral(" + @value + ")"
+                toSource: ->"Enumeral(" + @value + ")"
+                valueOf: -> @value
+
+###  Generating enumerals:
+
+The `generate()` function creates an `Enumeral` type that meets our specifications.
+The provided `data` should be an object whose enumerable own properties associate enumeral names with values.
+
+        Enumeral.generate = (data) ->
+
+First, we need to "fork" the main `Enumeral` constructor so that typechecking will work.
+We create a new constructor that just passes everything on.
+
+            type = (n) -> Enumeral.call this, n
+            type.prototype = Object.create Enumeral.prototype
+
+Next, we define our enumerals.
+We also create a hidden object which store the relationship going the other way.
+Note that since values are not guaranteed to be unique, this object may not contain every enumeral (some might be overwritten).
+
+            generator = on
+            byValue = {}
+            for own enumeral, value of data
+                continue if byValue[value]?
+                type[enumeral] = new type value
+                byValue[value] = type[enumeral]
+            generator = off
+
+This function allows quick conversion from value to enumeral.
+
+            type.fromValue = (n) -> byValue[n | 0]
+
+We can now freeze our enumerals and return them.
+
+            return Object.freeze type
+
+
+- - -
+
+> From [/src/Constructors/Application.litcoffee](../src/Constructors/Application.litcoffee) :
 
 #  THE APPLICATION CONSTRUCTOR  #
+
+##  Introduction  ##
 
 The `Application()` constructor creates a unique, read-only object which represents an application used to interface with the Mastodon API.
 Its properties are summarized below, alongside their Mastodon API equivalents:
@@ -305,9 +375,10 @@ Its properties are summarized below, alongside their Mastodon API equivalents:
 
 The `Application()` constructor takes a `data` object from an API response and reads its attributes into an instance's properties.
 
-    Constructors.Application = (data) ->
+    Laboratory.Application = Application = (data) ->
 
-        return unless this and (this instanceof Constructors.Application) and data?
+        throw new Error "Laboratory Error : `Application()` must be called as a constructor" unless this and this instanceof Application
+        throw new Error "Laboratory Error : `Application()` was called without any `data`" unless data?
 
         @name = data.name
         @href = data.website
@@ -318,153 +389,19 @@ The `Application()` constructor takes a `data` object from an API response and r
 
 The `Application` prototype just inherits from `Object`.
 
-    Object.defineProperty Constructors.Application, "prototype",
+    Object.defineProperty Application, "prototype",
         value: Object.freeze {}
 
 
-#  THE ENUMERAL CONSTRUCTOR  #
+- - -
 
-The `Enumeral()` constructor creates a unique, read-only object which can be used as a unique identifier.
-`Enumeral`s evaluate to numbers and can also be used with binary comparisons.
+> From [/src/Constructors/Attachment.litcoffee](../src/Constructors/Attachment.litcoffee) :
 
-For more information on enumerals and how they work, see the documentation for [Laboratory enumerals](../Enumerals/).
+#  THE ATTACHMENT CONSTRUCTOR  #
 
-##  Implementation  ##
+##  Introduction  ##
 
-###  The constructor:
-
-The `Enumeral()` constructor takes a numeric `value`, which the resultant enumeral will compute to.
-
-    Constructors.Enumeral = (value) ->
-
-        return unless this and (this instanceof Constructors.Enumeral)
-
-        @value = 0 unless isFinite @value = Number value
-
-        return Object.freeze this
-
-###  The prototype:
-
-The `Enumeral` prototype overwrites `valueOf()` to allow for easy numeric conversion.
-It also adjusts `toString()` and `toSource()` slightly.
-
-    Object.defineProperty Constructors.Enumeral, "prototype",
-        value: Object.freeze
-            toString: -> "Enumeral(" + @value + ")"
-            toSource: ->"Enumeral(" + @value + ")"
-            valueOf: -> @value
-
-
-#  THE FOLLOW CONSTRUCTOR  #
-
-The `Follow()` constructor creates a unique, read-only object which represents a follow by another user.
-Its properties are summarized below, alongside their Mastodon API equivalents:
-
-|  Property  | API Response | Description |
-| :--------: | :----------: | :---------- |
-|    `id`    |     `id`     | The id of follow notification |
-| `follower` |  `account`   | The account who issued the follow |
-
-##  Implementation  ##
-
-###  The constructor:
-
-The `Follow()` constructor takes a `data` object from an API response and reads its attributes into an instance's properties.
-In order to ensure that `Follow`s always have the most recent account data, they will calculate their `account` parameter on-demand by looking up the account's id from a list of `accounts`.
-(This should be a list of `Profile`s, although this is not enforced.)
-
-    Constructors.Follow = (data, accounts) ->
-
-        return unless this and (this instanceof Constructors.Follow) and data?
-
-        @follower = data.account.id
-
-        @id = data.id
-        Object.defineProperty this, "follower",
-            get: -> accounts[author]
-            enumerable: yes
-
-        return Object.freeze this
-
-###  The prototype:
-
-The `Follow` prototype just inherits from `Object`.
-
-    Object.defineProperty Constructors.Follow, "prototype",
-        value: Object.freeze {}
-
-
-#  THE LABORATORY EVENT CONSTRUCTOR  #
-
-The `LaboratoryEvent()` constructor creates a new event builder, with an assigned `type` and default `props`.
-Calling the `new()` function on an event builder returns a new `CustomEvent`, while calling `dispatch()` both creates and dispatches said event—by default, to the `document`.
-
-##  Implementation
-
-###  The constructor:
-
-The `LaboratoryEvent()` constructor takes a string `type`, which names the event, and an object `props`, which defines its default `detail`.
-It adds `_builder` as a default property, which is a reference to itself.
-
-    Constructors.LaboratoryEvent = (type, props) ->
-
-        return unless this and (this instanceof Constructors.LaboratoryEvent)
-
-        @type = String type
-        @defaultProps = Object props
-        Object.defineProperty @defaultProps, "_builder",
-            value: this
-            enumerable: yes
-        Object.freeze @defaultProps
-        Object.defineProperties this,
-            new:
-                value: Constructors.LaboratoryEvent.prototype.new.bind this
-            dispatch:
-                value: Constructors.LaboratoryEvent.prototype.dispatch.bind this
-
-        return Object.freeze this
-
-###  The prototype:
-
-    Object.defineProperty Constructors.LaboratoryEvent, "prototype",
-        value: Object.freeze
-
-####  `new()`.
-
-The `new()` prototype function simply takes the provided `props` and copies them over to a `detail`, which it assigns to a new `CustomEvent` of type `@type`.
-Only those properties which exist in an instance's `@defaultProps` are considered.
-
-            new: (props) ->
-
-                return unless this instanceof Constructors.LaboratoryEvent
-
-                detail = {}
-
-                for name, initial of @defaultProps
-                    Object.defineProperty detail, name,
-                        value: if props? and props[name]? and name isnt '_builder' then props[name] else initial
-                        enumerable: name isnt '_builder'
-
-                return new CustomEvent @type, {detail: Object.freeze detail}
-
-####  `dispatch()`.
-
-The `dispatch()` prototype function calls `new()` with the given `props`, and then immediately dispatches the resulting event at the provided `location`.
-By default, it will dispatch to `document`.
-
-            dispatch: (props, location) ->
-
-                location = document unless location?.dispatchEvent?
-                return unless (location.dispatchEvent instanceof Function) and (this instanceof Constructors.LaboratoryEvent)
-
-                location.dispatchEvent @new(props)
-
-                return
-
-
-#  THE MEDIA ATTACHMENT CONSTRUCTOR  #
-
-The `MediaAttachment()` constructor creates a unique, read-only object which represents an attached piece of media sent through the Mastodon API.
+The `Attachment()` constructor creates a unique, read-only object which represents an attached piece of media sent through the Mastodon API.
 Its properties are summarized below, alongside their Mastodon API equivalents:
 
 | Property  | API Response  | Description |
@@ -472,81 +409,246 @@ Its properties are summarized below, alongside their Mastodon API equivalents:
 |   `id`    |     `id`      | The id of the media attachment |
 |  `href`   |     `url`     | The url of the media attachment |
 | `preview` | `preview_url` | The url of a preview for the media attachment |
-|  `type`   |    `type`     | A [`Laboratory.MediaType`](../Enumerals/MediaType.litcoffee) |
+|  `type`   |    `type`     | An `Attachment.Type` |
+
+###  Media types:
+
+The possible `Attachment.Type`s are as follows:
+
+| Enumeral | Binary Value | Description |
+| :------: | :----------: | :---------- |
+| `Attachment.Type.UNKNOWN` | `00` | The media type cannot be determined |
+| `Attachment.Type.PHOTO` | `01` | The media is a photo |
+| `Attachment.Type.VIDEO` | `10` | The media is a video |
+| `Attachment.Type.GIFV` | `11` | The media is a gif-video |
 
 ##  Implementation  ##
 
 ###  The constructor:
 
-The `MediaAttachment()` constructor takes a `data` object from an API response and reads its attributes into an instance's properties.
+The `Attachment()` constructor takes a `data` object from an API response and reads its attributes into an instance's properties.
 
-    Constructors.MediaAttachment = (data) ->
+    Laboratory.Attachment = Attachment = (data) ->
 
-        return unless this and (this instanceof Constructors.MediaAttachment) and data?
+        throw new Error "Laboratory Error : `Attachment()` must be called as a constructor" unless this and this instanceof Attachment
+        throw new Error "Laboratory Error : `Attachment()` was called without any `data`" unless data?
 
-        @id = data.id
-        @href = data.url
-        @preview = data.preview_url
-        @type = if data.type is "image" then Enumerals.MediaType.IMAGE else if data.type is "video" then Enumerals.MediaType.VIDEO else Enumerals.MediaType.UNKNOWN
+        @id = Number data.id
+        @href = String data.url
+        @preview = String data.preview_url
+        @type = switch data.type
+            when "image" then Attachment.Type.IMAGE
+            when "video" then Attachment.Type.VIDEO
+            when "gifv" then Attachment.Type.GIFV
+            else Attachment.Type.UNKNOWN
 
         return Object.freeze this
 
 ###  The prototype:
 
-The `MediaAttachment` prototype just inherits from `Object`.
+The `Attachment` prototype just inherits from `Object`.
 
-    Object.defineProperty Constructors.MediaAttachment, "prototype",
+    Object.defineProperty Attachment, "prototype",
         value: Object.freeze {}
 
+###  Defining media types:
 
-#  THE MENTION CONSTRUCTOR  #
+Here we define our `Attachment.Type`s, as described above:
 
-The `Mention()` constructor creates a unique, read-only object which represents a user mention.
+    Attachment.Type = Enumeral.generate
+        UNKNOWN : 0b00
+        PHOTO   : 0b01
+        VIDEO   : 0b10
+        GIFV    : 0b11
+
+
+- - -
+
+> From [/src/Constructors/Authorization.litcoffee](../src/Constructors/Authorization.litcoffee) :
+
+#  THE AUTHORIZATION CONSTRUCTOR  #
+
+##  Introduction  ##
+
+The `Authorization()` constructor creates a unique, read-only object which represents a successful authorization request.
 Its properties are summarized below, alongside their Mastodon API equivalents:
 
-|    Property    | API Response  | Description |
-| :------------: | :-----------: | :---------- |
-|      `id`      |     `id`      | The id of the mentioned account |
-|     `href`     |     `url`     | The url of the mentioned account's profile |
-|   `username`   |  `username`   | The mentioned account's username |
-|   `account`    | Not provided  | The mentioned account's username, followed by their domain |
-| `localAccount` |    `acct`     | The mentioned account's username, followed by their domain for remote users only |
+|   Property    |  API Response  | Description |
+| :-----------: | :------------: | :---------- |
+|   `origin`    | *Not provided* | The origin of the API request |
+| `accessToken` | `access_token` | The access token received by the authorization |
+|  `datetime`   |  `created_at`  | The `Date` the token was created |
+|    `scope`    |    `scope`     | The `Authorization.Scope` associated with the access token |
+|  `tokenType`  |  `token_type`  | Should always be the string `"bearer"` |
+|     `me`      | *Not provided* | The id of the currently-signed-in account |
+
+###  Scopes:
+
+The possible `Authorization.Scope`s are as follows:
+
+| Enumeral | Binary Value | Description |
+| :------: | :----------: | :---------- |
+| `Authorization.Scope.NONE` | `000` | No scope is defined |
+| `Authorization.Scope.READ` | `001` | The scope is `"read"` |
+| `Authorization.Scope.WRITE` | `010` | The scope is `"write"` |
+| `Authorization.Scope.READWRITE` | `011` | The scope is `"read write"` |
+| `Authorization.Scope.FOLLOW` | `100` | The scope is `"follow"` |
+| `Authorization.Scope.READFOLLOW` | `101` | The scope is `"read follow"` |
+| `Authorization.Scope.WRITEFOLLOW` | `110` | The scope is `"write follow"` |
+| `Authorization.Scope.READWRITEFOLLOW` | `111` | The scope is `"read write follow"` |
 
 ##  Implementation  ##
 
 ###  The constructor:
 
-The `Mention()` constructor takes a `data` object from an API response and reads its attributes into an instance's properties.
-It uses the `origin` argument to help fill out account handles.
+The `Authorization()` constructor takes a `data` object from an API response and reads its attributes into an instance's properties.
+We also need to provide it with an `origin`.
 
-    Constructors.Mention = (data, origin) ->
+    Laboratory.Authorization = Authorization = (data, origin, me) ->
 
-        return unless this and (this instanceof Constructors.Mention) and data?
+        throw new Error "Laboratory Error : `Authorization()` must be called as a constructor" unless this and this instanceof Authorization
+        throw new Error "Laboratory Error : `Authorization()` was called without any `data`" unless data?
 
-        @id = data.id
-        @href = data.url
-        @username = data.username
-        @account = data.acct + (if origin? and data.acct.indexOf("@") is -1 then origin else "")
-        @localAccount = data.acct
+        @origin = String origin
+        @accessToken = String data.access_token
+        @datetime = new Date data.created_at
+        @scope = Authorization.Scope.fromValue Authorization.Scope.READ * (((scopes = (String data.scope).split /[\s\+]+/g).indexOf "read") isnt -1) + Authorization.Scope.WRITE * ((scopes.indexOf "write") isnt -1) + Authorization.Scope.FOLLOW * ((scopes.indexOf "follow") isnt -1)
+        @tokenType = String data.tokenType
+        @me = +me
 
         return Object.freeze this
 
 ###  The prototype:
 
-The `Mention` prototype just inherits from `Object`.
+The `Authorization` prototype just inherits from `Object`.
 
-    Object.defineProperty Constructors.Mention, "prototype",
+    Object.defineProperty Authorization, "prototype",
+        value: Object.freeze {}
+
+###  Defining our scopes:
+
+Here we define our `Authorization.Scope`s, as described above:
+
+    Authorization.Scope = Enumeral.generate
+        NONE            : 0b000
+        READ            : 0b001
+        WRITE           : 0b010
+        READWRITE       : 0b011
+        FOLLOW          : 0b100
+        READFOLLOW      : 0b101
+        WRITEFOLLOW     : 0b110
+        READWRITEFOLLOW : 0b111
+
+
+- - -
+
+> From [/src/Constructors/Client.litcoffee](../src/Constructors/Client.litcoffee) :
+
+#  THE CLIENT CONSTRUCTOR  #
+
+##  Introduction  ##
+
+The `Client()` constructor creates a unique, read-only object which represents a registered Mastodon client.
+It is unlikely you will ever need to call this constructor yourself.
+Its properties are summarized below, alongside their Mastodon API equivalents:
+
+|    Property    |  API Response   | Description |
+| :------------: | :-------------: | :---------- |
+|    `origin`    | *Not provided*  | The origin of the API request |
+|     `name`     | *Not provided*  | The name of the client |
+|      `id`      |      `id`       | The internal id for the client|
+|   `clientID`   |   `client_id`   | The public id of the client |
+| `clientSecret` | `client_secret` | The private (secret) id of the client |
+|    `scope`     | *Not provided*  | The [`Authorization.Scope`](Authorization.litcoffee) associated with the client |
+|   `redirect`   | `redirect_uri`  | The redirect URL associated with the client |
+
+##  Implementation  ##
+
+###  The constructor:
+
+The `Client()` constructor takes a `data` object from an API response and reads its attributes into an instance's properties.
+We also need to provide it with the parameters of the API request, through the `params` object, and the origin of the request, through `origin`.
+
+    Laboratory.Client = Client = (data, params, origin) ->
+
+        throw new Error "Laboratory Error : `Client()` must be called as a constructor" unless this and this instanceof Client
+        throw new Error "Laboratory Error : `Client()` was called without any `data`" unless data?
+
+        @origin = origin
+        @name = params.client_name
+        @id = data.id
+        @clientID = data.client_id
+        @clientSecret = data.client_secret
+        @scope = Authorization.Scope.fromValue Authorization.Scope.READ * (params.scopes.indexOf("read") isnt -1) + Authorization.Scope.WRITE * (params.scopes.indexOf("write") isnt -1) + Authorization.Scope.FOLLOW * (params.scopes.indexOf("follow") isnt -1)
+        @redirect = data.redirect_uri
+
+        return Object.freeze this
+
+###  The prototype:
+
+The `Client` prototype just inherits from `Object`.
+
+    Object.defineProperty Client, "prototype",
         value: Object.freeze {}
 
 
+- - -
+
+> From [/src/Constructors/Failure.litcoffee](../src/Constructors/Failure.litcoffee) :
+
+#  THE FAILURE CONSTRUCTOR  #
+
+##  Introduction  ##
+
+The `Failure()` constructor creates a unique, read-only object which represents a failed request.
+Its properties are summarized below, alongside their Mastodon API equivalents:
+
+| Property  |  API Response  | Description |
+| :-------: | :------------: | :---------- |
+|  `error`  |    `error`     | The text of the error |
+|  `code`   | *Not provided* | The HTTP access code of the error, if applicable |
+| `request` | *Not provided* | The request which failed |
+
+##  Implementation  ##
+
+###  The constructor:
+
+The `Failure()` constructor takes a `data` object from an API response and reads its attributes into an instance's properties.
+We have to provide it with the `request` we made and the HTTP `code` of the response as well.
+
+    Laboratory.Failure = Failure = (data, request, code) ->
+
+        throw new Error "Laboratory Error : `Failure()` must be called as a constructor" unless this and this instanceof Failure
+        throw new Error "Laboratory Error : `Failure()` was called without any `data`" unless data?
+
+        @request = String request
+        @error = String data.error
+        @code = null unless isFinite @code = Number code
+
+        return Object.freeze this
+
+###  The prototype:
+
+The `Failure` prototype just inherits from `Object`.
+
+    Object.defineProperty Failure, "prototype",
+        value: Object.freeze {}
+
+
+- - -
+
+> From [/src/Constructors/Post.litcoffee](../src/Constructors/Post.litcoffee) :
+
 #  THE POST CONSTRUCTOR  #
+
+##  Introduction  ##
 
 The `Post()` constructor creates a unique, read-only object which represents an account's profile information.
 Its properties are summarized below, alongside their Mastodon API equivalents:
 
 |      Property      |    API Response     | Description |
 | :----------------: | :-----------------: | :---------- |
-|       `type`       |    Not provided     | A [`Laboratory.PostType`](../Enumerals/PostType.litcoffee) |
+|       `type`       |   *Not provided*    | A `Post.Type` |
 |       `id`         |        `id`         | The id of the post |
 |       `uri`        |        `uri`        | A fediverse-unique identifier for the post |
 |      `href`        |        `url`        | The url of the post's page |
@@ -560,49 +662,115 @@ Its properties are summarized below, alongside their Mastodon API equivalents:
 |   `isFavourited`   |    `favourited`     | Whether or not the user has favourited the post |
 |      `isNSFW`      |     `sensitive`     | Whether or not the post's media contains sensitive content |
 |     `message`      |   `spoiler_text`    | The message to hide the post behind, if any |
-|    `visibility`    |    `visibility`     | A [`Laboratory.Visibility`](../Enumerals/Visibility.litcoffee) |
-| `mediaAttachments` | `media_attachments` | An array of [`Laboratory.MediaAttachment`](MediaAttachment.litcoffee)s |
-|     `mentions`     |     `mentions`      | An array of [`Laboratory.Mention`](Mention.litcoffee)s |
-|   `application`    |   `application`     | A [`Laboratory.Application`](Application.litcoffee) identifying the application which created the post |
-|   `rebloggedBy`    |    Not provided     | The id of the account who reblogged the post; only set for reblog notifications |
-|   `favouritedBy`   |    Not provided     | The id of the account who favourited the post; only set for favourite notifications |
+|    `visibility`    |    `visibility`     | A `Post.Visibility` |
+| `mediaAttachments` | `media_attachments` | An array of [`Attachment`](Attachment.litcoffee)s |
+|     `mentions`     |     `mentions`      | An array of [`Profile`](Profile.litcoffee)s |
+|   `application`    |   `application`     | A [`Application`](Application.litcoffee) identifying the application which created the post |
+|   `rebloggedBy`    |   *Not provided*    | The account who reblogged the post; only set for reblog notifications |
+|   `favouritedBy`   |   *Not provided*    | The account who favourited the post; only set for favourite notifications |
+
+`Post`s will not necessarily contain all of the above properties.
+Follow notifcations will only have a `type`, `id`, and `author`, and the `rebloggedBy` and `favouritedBy` properties only show up on reblog and favourite reactions, respectively.
+If a reaction has neither of these properties, then it must be a mention.
+
+###  Post types:
+
+The available `Post.Type`s are as follows:
+
+| Enumeral | Hex Value | Description |
+| :------: | :-------: | :---------- |
+| `Post.Type.UNKNOWN` | `0x00` | The post type cannot be determined |
+| `Post.Type.STATUS` | `0x10` | The post is an status |
+| `Post.Type.NOTIFICATION` | `0x20` | The post is a notification |
+| `Post.Type.FOLLOW` | `0x21` | The post is a notification |
+| `Post.Type.REACTION` | `0x30` | The post is a notification responding to another post |
+| `Post.Type.FAVOURITE` | `0x31` | The post is a notification responding to another post |
+| `Post.Type.REBLOG` | `0x32` | The post is a notification responding to another post |
+| `Post.Type.MENTION` | `0x33` | The post is a notification responding to another post |
+
+Note that not all of the above types will necessarily ever appear on posts; `Post.Type.NOTIFICATION` and `Post.Type.REACTION` exist purely for use with binary comparison tests.
+
+###  Post visibilities:
+
+The available `Post.Visibility`s are as follows:
+
+| Enumeral | Binary Value | Description |
+| :------: | :-----------: | :---------- |
+| `Post.Visibility.PRIVATE` | `00` | The post cannot be reblogged and appears as unlisted |
+| `Post.Visibility.REBLOGGABLE` | `01` | The post is unlisted but can be reblogged |
+| `Post.Visibility.LISTED` | `10` | The post is listed but can't be reblogged |
+| `Post.Visibility.PUBLIC` | `11` | The post is listed and can be reblogged |
+
+However, note that `Visibility.LISTED` (`0x02`) is not a valid visibility for a Mastodon post.
+
+The visibility of the post can be evaluating using bitwise comparisons: `visibility & Post.Visibility.LISTED` will detect whether a post is listed or unlisted, for example.
+
+##  Prototype Methods  ##
+
+###  `compare()`:
+
+>   ```javascript
+>       Laboratory.Post.prototype.compare(post);
+>   ```
+>
+>   - __`post` :__ A `Post` to compare with
+
+The `compare()` prototype method compares a `Post` with another and returns `true` if they have the same properties.
+For efficiency, if two `Post`s have the same `id` then `compare()` will only test those properties which are likely to change.
 
 ##  Implementation  ##
 
 ###  The constructor:
 
 The `Post()` constructor takes a `data` object from an API response and reads its attributes into an instance's properties.
-In order to ensure that `Post`s always have the most recent account data, they will calculate their `account` parameter on-demand by looking up the account's id from a list of `accounts`.
-(This should be a list of `Profile`s, although this is not enforced.)
 
-    Constructors.Post = (data, accounts) ->
+    Laboratory.Post = Post = (data) ->
 
-        return unless this and (this instanceof Constructors.Post) and data?
+        throw new Error "Laboratory Error : `Post()` must be called as a constructor" unless this and this instanceof Post
+        throw new Error "Laboratory Error : `Post()` was called without any `data`" unless data?
+
+We'll use the `getProfile()` function in our various account getters.
+
+        profiles = Store.profiles
+        getProfile = (id) -> profiles[id]
 
 The `Post()` constructor can be called with either a status response or a notification one.
 We can check this fairly readily by checking for the presence of the `status` attibute.
-If `data` has an associated `status`, then it must be a notification.
+If `data` has an associated `type`, then it must be a notification.
 We pull the notification data and then overwrite `data` to just show the post.
 
-        if data.status
-            @type = Enumerals.PostType.NOTIFICATION
+        if data.type?
             @id = data.id
-            switch data.type
-                when "reblog"
-                    Object.defineProperty this, "rebloggedBy",
-                        get: -> accounts[data.account.id]
-                        enumerable: yes
-                when "favourite"
-                    Object.defineProperty this, "favouritedBy",
-                        get: -> accounts[data.account.id]
-                        enumerable: yes
-                # when "mention" then the mentioner is just the author of the post :P
-            data = data.status
+            fromID = data.account.id
+            if data.status
+                switch data.type
+                    when "reblog"
+                        @type = Post.Type.REBLOG
+                        Object.defineProperty this, "rebloggedBy",
+                            get: getProfile.bind this, fromID
+                            enumerable: yes
+                    when "favourite"
+                        @type = Post.Type.FAVOURITE
+                        Object.defineProperty this, "favouritedBy",
+                            get: getProfile.bind this, fromID
+                            enumerable: yes
+                    when "mention" then @type = Post.Type.MENTION
+                    else @type = Post.Type.REACTION
+                data = data.status
+            else
+                Object.defineProperty this, "author",
+                    get: getProfile.bind this, fromID
+                    enumerable: yes
+                switch data.type
+                    when "follow" then @type = Post.Type.FOLLOW
+                    else @type = Post.Type.NOTIFICATION
+                return Object.freeze this
+
 
 If our `data` isn't a notification then we can use its `id` like normal.
 
         else
-            @type = Enumerals.PostType.STATUS
+            @type = Post.Type.STATUS
             @id = data.id
 
 That said, it is possible our `data` is a normal (non-notification) reblog.
@@ -610,43 +778,45 @@ In which case, we want to use the original post for extracting our data.
 
             if data.reblog
                 Object.defineProperty this, "rebloggedBy",
-                    get: -> accounts[data.account.id]
+                    get: getProfile.bind this, data.account.id
                     enumerable: yes
                 data = data.reblog
 
 Now we can set the rest of our properties.
 
-        @uri = data.uri
-        @href = data.url
+        @uri = String data.uri
+        @href = String data.url
         Object.defineProperty this, "author",
-            get: -> accounts[data.account.id]
+            get: getProfile.bind this, data.account.id
             enumerable: yes
-        @inReplyTo = data.in_reply_to_id
-        @content = data.content
-        @datetime = data.created_at
-        @reblogCount = data.reblogs_count
-        @favouriteCount = data.favourites_count
-        @isReblogged = data.reblogged
-        @isFavourited = data.favourited
-        @isNSFW = data.sensitive
-        @message = data.spoiler_text
+        @inReplyTo = Number data.in_reply_to_id
+        @content = String data.content
+        @datetime = new Date data.created_at
+        @reblogCount = Number data.reblogs_count
+        @favouriteCount = Number data.favourites_count
+        @isReblogged = !!data.reblogged
+        @isFavourited = !!data.favourited
+        @isNSFW = !!data.sensitive
+        @message = String data.spoiler_text
         @visibility = {
-            private: Enumerals.Visibility.PRIVATE
-            unlisted: Enumerals.Visibility.UNLISTED
-            public: Enumerals.Visibility.PUBLIC
-        }[data.visibility] || Enumerals.Visibility.UNLISTED
-        @mediaAttachments = (new Constructors.MediaAttachment item for item in data.media_attachments)
-        @mentions = (new Constructors.Mention item for item in data.mentions)
-        @application = new Constructors.Application data.application
+            private: Post.Visibility.PRIVATE
+            unlisted: Post.Visibility.REBLOGGABLE
+            public: Post.Visibility.PUBLIC
+        }[data.visibility] or Post.Visibility.PRIVATE
+        @mediaAttachments = (new Attachment item for item in data.media_attachments)
+        @mentions = do =>
+            mentions = []
+            Object.defineProperty mentions, index, {get: getProfile.bind(this, mention.id), enumerable: yes} for mention, index in data.mentions
+            return mentions
+        @application = if data.application? then new Application data.application else null
 
         return Object.freeze this
 
 ###  The prototype:
 
-
 The `Post` prototype has one function.
 
-    Object.defineProperty Constructors.Post, "prototype",
+    Object.defineProperty Post, "prototype",
         value: Object.freeze
 
 `compare` does a quick comparison between two `Post`s, and tells whether or not they are equivalent.
@@ -654,7 +824,7 @@ For efficiency's sake, if the ids of the two posts are the same, it only compare
 
             compare: (other) ->
 
-                return false unless other instanceof Constructors.Post
+                return no unless this instanceof Post and other instanceof Post
 
                 return (
                     @type is other.type and
@@ -665,8 +835,35 @@ For efficiency's sake, if the ids of the two posts are the same, it only compare
                     @isFavourited is other.isFavourited
                 )
 
+###  Defining our enumerals:
+
+Here we define our enumerals as described above.
+
+    Post.Type = Enumeral.generate
+        UNKNOWN      : 0x00
+        STATUS       : 0x10
+        NOTIFICATION : 0x20
+        FOLLOW       : 0x21
+        REACTION     : 0x30
+        FAVOURITE    : 0x31
+        REBLOG       : 0x32
+        MENTION      : 0x33
+
+    Post.Visibility = Enumeral.generate
+        PRIVATE      : 0x00
+        REBLOGGABLE  : 0x01
+        LISTED       : 0x02
+        PUBLIC       : 0x03
+
+
+
+- - -
+
+> From [/src/Constructors/Profile.litcoffee](../src/Constructors/Profile.litcoffee) :
 
 #  THE PROFILE CONSTRUCTOR  #
+
+##  Introduction  ##
 
 The `Profile()` constructor creates a unique, read-only object which represents an account's profile information.
 Its properties are summarized below, alongside their Mastodon API equivalents:
@@ -675,7 +872,7 @@ Its properties are summarized below, alongside their Mastodon API equivalents:
 | :--------------: | :---------------: | :---------- |
 |       `id`       |       `id`        | The id of the account |
 |    `username`    |    `username`     | The account's username |
-|     `account`    |   Not provided    | The account's username, followed by their domain |
+|     `account`    |  *Not provided*   | The account's username, followed by their domain |
 |  `localAccount`  |      `acct`       | The account's username, followed by their domain for remote users only |
 |  `displayName`   |  `display_name`   | The account's display name |
 |      `bio`       |      `note`       | The account's profile bio |
@@ -686,47 +883,99 @@ Its properties are summarized below, alongside their Mastodon API equivalents:
 | `followerCount`  | `followers_count` | The number of accounts following the given one |
 | `followingCount` | `following_count` | The number of accounts that the given one is following |
 |  `statusCount`   | `statuses_count`  | The number of statuses that the given account has posted |
-|  `relationship`  |   Not provided    | A [`Laboratory.Relationship`](../Enumerals/Laboratory.Relationship) providing the relationship between the given account and the current user. |
+|  `relationship`  |  *Not provided*   | A `Laboratory.Profile.Relationship`, providing the relationship between the given account and the current user. |
+
+###  Profile relationiships:
+
+The available `Profile.Relationship`s are as follows:
+
+| Enumeral | Binary Value | Description |
+| :------: | :----------: | :---------- |
+| `Profile.Relationship.NOT_FOLLOWING` | `00000000` | Neither the account nor the user are following each other |
+| `Profile.Relationship.FOLLOWER` | `00000001` | The user is being followed by the account |
+| `Profile.Relationship.FOLLOWING` | `00000010` | The account is being followed by the user |
+| `Profile.Relationship.MUTUAL` | `00000011` | The user and the account are following each other |
+| `Profile.Relationship.REQUESTED` | `00000100` | The user has requested to follow the account |
+| `Profile.Relationship.REQUESTED_MUTUAL` | `00000101` | The account follows the user, and the user has requested to follow the account |
+| `Profile.Relationship.BLOCKING` | `00001000` | The user is blocking the account |
+| `Profile.Relationship.MUTING` | `00010000` | The user is muting the account |
+| `Profile.Relationship.MUTING_FOLLOWER` | `00010001` | The user is muting, and being followed by, the account |
+| `Profile.Relationship.MUTING_FOLLOWING` | `00010010` | The user is muting and following the account |
+| `Profile.Relationship.MUTING_MUTUAL` | `00010011` | The user and the account are following each other, but the user is muting the account |
+| `Profile.Relationship.MUTING_REQUESTED` | `00010100` | The user is muting the account, but has also requested to follow it |
+| `Profile.Relationship.MUTING_REQUESTED_MUTUAL` | `00010101` | The user is muting, and being followed by, the accoung, but has also requested to follow it |
+| `Profile.Relationship.UNKNOWN` | `01000000` | The relationship between the user and the account is unknown |
+| `Profile.Relationship.SELF` | `10000000` | The account is the user |
+
+You can use bitwise comparisons on these enumerals to test for a specific relationship status.
+Of course, many combinations are not possible.
+
+|    Flag    | Enumeral | Meaning |
+| :--------: | -------- | ------- |
+| `00000001` | `Profile.Relationship.FOLLOWER` | The user is followed by the account |
+| `00000010` | `Profile.Relationship.FOLLOWING` | The account is followed by the user |
+| `00000100` | `Profile.Relationship.REQUESTED` | The user has sent a follow request to the account |
+| `00001000` | `Profile.Relationship.BLOCKING` | The user is blocking the account |
+| `00010000` | `Profile.Relationship.MUTING` | The user is muting the account |
+| `00100000` | _Unused_ | Reserved for later use |
+| `01000000` | `Profile.Relationship.UNKNOWN` | The relationship status between the user and the account is unknown |
+| `10000000` | `Profile.Relationship.SELF` | The user is the same as the account |
+
+##  Prototype Methods  ##
+
+###  `compare()`:
+
+>   ```javascript
+>       Laboratory.Profile.prototype.compare(profile);
+>   ```
+>
+>   - __`profile` :__ A `Profile` to compare with
+
+The `profile()` prototype method compares a `Profile` with another and returns `true` if they have the same properties.
 
 ##  Implementation  ##
 
 ###  The constructor:
 
 The `Profile()` constructor takes a `data` object from an API response (or another `Profile` object) and reads its attributes into an instance's properties.
-It uses the `origin` argument to help fill out account handles.
-The `relationship` argument can be used to set the Profile relationship.
+Additionally, the `relationship` argument can be used to set the Profile relationship.
 
-    Constructors.Profile = (data, origin, relationship) ->
+    Laboratory.Profile = Profile = (data, relationship) ->
 
-        return unless this and (this instanceof Constructors.Profile) and data?
+        throw new Error "Laboratory Error : `Profile()` must be called as a constructor" unless this and this instanceof Profile
+        throw new Error "Laboratory Error : `Profile()` was called without any `data`" unless data?
+        
+If the `relationship` isn't provided, we check to see if we already have one for this id in our `Store`.
+
+        relationship = Store.profiles[data.id]?.relationship unless relationship?
 
 If our `data` is already a `Profile`, we can just copy its info over.
 
-        if (data instanceof Constructors.Profile) then {@id, @username, @account, @localAccount, @displayName, @bio, @href, @avatar, @header, @isLocked, @followerCount, @followingCount, @statusCount, @relationship} = data
+        if data instanceof Profile then {@id, @username, @account, @localAccount, @displayName, @bio, @href, @avatar, @header, @isLocked, @followerCount, @followingCount, @statusCount, @relationship} = data
 
 Otherwise, we have to change some variable names around.
 
         else
-            @id = data.id
-            @username = data.username
-            @account = data.acct + (if origin? and data.acct.indexOf("@") is -1 then origin else "")
-            @localAccount = data.acct
-            @displayName = data.display_name
-            @bio = data.note
-            @href = data.url
-            @avatar = data.avatar
-            @header = data.header
-            @isLocked = data.locked
-            @followerCount = data.followers_count
-            @followingCount = data.following_count
-            @statusCount = data.statuses_count
-            @relationship = Enumerals.Relationship.UNKNOWN
+            @id = Number data.id
+            @username = String data.username
+            @account = String data.acct + (if (origin = Store.auth.origin)? and data.acct.indexOf("@") is -1 then "@" + origin else "")
+            @localAccount = String data.acct
+            @displayName = String data.display_name
+            @bio = String data.note
+            @href = String data.url
+            @avatar = String data.avatar
+            @header = String data.header
+            @isLocked = !!data.locked
+            @followerCount = Number data.followers_count
+            @followingCount = Number data.following_count
+            @statusCount = Number data.statuses_count
+            @relationship = if data.id is Store.auth.me then Profile.Relationship.SELF else Profile.Relationship.UNKNOWN
 
 We set the relationship last, overwriting any previous relationship if one is provided.
 This code will coerce the provided relationship into an Number and then back to an enumeral if possible.
-Note that because enumerals are objects, they will always evaluate to `true` even if their value is `0x00`.
+Remember that because enumerals are objects, they will always evaluate to `true` even if their value is `0x00`.
 
-        @relationship = Enumerals.Relationship.fromValue(relationship) || @relationship if relationship?
+        @relationship = Profile.Relationship.fromValue(relationship) || @relationship if relationship?
 
         return Object.freeze this
 
@@ -734,7 +983,7 @@ Note that because enumerals are objects, they will always evaluate to `true` eve
 
 The `Profile` prototype has one function.
 
-    Object.defineProperty Constructors.Profile, "prototype",
+    Object.defineProperty Profile, "prototype",
         value: Object.freeze
 
 `compare` does a quick comparison between two `Profile`s, and tells whether or not they are equivalent.
@@ -742,7 +991,7 @@ For efficiency's sake, it compares attributes with the most-likely-to-be-differe
 
             compare: (other) ->
 
-                return false unless other instanceof Constructors.Profile
+                return false unless this instanceof Profile and other instanceof Profile
 
                 return (
                     @id is other.id and
@@ -761,183 +1010,435 @@ For efficiency's sake, it compares attributes with the most-likely-to-be-differe
                     @href is other.href
                 )
 
+###  Defining profile relationships:
 
-#  LABORATORY ENUMERALS  #
+Here we define profile relationships, as specified above.
 
-If you have experience working with JavaScript and the DOM, you may have encountered DOM attributes whose values are described by an enumerated type.
-For example, `Node.NodeType` can have values which include `Node.ELEMENT_NODE`, with a value of `1`, and `Node.TEXT_NODE`, with a value of `3`.
-__Laboratory enumerals__ are an extension of this principle.
-They aim to accomplish three things:
-
-1.  **Provide a unique, static identifier for a response value.**
-    Laboratory enumerals are unique, immutable objects that do not equate to anything but themselves under strict (`===`) equality.
-
-2.  **Allow checking of specific properties using binary flags.**
-    Laboratory enumerals compute to numbers which are non-arbitrary in their meaning.
-    You can use binary tests to check for specific enumeral properties; for example, `visibility & Laboratory.Visibility.Listed` can be used to tell if a given `visibility` is listed or not.
-
-3.  **Provide easy type identification.**
-    Each Laboratory enumeral is an instance of the object in which it is contained.
-    Thus, `Laboratory.PostType.STATUS instanceof Laboratory.PostType` evaluates to `true`.
-
-The types of enumerals, and descriptions of their specific properties, are given below:
-
-- [**MediaType**](MediaType.litcoffee)
-- [**PostType**](PostType.litcoffee)
-- [**Relationship**](Relationship.litcoffee)
-- [**Visibility**](Visibility.litcoffee)
-
-##  Implementation  ##
-
-Here we set up our internal `Enumerals` object.
-The own properties of this object will be copied to our global `window.Laboratory` object later.
-
-    Enumerals = {}
-
-###  `generateEnumerals()`:
-
-The `generateEnumerals()` function creates an `Enumerals` type that meets our specifications.
-The provided `data` should be an object whose enumerable own properties associate enumeral names with values.
-
-    generateEnumerals = (data) ->
-
-First, we need to "fork" the main `Enumeral` constructor so that typechecking will work.
-We create a new constructor that just passes everything on.
-
-        type = (n) -> Constructors.Enumeral.call(this, n)
-        type.prototype = Object.create Constructors.Enumeral.prototype
-
-Next, we define our enumerals.
-We also create a hidden object which store the relationship going the other way.
-Note that since values are not guaranteed to be unique, this object may not contain every enumeral (some might be overwritten).
-
-        byValue = {}
-        for own enumeral, value of data
-            type[enumeral] = new type value
-            byValue[value] = type[enumeral]
-
-This function allows quick conversion from value to enumeral.
-
-        type.fromValue = (n) -> byValue[Number n]
-
-We can now freeze our enumerals and return them.
-
-        return Object.freeze type
+    Profile.Relationship = Enumeral.generate
+        NOT_FOLLOWING           : 0b00000000
+        FOLLOWER                : 0b00000001
+        FOLLOWING               : 0b00000010
+        MUTUAL                  : 0b00000011
+        REQUESTED               : 0b00000100
+        REQUESTED_MUTUAL        : 0b00000101
+        BLOCKING                : 0b00001000
+        MUTING                  : 0b00010000
+        MUTING_FOLLOWER         : 0b00010001
+        MUTING_FOLLOWING        : 0b00010010
+        MUTING_MUTUAL           : 0b00010011
+        MUTING_REQUESTED        : 0b00010100
+        MUTING_REQUESTED_MUTUAL : 0b00010101
+        UNKNOWN                 : 0b01000000
+        SELF                    : 0b10000000
 
 
-#  MEDIA TYPE ENUMERALS  #
+- - -
 
-This file provides enumerals for various media types.
-The options are as follows:
+> From [/src/Constructors/Rolodex.litcoffee](../src/Constructors/Rolodex.litcoffee) :
 
-| Enumeral | Numeric Value | Description |
-| :------: | :-----------: | :---------- |
-| `Laboratory.MediaType.UNKNOWN` | `0x00` | The media type cannot be determined |
-| `Laboratory.MediaType.PHOTO` | `0x01` | The media is a photo |
-| `Laboratory.MediaType.VIDEO` | `0x02` | The media is a video |
+#  THE ROLODEX CONSTRUCTOR  #
 
-##  Implementation  ##
+##  Introduction  ##
 
-    Enumerals.MediaType = generateEnumerals
-        UNKNOWN: 0x00
-        PHOTO: 0x01
-        VIDEO: 0x02
+The `Rolodex()` constructor creates a unique, read-only object which represents a list of [`Profile`](Profile.litcoffee)s.
+Its properties are summarized below, alongside their Mastodon API equivalents:
 
+|  Property  |  API Response  | Description |
+| :--------: | :------------: | :---------- |
+| `profiles` | [The response] | An ordered array of profiles, in reverse-chronological order |
+|   `type`   | *Not provided* | A `Rolodex.Type` |
+|  `query`   | *Not provided* | The query associated with the `Rolodex` |
+|  `before`  | *Not provided* | The upper limit of the `Rolodex` |
+|  `after`   | *Not provided* | The lower limit of the `Rolodex` |
 
-#  POST TYPE ENUMERALS  #
+Note that `before` and `after` are special identifiers which may depend on the `Rolodex.Type`.
 
-This file provides enumerals for various post types.
-The options are as follows:
+###  Rolodex types:
 
-| Enumeral | Numeric Value | Description |
-| :------: | :-----------: | :---------- |
-| `Laboratory.PostType.UNKNOWN` | `0x00` | The post type cannot be determined |
-| `Laboratory.PostType.STATUS` | `0x01` | The post is an status |
-| `Laboratory.PostType.NOTIFICATION` | `0x02` | The post is a notification |
+The possible `Rolodex.Type`s are as follows:
+
+| Enumeral | Hex Value | Description |
+| :------: | :----------: | :---------- |
+| `Rolodex.Type.UNDEFINED` | `0x00` | No type is defined |
+| `Rolodex.Type.SEARCH` | `0x10` | A search of profiles |
+| `Rolodex.Type.FOLLOWERS` | `0x21` | The followers of an account |
+| `Rolodex.Type.FOLLOWING` | `0x22` | Those following an account |
+| `Rolodex.Type.FAVOURITED_BY` | `0x41` | Those who favourited a given status |
+| `Rolodex.Type.REBLOGGED_BY` | `0x45` | Those who reblogged a given status |
+| `Rolodex.Type.BLOCKS` | `0x83` | Those who have been blocked |
+| `Rolodex.Type.MUTES` | `0x84` | Those who have been muted |
+
+The `Rolodex()` constructor does not use or remember its `Rolodex.Type`, but these values are used when requesting new `Rolodex`es using `LaboratoryRolodexRequested`.
+
+##  Prototype Methods ##
+
+###  `join()`:
+
+>   ```javascript
+>       Laboratory.Rolodex.prototype.join(data);
+>   ```
+>
+>   - __`data` :__ A `Profile`, array of `Profile`s, or a `Rolodex`
+
+The `join()` prototype method joins the `Profile`s of a `Rolodex` with that of the provided `data`, and returns a new `Rolodex` of the results.
+When merging two `Rolodex`es, the `type` and `query` parameters will only be preserved if they match across both; in this case, `before` and `after` will be adjusted such that both `Rolodex`es are contained in the range.
+Otherwise, the `type` of the resultant `Rolodex` will be `Rolodex.Type.UNDEFINED` and its `query` will be the empty string.
+
+When joining a `Rolodex` with a different data type, the `type`, `query`, `before`, and `after` parameters remain unchanged.
+
+###  `remove()`:
+
+>   ```javascript
+>       Laboratory.Rolodex.prototype.remove(data);
+>   ```
+>
+>   - __`data` :__ A `Profile`, array of `Profile`s, or a `Rolodex`
+
+The `remove()` prototype method collects the `Profile`s of a `Rolodex` except for those of the provided `data`, and returns a new `Rolodex` of the results.
+The `type`, `query`, `before`, and `after` parameters are preserved from the original.
 
 ##  Implementation  ##
 
-    Enumerals.PostType = generateEnumerals
-        UNKNOWN: 0x00
-        STATUS: 0x01
-        NOTIFICATION: 0x02
+###  The constructor:
+
+The `Rolodex()` constructor takes a `data` object and uses it to construct a rolodex.
+`data` can be either an API response or an array of `Profile`s.
+`params` provides additional information not given in `data`.
+
+    Laboratory.Rolodex = Rolodex = (data, params) ->
+
+        throw new Error "Laboratory Error : `Rolodex()` must be called as a constructor" unless this and this instanceof Rolodex
+        throw new Error "Laboratory Error : `Rolodex()` was called without any `data`" unless data?
+
+This loads our `params`.
+
+        @type = if params.type instanceof Rolodex.Type then params.type else Rolodex.Type.UNDEFINED
+        @query = String params.query
+        @before = Number params.before if isFinite params.before
+        @after = Number params.after if isFinite params.after
+
+We'll use the `getProfile()` function in our profile getters.
+
+        getProfile = (id) -> Store.profiles[id]
+
+We sort our data according to their ids.
+
+        data.sort (first, second) -> second.id - first.id
+
+The following loop removes any duplicates from our `data`.
+
+        prev = null
+        for index in [data.length - 1 .. 0]
+            currentID = (current = data[index]).id
+            if prev? and currentID is prev.id
+                data.splice index, 1
+                continue
+            prev = current
+
+Finally, we implement our list of `profiles` as getters such that they always return the most current data.
+**Note that this will likely prevent optimization of the `profiles` array, so it is recommended that you make a static copy (using `Array.prototype.slice()` or similar) before doing intensive array operations with it.**
+
+        @profiles = []
+        Object.defineProperty @profiles, index, {get: getProfile.bind(this, value.id), enumerable: true} for value, index in data
+        Object.freeze @profiles
+
+        return Object.freeze this
+
+###  The prototype:
+
+The `Rolodex` prototype has two functions.
+
+    Object.defineProperty Rolodex, "prototype",
+        value: Object.freeze
+
+####  `join()`.
+
+The `join()` function creates a new `Rolodex` which combines the `Profile`s of the original and the provided `data`.
+Its `data` argument can be either a `Profile`, an array thereof, or a `Rolodex`.
+We don't have to worry about duplicates here because the `Rolodex()` constructor should take care of them for us.
+
+            join: (data) ->
+                return this unless data instanceof Profile or data instanceof Array or data instanceof Rolodex
+                combined = profile for profile in switch
+                    when data instanceof Profile then [data]
+                    when data instanceof Rolodex then data.profiles
+                    else data
+                combined.push profile for profile in @profiles
+                return new Rolodex combined, (
+                    if data instanceof Rolodex
+                        if data.type is @type and data.query is @query
+                            type: @type
+                            query: @query
+                            before: switch
+                                when data.before >= @before then data.before
+                                when data.before <= @before then @before
+                                else undefined
+                            after: switch
+                                when data.after <= @after then data.after
+                                when data.after >= @after then @after
+                                else undefined
+                        else
+                            type: if data.type is @type then @type else Rolodex.Type.UNDEFINED
+                            query: ""
+                            before: undefined
+                            after: undefined
+                    else
+                        type: @type
+                        query: @query
+                        before: @before
+                        after: @after
+                )
+
+####  `remove()`.
+
+The `remove()` function returns a new `Rolodex` with the provided `Profile`s removed.
+Its `data` argument can be either a `Profile`, an array thereof, or a `Rolodex`.
+
+            remove: (data) ->
+                return this unless data instanceof Profile or data instanceof Array or data instanceof Rolodex
+                redacted = (profile for profile in @profiles)
+                redacted.splice index, 1 for profile in (
+                    switch
+                        when data instanceof Profile then [data]
+                        when data instanceof Rolodex then data.profiles
+                        else data
+                ) when (index = redacted.indexOf profile) isnt -1
+                return new Rolodex redacted,
+                    type: @type
+                    query: @query
+                    before: @before
+                    after: @after
+
+###  Defining rolodex types:
+
+Here we define our `Rolodex.Type`s, as described above:
+
+    Rolodex.Type = Enumeral.generate
+        UNDEFINED     : 0x00
+        SEARCH        : 0x10
+        FOLLOWERS     : 0x21
+        FOLLOWING     : 0x22
+        FAVOURITED_BY : 0x41
+        REBLOGGED_BY  : 0x45
+        BLOCKS        : 0x83
+        MUTES         : 0x84
 
 
-#  RELATIONSHIP ENUMERALS  #
+- - -
 
-| Enumeral | Numeric Value | Description |
-| :------: | :-----------: | :---------- |
-| `Laboratory.Relationship.SELF` | `0x10` | The account is the user |
-| `Laboratory.Relationship.FOLLOWING` | `0x02` | The account is being followed by the user |
-| `Laboratory.Relationship.FOLLOWED_BY` | `0x01` | The user is being followed by the account |
-| `Laboratory.Relationship.MUTUALS` | `0x03` | The user and the account are following each other |
-| `Laboratory.Relationship.REQUESTED` | `0x04` | The user has requested to follow the account |
-| `Laboratory.Relationship.REQUESTED_MUTUALS` | `0x05` | The account follows the user, and the user has requested to follow the account |
-| `Laboratory.Relationship.NOT_FOLLOWING` | `0x00` | Neither the account nor the user are following each other |
-| `Laboratory.Relationship.BLOCKING` | `0x08` | The user is blocking the account |
-| `Laboratory.Relationship.UNKNOWN` | `0x20` | The relationship between the user and the account is unknown |
+> From [/src/Constructors/Timeline.litcoffee](../src/Constructors/Timeline.litcoffee) :
 
-You can use bitwise comparisons on these enumerals to test for a specific relationship status.
-Of course, many combinations are not possible.
+#  THE TIMELINE CONSTRUCTOR  #
 
-|  Flag  | Meaning |
-| :----: | ------- |
-| `0x01` | The user is followed by the account |
-| `0x02` | The account is followed by the user |
-| `0x04` | The user has sent a follow request to the account |
-| `0x08` | The user is blocking the account |
-| `0x10` | The user is the same as the account |
-| `0x20` | The relationship status between the user and the account is unknown |
+##  Introduction  ##
+
+The `Timeline()` constructor creates a unique, read-only object which represents a Mastodon timeline.
+Its properties are summarized below, alongside their Mastodon API equivalents:
+
+| Property |  API Response  | Description |
+| :------: | :------------: | :---------- |
+| `posts`  | [The response] | An ordered array of posts in the timeline, in reverse-chronological order |
+|  `type`  | *Not provided* | A `Timeline.Type` |
+| `query`  | *Not provided* | The minimum id of posts in the timeline |
+| `before` | *Not provided* | The upper limit of the timeline |
+| `after`  | *Not provided* | The lower limit of the timeline |
+
+###  Timeline types:
+
+The possible `Timeline.Type`s are as follows:
+
+| Enumeral | Hex Value | Description |
+| :------: | :----------: | :---------- |
+| `Timeline.Type.UNDEFINED` | `0x00` | No type is defined |
+| `Timeline.Type.HASHTAG` | `0x10` | A timeline of hashtags |
+| `Timeline.Type.LOCAL` | `0x11` | A local timeline |
+| `Timeline.Type.GLOBAL` | `0x12` | A global (whole-known-network) timeline |
+| `Timeline.Type.HOME` | `0x22` | A user's home timeline |
+| `Timeline.Type.NOTIFICATIONS` | `0x23` | A user's notifications |
+| `Timeline.Type.FAVOURITES` | `0x24` | A list of a user's favourites |
+| `Timeline.Type.ACCOUNT` | `0x40` | A timeline of an account's posts |
+
+The `Timeline()` constructor does not use or remember its `Timeline.Type`, but these values are used when requesting new `Timeline`s using `LaboratoryTimelineRequested`.
+
+##  Prototype Methods ##
+
+###  `join()`:
+
+>   ```javascript
+>       Laboratory.Timeline.prototype.join(data);
+>   ```
+>
+>   - __`data` :__ A `Post`, array of `Post`s, or a `Timeline`
+
+The `join()` prototype method joins the `Post`s of a timeline with that of the provided `data`, and returns a new `Timeline` of the results.
+When merging two `Timeline`s, the `type` and `query` parameters will only be preserved if they match across both; in this case, `before` and `after` will be adjusted such that both `Timeline`s are contained in the range.
+Otherwise, the `type` of the resultant `Timeline` will be `Timeline.Type.UNDEFINED` and its `query` will be the empty string.
+
+When joining a `Timeline` with a different data type, the `type`, `query`, `before`, and `after` parameters remain unchanged.
+
+###  `remove()`:
+
+>   ```javascript
+>       Laboratory.Timeline.prototype.remove(data);
+>   ```
+>
+>   - __`data` :__ A `Post`, array of `Post`s, or a `Timeline`
+
+The `remove()` prototype method collects the `Post`s of a timeline except for those of the provided `data`, and returns a new `Timeline` of the results.
+The `type`, `query`, `before`, and `after` parameters are preserved from the original.
 
 ##  Implementation  ##
 
-    Enumerals.Relationship = generateEnumerals
-        NOT_FOLLOWING: 0x00
-        FOLLOWED_BY: 0x01
-        FOLLOWING: 0x02
-        MUTUALS: 0x03
-        REQUESTED: 0x04
-        REQUESTED_MUTUALS: 0x05
-        BLOCKING: 0x08
-        SELF: 0x10
-        UNKNOWN: 0x20
+###  The constructor:
+
+The `Timeline()` constructor takes a `data` object and uses it to construct a timeline.
+`data` can be either an API response or an array of `Post`s.
+`params` provides additional information not given in `data`.
+
+    Laboratory.Timeline = Timeline = (data, params) ->
+
+        throw new Error "Laboratory Error : `Timeline()` must be called as a constructor" unless this and this instanceof Timeline
+        throw new Error "Laboratory Error : `Timeline()` was called without any `data`" unless data?
+
+This loads our `params`.
+
+        @type = if params.type instanceof Timeline.Type then params.type else Timeline.Type.UNDEFINED
+        @query = String params.query
+        @before = Number params.before if isFinite params.before
+        @after = Number params.after if isFinite params.after
+
+Mastodon keeps track of ids for notifications separately from ids for posts, as best as I can tell, so we have to verify that our posts are of matching type before proceeding.
+Really all we care about is whether the posts are notifications, so that's all we test.
+
+        isNotification = (object) -> !!(
+            (
+                switch
+                    when object instanceof Post then object.type
+                    when object.type? then Post.Type.NOTIFICATION  #  This is an approximation; the post could be a reaction.
+                    else Post.Type.STATUS
+            ) & Post.Type.NOTIFICATION
+        )
+
+We'll use the `getPost()` function in our post getters.
+
+        getPost = (id, isANotification) -> if isANotification then Store.notifications[id] else Store.statuses[id]
+
+We sort our data according to when they were created, unless two posts were created at the same time.
+Then we use their ids.
+
+>   __Note :__
+>   Until/unless Mastodon starts assigning times to notifications, there are a few (albeit extremely unlikely) edge-cases where the following `sort()` function will cease to be well-defined.
+>   Regardless, attempting to create a timeline out of both notifications and statuses will likely result in a very odd sorting.
+
+        data.sort (first, second) -> if not (isNotification first) and not (isNotification second) and (a = Number first instanceof Post and first.datetime or Date first.created_at) isnt (b = Number second instanceof Post and second.datetime or Date second.created_at) then -1 + 2 * (a > b) else second.id - first.id
+
+Next we walk the array and look for any duplicates, removing them.
+
+>   __Note :__
+>   Although `Timeline()` purports to remove all duplicate `Post`s, this behaviour is only guaranteed for *contiguous* `Post`s—given our sort algorithm, this means posts whose `datetime` values are also the same.
+>   If the same post ends up sorted to two different spots, `Timeline()` will leave both in place.
+>   (Generally speaking, if you find yourself with two posts with identical `id`s but different `datetime`s, this is a sign that something has gone terribly wrong.)
+
+        prev = null
+        for index in [data.length - 1 .. 0]
+            currentID = (current = data[index]).id
+            if prev? and currentID is prev.id and (isNotification prev) is (isNotification current)
+                data.splice index, 1
+                continue
+            prev = current
+
+Finally, we implement our list of `posts` as getters such that they always return the most current data.
+**Note that this will likely prevent optimization of the `posts` array, so it is recommended that you make a static copy (using `Array.prototype.slice()` or similar) before doing intensive array operations with it.**
+
+        @posts = []
+        Object.defineProperty @posts, index, {get: getPost.bind(this, value.id, isNotification value), enumerable: true} for value, index in data
+        Object.freeze @posts
+
+        return Object.freeze this
+
+###  The prototype:
+
+The `Timeline` prototype has two functions.
+
+    Object.defineProperty Timeline, "prototype",
+        value: Object.freeze
+
+####  `join()`.
+
+The `join()` function creates a new `Timeline` which combines the `Post`s of the original and the provided `data`.
+Its `data` argument can be either a `Post`, an array thereof, or a `Timeline`.
+We don't have to worry about duplicates here because the `Timeline()` constructor should take care of them for us.
+
+            join: (data) ->
+                return this unless data instanceof Post or data instanceof Array or data instanceof Timeline
+                combined = post for post in switch
+                    when data instanceof Post then [data]
+                    when data instanceof Timeline then data.posts
+                    else data
+                combined.push post for post in @posts
+                return new Timeline combined, (
+                    if data instanceof Timeline
+                        if data.type is @type and data.query is @query
+                            type: @type
+                            query: @query
+                            before: switch
+                                when data.before >= @before then data.before
+                                when data.before <= @before then @before
+                                else undefined
+                            after: switch
+                                when data.after <= @after then data.after
+                                when data.after >= @after then @after
+                                else undefined
+                        else
+                            type: if data.type is @type then @type else Timeline.Type.UNDEFINED
+                            query: ""
+                            before: undefined
+                            after: undefined
+                    else
+                        type: @type
+                        query: @query
+                        before: @before
+                        after: @after
+                )
+
+####  `remove()`.
+
+The `remove()` function returns a new `Timeline` with the provided `Post`s removed.
+Its `data` argument can be either a `Post`, an array thereof, or a `Timeline`.
+
+            remove: (data) ->
+                return this unless data instanceof Post or data instanceof Array or data instanceof Timeline
+                redacted = (post for post in @posts)
+                redacted.splice index, 1 for post in (
+                    switch
+                        when data instanceof Post then [data]
+                        when data instanceof Timeline then data.posts
+                        else data
+                ) when (index = redacted.indexOf post) isnt -1
+                return new Timeline redacted,
+                    type: @type
+                    query: @query
+                    before: @before
+                    after: @after
+
+###  Defining timeline types:
+
+Here we define our `Timeline.Type`s, as described above:
+
+    Timeline.Type = Enumeral.generate
+        UNDEFINED     : 0x00
+        HASHTAG       : 0x10
+        LOCAL         : 0x11
+        GLOBAL        : 0x12
+        HOME          : 0x22
+        NOTIFICATIONS : 0x23
+        FAVOURITES    : 0x24
+        ACCOUNT       : 0x40
 
 
-#  VISIBILITY ENUMERALS  #
+- - -
 
-This file provides enumerals for post visibility.
-The options are as follows:
-
-| Enumeral | Numeric Value | Description |
-| :------: | :-----------: | :---------- |
-| `Laboratory.Visibility.PRIVATE` | `0x00` | The post cannot be reblogged and appears as unlisted |
-| `Laboratory.Visibility.UNLISTED` | `0x01` | The post is unlisted but can be reblogged |
-| `Laboratory.Visibility.UNREBLOGGABLE` | `0x02` | The post can be reblogged but is unlisted |
-| `Laboratory.Visibility.PUBLIC` | `0x03` | The post is listed and can be reblogged |
-
-However, `Laboratory.Visibility.UNREBLOGGABLE` (`0x02`) is not a valid visibility for a Mastodon post.
-(The valid visibilities evaluate to `0x00`, `0x01`, and `0x03`, repsectively.)
-
-Note that the visibility of the post can be evaluating using bitwise comparisons:
-
-|  Flag  |          Meaning          |
-| :----: | ------------------------- |
-| `0x01` | The post can be reblogged |
-| `0x02` | The post is listed        |
-
-##  Implementation  ##
-
-    Enumerals.Visibility = generateEnumerals
-        PRIVATE: 0x00
-        UNLISTED: 0x01
-        UNREBLOGGABLE: 0x02
-        PUBLIC: 0x03
-        REQUESTED: 0x04
-        REQUESTED_MUTUALS: 0x05
-        BLOCKING: 0x08
-        SELF: 0x10
-        UNKNOWN: 0x20
-
+> From [/src/API/README.litcoffee](../src/API/README.litcoffee) :
 
 #  LABORATORY EVENT API  #
 
@@ -962,74 +1463,56 @@ The Laboratory Event API describes these events and their function.
 
 ##  Creating and Issuing Laboratory Events ##
 
-Laboratory Events are implemented as `CustomEvents`.
+Laboratory Events are implemented as DOM `CustomEvents`.
 Consequently, each event has just two pieces of information that you need to account for: its `type`, which identifies the event, and its `detail`, which is an object holding the event's data.
 Every Laboratory Event will have a `detail` which is an immutable object.
 
-There is no restriction on creating Laboratory Events from scratch; however, this is **not recommended.**
-Instead, a number of __event builders__ have been provided, which can be used to create and dispatch Laboratory Events.
-Each of these is an instance of `Laboratory.LaboratoryEvent`, and can be used in the following manner:
+It is rare that you will need to interact with events through traditional methods, ie using `document.addEventListener()`.
+Instead, the special functions `Laboratory.dispatch()`, `Laboratory.listen()`, and `Laboratory.forget()` should be used to dispatch and listen for events.
+The advantage to using these functions is that they will handle event and detail creation for you.
+For example, the following code would dispatch the `LaboratorySomethingRequested` event with the provided `detail`.
 
-###  Creating a Laboratory Event:
-
-The `Laboratory.LaboratoryEvent.prototype.new()` function is used to create a new `CustomEvent` with the appropriate `type` and `detail`.
-
-```javascript
-    //  Suppose SomeEventBuilder is an instance of Laboratory.LaboratoryEvent:
-    var event = SomeEventBuilder.new(props);
-```
-
-You can pass this function an object containing properties and values which should be included in the event; however, only those properties defined by the API will be included.
-
-###  Dispatching a Laboratory Event:
-
-You can dispatch a Laboratory Event created with `Laboratory.LaboratoryEvent.prototype.new()` in the usual manner—by calling `document.dispatchEvent()` with the Laboratory Event as its argument.
-Laboratory Events should always be dispatched on the `document`.
-
-Usually, you want to create and dispatch an event at the same time.
-The `Laboratory.LaboratoryEvent.prototype.dispatch()` function does this for you.
-It has the same syntax as `Laboratory.LaboratoryEvent.prototype.new()`:
-
-```javascript
-    //  Suppose SomeEventBuilder is an instance of Laboratory.LaboratoryEvent:
-    SomeEventBuilder.dispatch(props);
-    SomeEventBuilder.dispatch(props, location);
-```
-
-You will note that there is an optional `location` argument on the `Laboratory.LaboratoryEvent.prototype.dispatch()` function.
-You can use this argument to dispatch the event to a location other than `document`.
-However, this is **not recommended,** as Laboratory handlers all listen for events on the `document` and nowhere else.
-
-##  Listening for Laboratory Events  ##
-
-You may find yourself not wanting to create Laboratory Events, but to listen for them.
-Unlike the Laboratory handlers, you do not have access to Laboratory's store, but listening for events can still be useful when it comes to interacting with the Laboratory framework.
-
-All Laboratory Events have a type that resembles `LaboratoryModuleEventName`, where the appropriate event builder for this event would be located at `Laboratory.Module.EventName`.
-Just add an event listener to `document` with your callback to listen for these events:
-
-```javascript
-    //  Suppose LaboratorySomeEvent is a Laboratory Event:
-    document.addEventListener("LaboratorySomeEvent", callback);
-```
-
-The most important event to listen for is the `LaboratoryInitializationReady` event, which tells you when Laboratory handlers have been assigned and are now listening.
-This event should be used as a trigger for starting any of your Laboratory-related code.
-
-##  How to Read This Source  ##
-
-Unlike with most other Laboratory source files, Laboratory events interweave their source code with their documentation.
-Generally speaking, you can completely ignore the source code, as the surrounding text is much more useful and informative.
-However, the source code does provide one useful bit of information not disclosed anywhere else: the default values for event properties.
-Supposing you see the following source code…
-
->   ```coffeescript
->       Event: new Constructors.LaboratoryEvent "LaboratorySomeEvent",
->           key1: null
->           key2: ""
+>   ```javascript
+>       Laboratory.dispatch("LaboratorySomethingRequested", detail);
 >   ```
 
-…you can see that the default value for `key1` of `LaboratorySomeEvent` is `null` and the default value for `key2` is the empty string.
+This code can be used to associate a callback with a `LaboratorySomethingReceieved` event:
+
+>   ```javascript
+>       Laboratory.listen("LaboratorySomethingReceived", callback);
+>   ```
+
+This code can be used to forget the previous association:
+
+>   ```javascript
+>       Laboratory.forget("LaboratorySomethingReceived", callback);
+>   ```
+
+###  Three types of event:
+
+Laboratory Events are broken up into three general categories: __requests__, __responses__, and __failures__.
+(There are a few miscellaneous events which don't fall into one of these categories, but they are few and far between.)
+Requests usually have names like "LaboratorySomethingRequested", responses usually have names like "LaboratorySomethingReceived", and failures usually have names like "LaboratorySomethingFailed".
+Typically, you will dispatch requests, and listen for their associated responses (or failures if the response doesn't go through).
+Of course, there is nothing stopping you from dispatching your own responses and failures, or from listening for others' requests.
+However, generally speaking this should not be necessary.
+
+###  Event promises:
+
+If your environment supports `Promise`s, then the `Laboratory.request()` function will handle the request/response/failure pipeline for you; for example:
+
+>   ```javascript
+>       Laboratory.request("LaboratorySomethingRequested", detail).then(callback).else(onError);
+>   ```
+
+###  Event details:
+
+Dispatching most events requires calling `Laboratory.dispatch()` with not only a string specifying the event, but also a `detail`, which is an object containing additional event information.
+The kind of information expected by a `detail` varies from event to event, so be sure to check the documentation to see what is required.
+
+When you listen for an event using `Laboratory.listen()`, the callback function you provide will be called with the event's `detail` as its argument.
+For responses, `detail`s will be instances of the modules to which the events belong; for example, the detail for a `LaboratoryProfileRequested` event is an instance of `Laboratory.Profile`.
+The `detail`s for failures are all objects of type `Laboratory.Failure`.
 
 ##  Laboratory Event Reference  ##
 
@@ -1037,479 +1520,621 @@ Laboratory Events are broken up into several __modules__, each of which is docum
 These are as follows:
 
 - [__Initialization__](Initialization.litcoffee)
+- [__Request__](Request.litcoffee)
+- [__Client__](Client.litcoffee)
 - [__Authorization__](Authorization.litcoffee)
-- [__Account__](Account.litcoffee)
+- [__Profile__](Profile.litcoffee)
+- [__Rolodex__](Rolodex.litcoffee)
+- [__Attachment__](Attachment.litcoffee)
+- [__Post__](Post.litcoffee)
 - [__Timeline__](Timeline.litcoffee)
-- [__Status__](Status.litcoffee)
-- [__Composer__](Composer.litcoffee)
 
 ##  Implementation  ##
 
-Here we set up our internal `Events` object.
-The own properties of this object will be copied to our global `window.Laboratory` object later.
+There is a lot that goes on behind-the-scenes to make Laboratory events so easy to dispatch and listen for.
+Roughly speaking, we have to:
 
-    Events = {}
+1.  Keep a record of all accepted Laboratory events.
+2.  Specify what is expected of an event's *detail*, and give default values
+3.  Associate requests with responses and failures
+4.  Associate our handlers with events and keep track of them for later
+5.  Create the `dispatch()`, `listen()`, and `forget()` functions
+6.  Create promises and the `request()` function for accessing them.
+
+For simplicity's sake, we will store our events inside a giant object called `LaboratoryEvent`, whose methods will greatly ease this process.
+`LaboratoryEvent` won't be exposed to the window, it's just for our own internal use.
+
+    LaboratoryEvent =
+
+        Events: {}
+        Handlers: []
+
+###  Adding new events:
+
+The `LaboratoryEvent.create()` function registers a new event and associates it with a `detail`.
+If the provided `detail` is an object, then its own properties will determine the allowed and default properties of the event's detail; if it is a constructor, then the provided detail must be an instance (or `null`).
+
+        create: (type, detail) ->
+            LaboratoryEvent.Events[type] = {detail: Object detail} unless LaboratoryEvent.Events[type]?
+            return LaboratoryEvent
+
+###  Associating requests with responses and failures:
+
+The `LaboratoryEvent.associate()` function associates a request with its response or failure.
+
+        associate: (request, response, failure) ->
+            return LaboratoryEvent unless typeof (levent = LaboratoryEvent.Events[request]) is "object"
+            levent.response = response if response?
+            levent.failure = failure if failure?
+            return LaboratoryEvent
+
+###  Setting up handlers:
+
+The `LaboratoryEvent.handle()` function just associates a `type` with a `callback`.
+It sets things up so we can easily add our handlers later.
+
+>   __Note :__
+>   The `handle()` function directly modifies and stores its `callback` argument, which would definitely be a no-go if we were exposing it to outsiders.
+>   It saves us having to wrap the callback in an object or, worse, yet another function though, so let's just treat it responsibly and keep this between us.
+
+        handle: (type, callback) ->
+            return LaboratoryEvent unless LaboratoryEvent.Events[type = String type]?
+            callback.type = type
+            LaboratoryEvent.Handlers.push callback
+            return LaboratoryEvent
+
+###  Dispatching events:
+
+We can now create our `dispatch()` function.
+It just sets up our detail and dispatches the event to `document`.
+
+    Laboratory.dispatch = dispatch = (event, props) ->
+        return no unless (levent = LaboratoryEvent.Events[event = String event])?
+        if typeof (initials = levent.detail) is "function"
+            return no unless (detail = props) instanceof initials
+        else
+            detail = {}
+            (detail[prop] = if props? and props[prop]? then props[prop] else initial) for prop, initial of initials
+        document.dispatchEvent new CustomEvent event, {detail: Object.freeze detail}
+        return yes
+
+###  Listening for and forgetting events:
+
+Our `listen()` function is just a wrapper for `document.addEventListener()`.
+
+    Laboratory.listen = listen = (event, callback) ->
+        return no unless (levent = LaboratoryEvent.Events[event = String event])? and typeof callback is "function"
+        document.addEventListener event, callback
+        return yes
+
+Similarly, our `forget()` function is just a wrapper for `document.removeEventListener()`.
+
+    Laboratory.forget = forget = (event, callback) ->
+        return no unless (levent = LaboratoryEvent.Events[event = String event])? and typeof callback is "function"
+        document.removeEventListener event, callback
+        return yes
+
+###  Making promises:
+
+The `request()` function handles the listening and forgetting for us, returning a `Promise`.
+
+    Laboratory.request = request = (event, detail) -> new Promise (resolve, reject) ->
+        return unless (levent = LaboratoryEvent.Events[event])?
+        respond = (detail) ->
+            forget response, respond if response?
+            forget failure, fail if failure?
+            resolve detail
+        fail = (detail) ->
+            forget response, respond if response?
+            forget failure, fail if failure?
+            reject detail
+        listen response, respond if (response = levent.response)?
+        listen failure, fail if (failure = levent.failure)?
+        dispatch event, detail
+        return
 
 
-#  ACCOUNT EVENTS  #
+- - -
 
-    Events.Account = Object.freeze
+> From [/src/API/Attachment.litcoffee](../src/API/Attachment.litcoffee) :
 
-The __Account__ module of Laboratory Events is comprised of those events which are related to Mastodon accounts.
+#  ATTACHMENT EVENTS  #
 
-| Event / Builder | Description |
-| :-------------- | :---------- |
-| `LaboratoryAccountRelationshipsRequested` / `Laboratory.Account.RelationshipsRequested` | Fires when an account's relationship data should be requested |
-| `LaboratoryAccountRelationshipsReceived` / `Laboratory.Account.RelationshipsReceived` | Fires when an account's relationship data has been received |
-| `LaboratoryAccountRequested` / `Laboratory.Account.Requested` | Fires when an account's data should be requested |
-| `LaboratoryAccountReceived` / `Laboratory.Account.Received` | Fires when an account's data has been received |
-| `LaboratoryAccountRemoved` / `Laboratory.Account.Removed` | Fires when an account's callback should be removed |
-| `LaboratoryAccountFollowers` / `Laboratory.Account.Followers` | Fires when an account's followers should be requested |
-| `LaboratoryAccountFollowing` / `Laboratory.Account.Following` | Fires when data on who an account is following should be requested |
-| `LaboratoryAccountSearch` / `Laboratory.Account.Search` | Fires when a search for an account should be requested |
-| `LaboratoryAccountFollow` / `Laboratory.Account.Follow` | Fires when a request for a follow has been made |
-| `LaboratoryAccountBlock` / `Laboratory.Account.Block` | Fires when a request for a block should be requested |
+##  Introduction  ##
 
-##  `LaboratoryAccountRelationshipsRequested`  ##
+The __Attachment__ module of the Laboratory API is comprised of those events which are related to Mastodon media attachments.
 
->   - __Builder :__ `Laboratory.Account.RelationshipsRequested`
->   - __Properties :__
->       - `id` – The id(s) of the account.
+###  Quick reference:
 
-        RelationshipsRequested: new Constructors.LaboratoryEvent "LaboratoryAccountRelationshipsRequested",
-            id: null
+| Event | Description |
+| :---- | :---------- |
+| `LaboratoryAttachmentRequested` | Requests an `Attachment` from the Mastodon server |
+| `LaboratoryAttachmentReceived` | Fires when an `Attachment` has been processed |
+| `LaboratoryAttachmentFailed` | Fires when an `Attachment` fails to process |
 
-The `LaboratoryAccountRelationshipsRequested` event requests that the relationship(s) between the provided account `id`(s) and the user be updated.
-If multiple `id`s are are provided, they should be given in an `Array`.
+##  Requesting an Attachment  ##
 
-When the account relationships are received, they will be passed through the related account callbacks, so `LaboratoryAccountRelationshipsRequested` only works if the requested account(s) is/are already in the Laboratory store and have callbacks associated with them.
-Since it's rare that you will want the relationship information without other information about the account, usually it's best if you just call `LaboratoryAccountRequested` instead.
+>   - __API equivalent :__ `/api/v1/media`
+>   - __Request parameters :__
+>       - __`file` :__ The file to upload
+>   - __Request :__ `LaboratoryAttachmentRequested`
+>   - __Response :__ `LaboratoryAttachmentReceived`
+>   - __Failure :__ `LaboratoryAttachmentFailed`
 
-##  `LaboratoryAccountRelationshipsReceived`  ##
+Laboratory Attachment events are used to upload files to the server and receive media `Attachment`s which can then be linked to posts.
+The only relevant parameter is `file`, which should be the `File` to upload.
 
->   - __Builder :__ `Laboratory.Account.RelationshipsReceived`
->   - __Properties :__
->       - `data` – The response from the server.
+##  Implementation  ##
 
-        RelationshipsReceived: new Constructors.LaboratoryEvent "LaboratoryAccountRelationshipsReceived",
-            data: null
+###  Creating the events:
 
-The `LaboratoryAccountRelationshipsReceived` event provides the server response for a relationship request.
-The handler for this event will update the associated accounts' `relationship` property, firing their callbacks if anything changed.
+Here we create the events as per our specifications.
 
-##  `LaboratoryAccountRequested` ##
+    LaboratoryEvent
+        .create "LaboratoryAttachmentRequested",
+            file: undefined
+        .create "LaboratoryAttachmentReceived", Attachment
+        .create "LaboratoryAttachmentFailed", Failure
+        .associate "LaboratoryAttachmentRequested", "LaboratoryAttachmentReceived", "LaboratoryAttachmentFailed"
 
->   - __Builder :__ `Laboratory.Account.Requested`
->   - __Properties :__
->       - `id` – The id of the account to fetch data for.
->       - `callback` – A callback function which will be passed the information from the account.
+###  Handling the events:
 
-        Requested: new Constructors.LaboratoryEvent "LaboratoryAccountRequested",
-            id: null,
-            callback: null
+Laboratory provides handlers for the following Authorization events:
 
-The `LaboratoryAccountRequested` event requests information about an account, and associates the account with a provided `callback`.
-If information about the given account already exists in the Laboratory store the callback will be called immediately; regardless, a request for updated information will be sent.
-`LaboratoryAccountRequested` will automatically also dispatch a `LaboratoryAccountRelationshipsRequested` event to inquire about the account's relationship to the current user.
+- `LaboratoryAttachmentRequested`
 
-`callback`s remain associated with an account until a `LaboratoryAccountRemoved` event is fired to remove them.
-Whenever an account's information is updated, they are called with a new immutable `Laboratory.Profile` object whose own properties contain the new account data.
+####  `LaboratoryAttachmentRequested`.
 
-The `relationship` will initially be given as `Laboratory.Relationship.UNKNOWN`, and this value will be updated (with a new call to the callback function) once the request for the account's relationship data has gone through.
+The `LaboratoryAttachmentRequested` event uploads a file to the Mastodon API and turns the response into an `Attachment`.
 
-##  `Account.Received`  ##
+        .handle "LaboratoryAttachmentRequested", (event) ->
 
->   - __Builder :__ `Laboratory.Account.Received`
->   - __Properties :__
->       - `data` – The response from the server.
+            unless File? and (file = event.detail.file) instanceof File
+                dispatch "LaboratoryAttachmentFailed", new Failure "Unable to create attachment; none provided", "LaboratoryAttachmentRequested"
+                return
+            unless FormData?
+                dispatch "LaboratoryAttachmentFailed", new Failure "Unable to create attachment; `FormData` is not supported on this platform"
 
-        Received: new Constructors.LaboratoryEvent "LaboratoryAccountReceived",
-            data: null
+            onComplete = (response, data, params) ->
+                dispatch "LaboratoryAttachmentReceived", new Attachment response
+                return
 
-The `LaboratoryAccountReceived` event provides the server response for a relationship request.
-This event is fired by a number of other handlers when they find themselves with account data—for example, the handler for `LaboratoryTimelineReceived` will fire this event for each account on its timeline.
+            onError = (response, data, params) ->
+                dispatch "LaboratoryAttachmentFailed", new Failure response.error, "LaboratoryAttachmentRequested", params.status
+                return
 
-The handler for `LaboratoryAccountReceived` will fire the associated account's callback functions if the account data has changed.
-See the description for `LaboratoryAccountRequested` for more information on the type of data these callbacks will receive.
+            serverRequest "POST", Store.auth.origin + "/api/v1/media", (
+                form = new FormData
+                form.append "file", file
+                form
+            ), Store.auth.accessToken, onComplete, onError
 
-##  `LaboratoryAccountRemoved`  ##
+            return
 
->   - __Builder :__ `Laboratory.Account.Removed`
->   - __Properties :__
->       - `id` – The account to remove the callback for.
->       - `callback` – The callback to remove.
 
-        Removed: new Constructors.LaboratoryEvent "LaboratoryAccountRemoved",
-            id: null,
-            callback: null
+- - -
 
-The `LaboratoryAccountRemoved` event requests a callback be removed from an account.
-If the given `callback` has not been associated with the account with the given `id`, this event's handler does nothing.
-
-##  `LaboratoryAccountFollowers`  ##
-
->   - __Builder :__ `Laboratory.Account.Followers`
->   - __Properties :__
->       - `id` – The id of the account.
->       - `callback` – The callback to call when the follower list is received.
->       - `before` – The status id at which to end the timeline request.
->       - `after` – The status id at which to start the timeline request.
-
-        Followers: new Constructors.LaboratoryEvent "LaboratoryAccountFollowers",
-            id: null
-            callback: null
-            before: null
-            after: null
-
-The `LaboratoryAccountFollowers` event requests that the list of followers for the provided account `id` be retrieved.
-The range of ids covered by this list can be provided through `before` and `after`.
-The `callback` provided to this event will not be remembered later—so make sure one is specified each time.
-
-##  `LaboratoryAccountFollowing`  ##
-
->   - __Builder :__ `Laboratory.Account.Following`
->   - __Properties :__
->       - `id` – The id of the account.
->       - `callback` – The callback to call when the follower list is received.
->       - `before` – The status id at which to end the timeline request.
->       - `after` – The status id at which to start the timeline request.
-
-        Following: new Constructors.LaboratoryEvent "LaboratoryAccountFollowing",
-            id: null
-            callback: null
-            before: null
-            after: null
-
-The `LaboratoryAccountFollowing` event requests that the list people following the provided account `id` be retrieved.
-The range of ids covered by this list can be provided through `before` and `after`.
-The `callback` provided to this event will not be remembered later—so make sure one is specified each time.
-
-##  `LaboratoryAccountSearch`  ##
-
->   - __Builder :__ `Laboratory.Account.Search`
->   - __Properties :__
->       - `query` – The query to search for.
->       - `callback` – The callback to call when the follower list is received.
->       - `limit` – The maximum number of results to return from the search.
-
-        Search: new Constructors.LaboratoryEvent "LaboratoryAccountSearch",
-            query: null
-            callback: null
-            limit: null
-
-The `LaboratoryAccountSearch` event requests that an account search be performed for the specified query.
-You can limit the number of results returned with the `limit` property.
-The `callback` provided to this event will not be remembered later—so make sure one is specified each time.
-
-##  `LaboratoryAccountFollow`  ##
-
->   - __Builder :__ `Laboratory.Account.Follow`
->   - __Properties :__
->       - `id` – The id of the account.
->       - `value` – `true` if the account should be followed; `false` if the account should be unfollowed
-
-        Follow: new Constructors.LaboratoryEvent "LaboratoryAccountFollow",
-            id: null
-            value: true
-
-The `LaboratoryAccountFollow` event requests a follow for the specified user id.
-Once the server processes this request, a `LaboratoryAccountRelationshipsReceived` event will trigger with the updated relationship for the given account.
-
-##  `LaboratoryAccountBlock`  ##
-
->   - __Builder :__ `Laboratory.Account.Block`
->   - __Properties :__
->       - `id` – The id of the account.
->       - `value` – `true` if the account should be followed; `false` if the account should be unfollowed
-
-        Block: new Constructors.LaboratoryEvent "LaboratoryAccountBlock",
-            id: null
-            value: true
-
-The `LaboratoryAccountBlock` event requests a block for the specified user id.
-Once the server processes this request, a `LaboratoryAccountRelationshipsReceived` event will trigger with the updated relationship for the given account.
-
+> From [/src/API/Authorization.litcoffee](../src/API/Authorization.litcoffee) :
 
 #  AUTHORIZATION EVENTS  #
 
-    Events.Authorization = Object.freeze
+##  Introduction  ##
 
-The __Authorization__ module of Laboratory Events is comprised of those events which are related to OAuth authorization and authentication between the user, Laboratory, and the Mastodon server.
-The only Authorization event you should fire yourself is `LaboratoryAuthorizationRequested`; the remainder are used by Laboratory to document various stages in the authentication process.
+The __Authorization__ module of Laboratory Events is comprised of those events which are related to OAuth registration of the Laboratory client with the Mastodon server.
 
-| Event / Builder | Description |
+###  Quick reference:
+
+| Event | Description |
 | :-------------- | :---------- |
-| `LaboratoryAuthorizationClientRequested` / `Laboratory.Authorization.ClientRequested` | Fires when a client id and secret should be requested from the OAuth server |
-| `LaboratoryAuthorizationClientReceived` / `Laboratory.Authorization.ClientReceived` | Fires when a client id and secret have been received from the OAuth server |
-| `LaboratoryAuthorizationRequested` / `Laboratory.Authorization.Requested` | Fires when an access token should be requested from the OAuth server |
-| `LaboratoryAuthorizationGranted` / `Laboratory.Authorization.Granted` | Fires when a user has granted authorization for Laboratory to receive an access token from the OAuth server |
-| `LaboratoryAuthorizationReceived` / `Laboratory.Authorization.Received` | Fires when an access token has been received from the OAuth server |
-| `LaboratoryAuthorizationVerified` / `Laboratory.Authorization.Verified` | Fires when an access token has been verified and the account data for the user has been received |
-| `LaboratoryAuthorizationFavourites` / `Laboratory.Authorization.Favourites` | Requests the list of favourited statuses for the currently authenticated user |
-| `LaboratoryAuthorizationBlocks` / `Laboratory.Authorization.Blocks` | Requests the list of favourited statuses for the currently authenticated user |
+| `LaboratoryAuthorizationRequested` | Fires when a new access token should be requested from the OAuth server |
+| `LaboratoryAuthorizationReceived` | Fires when an access token has been received from the OAuth server |
+| `LaboratoryAuthorizationFailed` | Fires when a request for an access token failed |
+| `LaboratoryAuthorizationGranted` | Fires when a popup receives an authorization code |
 
-##  `LaboratoryAuthorizationClientRequested`  ##
+##  Requesting Authorization  ##
 
->   - __Builder :__ `Laboratory.Authorization.ClientRequested`
->   - __Properties :__
->       - `url` – Provides the URL of the Mastodon server (only the origin is used).
->       - `redirect` – Provides the base URL for your application. This URL must be in the same domain as the current page and must have the Laboratory script loaded. Furthermore, if your application has multiple pages, it should be the same for each.
->       - `name` – Provides the name to use when registering the Mastodon client.
+>   - __API equivalent :__ `/oauth/token`, `/api/v1/verify_credentials`
+>   - __Request parameters :__
+>       - __`name` :__ The name of the client application (default: `"Laboratory"`)
+>       - __`url` :__ The location of the Mastodon server (default: `"/"`)
+>       - __`redirect` :__ The base url for the application (default: `""`)
+>       - __`scope` :__ An `Authorization.Scope` (default: `Authorization.Scope.READ`)
+>   - __Request :__ `LaboratoryAuthorizationRequested`
+>   - __Response :__ `LaboratoryAuthorizationReceived`
+>   - __Failure :__ `LaboratoryAuthorizationFailed`
+>   - __Miscellanous events :__
+>       - `LaboratoryAuthorizationGranted`
 
-        ClientRequested: new Constructors.LaboratoryEvent 'LaboratoryAuthorizationClientRequested',
+The `LaboratoryAuthorizationRequested` event requests an access token for use with OAuth.
+This will likely be the first request you make when interacting with Laboratory.
+You probably don't need to keep track of its response, since this data will be made available through the `Laboratory` object.
+
+The `LaboratoryAuthorizationGranted` event fires when a user has granted authorization through the OAuth popup.
+Its `detail` will contain either a `code` or an `accessToken`, alongside an optional `window`, `origin` and `scope`.
+If you have somehow acquired an access token from somewhere else, passing this value to `LaboratoryAuthorizationGranted` alongside its origin and scope will allow Laboratory to use it as well.
+Alternatively, you can pass an `Authorization` object to `LaboratoryAuthorizationReceived`, but note that doing so requires more information.
+
+##  Implementation  ##
+
+###  Recalling the origin:
+
+Only one authorization attempt can be made at a time, since it is made in a named window.
+We recall the origin of this attempt using the local `recalledOrigin` variable.
+
+    do ->
+        recalledOrigin = null
+
+###  Creating the events:
+
+Here we create the events as per our specifications.
+
+        LaboratoryEvent
+
+            .create "LaboratoryAuthorizationRequested",
+                name: "Laboratory"
+                url: "/"
+                redirect: ""
+                scope: Authorization.Scope.READ
+            .create "LaboratoryAuthorizationReceived", Authorization
+            .create "LaboratoryAuthorizationFailed", Failure
+            .associate "LaboratoryAuthorizationRequested", "LaboratoryAuthorizationReceived", "LaboratoryAuthorizationFailed"
+
+            .create "LaboratoryAuthorizationGranted",
+                code: undefined
+                accessToken: undefined
+                origin: undefined
+                scope: Authorization.Scope.NONE
+                window: undefined
+
+###  Handling the events:
+
+Laboratory provides handlers for the following Authorization events:
+
+- `LaboratoryAuthorizationRequested`
+- `LaboratoryAuthorizationGranted`
+- `LaboratoryAuthorizationReceived`
+
+####  `LaboratoryAuthorizationRequested`.
+
+The `LaboratoryAuthorizationRequested` handler starts a request for a new access token from the API.
+The code for this handler is very complex, largely because it takes place across multiple asynchronous requests and two separate windows.
+`LaboratoryAuthorizationRequested` only handles the first half of the request; see `LaboratoryAuthorizationGranted` for the second half.
+
+            .handle "LaboratoryAuthorizationRequested", (event) ->
+
+If we weren't provided with a scope, we'll set it to the default.
+
+                scope = Authorization.Scope.READ unless (scope = event.detail.scope) instanceof Authorization.Scope
+
+First, we normalize our URL.
+We also get our redirect URI at this point.
+
+                a = document.createElement "a"
+                a.href = event.detail.url
+                origin = a.origin
+                a.href = event.detail.redirect or ""
+                redirect = a.href
+
+The `makeRequest()` function will request our token once we acquire a client id and secret.
+Of course, it is possible that we already have these.
+
+                makeRequest = ->
+
+The actual token requesting takes place after authorization has been granted by the popup window (see the script at the beginning of [README](../README.litcoffee)); but we open it up here.
+
+>   __Note :__
+>   This window **will be blocked** by popup blockers unless it has already been opened previously in response to a click or keyboard event.
+
+                    window.open origin + "/oauth/authorize?" + (
+                        (
+                            (encodeURIComponent key) + "=" + (encodeURIComponent value) for key, value of {
+                                client_id: clientID
+                                response_type: "code"
+                                redirect_uri: redirect
+                                scope: do ->
+                                    scopeList = []
+                                    scopeList.push "read" if scope & Authorization.Scope.READ
+                                    scopeList.push "write" if scope & Authorization.Scope.WRITE
+                                    scopeList.push "follow" if scope & Authorization.Scope.FOLLOW
+                                    return scopeList.join " "
+                            }
+                        ).join "&"
+                    ), "LaboratoryOAuth"
+                    recalledOrigin = origin
+                    return
+
+We can only make our request once we have been registered as a client.
+Laboratory stores its client and authorization data in `localStorage`.
+Here we try to access that data if present:
+
+                [storedRedirect, clientID, clientSecret, storedScope, accessToken] = (localStorage.getItem "Laboratory | " + origin).split " ", 5 if localStorage?.getItem "Laboratory | " + origin
+
+If we have an access token which supports our requested `scope` then we can immediately try using it.
+We'll just forward it to `LaboratoryAuthorizationGranted`.
+
+                dispatch "LaboratoryAuthorizationGranted", {
+                    accessToken: accessToken
+                    origin: origin
+                    scope: scope
+                } if accessToken and (scope & storedScope) is +scope
+
+If we have client credentials and they are properly associated with our `redirect` and `scope`, we can go ahead and `makeRequest()`.
+
+                if storedRedirect is redirect and (scope & storedScope) is +scope and clientID? and clientSecret? then do makeRequest
+
+Otherwise, we need to get new client credentials before proceeding.
+
+                else
+
+                    handleClient = (e) ->
+                        return unless (client = e.detail) instanceof Client and client.origin is origin and (scope & client.scope) is +scope and client.redirect is redirect and client.clientID? and client.clientSecret?
+                        {clientID, clientSecret, scope} = client
+                        localStorage.setItem "Laboratory | " + origin, [redirect, clientID, clientSecret, +scope].join " "
+                        forget "LaboratoryClientReceived", handleClient
+                        clearTimeout timeout
+                        do makeRequest
+                        return
+
+                    listen "LaboratoryClientReceived", handleClient
+
+                    dispatch "LaboratoryClientRequested",
+                        name: event.detail.name
+                        url: origin
+                        redirect: redirect
+                        scope: Authorization.Scope.fromValue scope
+
+If we aren't able to acquire a client ID within 30 seconds, we timeout.
+
+                    timeout = setTimeout (
+                        ->
+                            forget "LaboratoryClientReceived", handleClient
+                            dispatch "LaboratoryAuthorizationFailed", new Failure "Unable to authorize client", "LaboratoryAuthorizationRequested"
+                            return
+                    ), 30000
+
+                return
+
+####  `LaboratoryAuthorizationGranted`.
+
+The `LaboratoryAuthorizationGranted` handler does the *actual* requesting of an access token, using the authorization code in its `detail`.
+It then attempts to verify the access token through a simple request to `/api/v1/accounts/verify_credentials`.
+If this succeeds, then it will respond with the `Authorization`.
+
+            .handle "LaboratoryAuthorizationGranted", (event) ->
+
+                if event.detail.window then do event.detail.window.close
+
+Our authorization must have an associated `origin`.
+If it doesn't, we can't proceed.
+
+                unless origin = event.detail.origin or recalledOrigin
+                    dispatch "LaboratoryAuthorizationFailed", new Failure "Authorization data wasn't associated with an origin", "LaboratoryAuthorizationRequested"
+                    return
+
+We also initialize our `scope`, `datetime`, and `tokenType` variables now.
+We'll only use these initial values if an `accessToken` was directly provided, otherwise we'll overwrite them using the server's response.
+
+                scope = if event.detail.scope instanceof Authorization.Scope then (
+                    do ->
+                        scopeList = []
+                        scopeList.push "read" if scope & Authorization.Scope.READ
+                        scopeList.push "write" if scope & Authorization.Scope.WRITE
+                        scopeList.push "follow" if scope & Authorization.Scope.FOLLOW
+                        return scopeList.join " "
+                ) else ""
+                datetime = NaN
+                tokenType = "bearer"
+
+We use our `origin` to get our redirect, client id, and secret.
+We only need these if we were provided with a `code`.
+
+                [redirect, clientID, clientSecret] = (localStorage.getItem "Laboratory | " + origin).split " ", 5 if localStorage?.getItem "Laboratory | " + origin
+
+The function `verify()` will attempt to verify our access token.
+The response should be an account object.
+
+                verify = ->
+
+                    verifyComplete = (response, data, params) ->
+                        dispatch "LaboratoryAuthorizationReceived", new Authorization {
+                            access_token: String accessToken
+                            created_at: String +datetime
+                            scope: scope
+                            token_type: tokenType
+                        }, origin, response.id
+                        localStorage.setItem "Laboratory | " + origin, [redirect, clientID, clientSecret, Authorization.Scope.READ * (((scopes = scope.split /[\s\+]+/g).indexOf "read") isnt -1) + Authorization.Scope.WRITE * ((scopes.indexOf "write") isnt -1) + Authorization.Scope.FOLLOW * ((scopes.indexOf "follow") isnt -1), accessToken].join " "
+                        dispatch "LaboratoryProfileReceived", new Profile response
+                        return
+
+                    verifyError = (response, data, params) ->
+                        dispatch "LaboratoryAuthorizationFailed", new Failure response.error, "LaboratoryAuthorizationRequested", params.status
+                        return
+
+                    serverRequest "GET", origin + "/api/v1/accounts/verify_credentials", null, accessToken, verifyComplete, verifyError
+
+If we were given an access token then we can go ahead and verify now.
+
+                if accessToken = event.detail.accessToken then do verify
+
+Otherwise we first have to acquire one.
+
+                else if code = event.detail.code
+                    onComplete = (response, data, params) ->
+                        accessToken = response.access_token
+                        datetime = new Date response.created_at
+                        scope = response.scope
+                        tokenType = response.token_type
+                        do verify
+                        return
+                    onError = (response, data, params) ->
+                        dispatch "LaboratoryAuthorizationFailed", new Failure response.error, "LaboratoryAuthorizationRequested", params.status
+                        return
+                    serverRequest "POST", origin + "/oauth/token", {
+                        client_id: clientID
+                        client_secret: clientSecret
+                        redirect_uri: redirect
+                        grant_type: "authorization_code"
+                        code: code
+                    }, null, onComplete, onError
+
+If we weren't given an `accessToken` *or* a `code`, that's an error.
+
+                else dispatch "LaboratoryAuthorizationFailed", new Failure "No authorization code or access token was granted", "LaboratoryAuthorizationRequested"
+
+We can now reset our recalled origin.
+
+                recalledOrigin = null
+                return
+
+####  `LaboratoryAuthorizationReceived`.
+
+The `LaboratoryAuthorizationReceived` handler just saves the provided `Authorization` to the `Store`.
+It also exposes it to the window through `Exposed`.
+
+            .handle "LaboratoryAuthorizationReceived", (event) ->
+                return unless event.detail instanceof Authorization
+                Exposed.auth = Store.auth = event.detail
+                return
+
+
+- - -
+
+> From [/src/API/Client.litcoffee](../src/API/Client.litcoffee) :
+
+#  CLIENT EVENTS  #
+
+##  Introduction  ##
+
+The __Client__ module of Laboratory Events is comprised of those events which are related to OAuth registration of the Laboratory client with the Mastodon server.
+
+###  Quick reference:
+
+| Event | Description |
+| :-------------- | :---------- |
+| `LaboratoryClientRequested` | Fires when a client id and secret should be requested from the OAuth server |
+| `LaboratoryClientReceived` | Fires when a client id and secret have been received from the OAuth server |
+| `LaboratoryClientFailed` | Fires when a request for a client id and secret from the OAuth server failed |
+
+##  Requesting Client Authorization  ##
+
+>   - __API equivalent :__ `/api/v1/apps`
+>   - __Request parameters :__
+>       - __`name` :__ The name of the client application (default: `"Laboratory"`)
+>       - __`url` :__ The location of the Mastodon server (default: `"/"`)
+>       - __`redirect` :__ The base url for the application (default: `""`)
+>       - __`scope` :__ A `Laboratory.Authorization.Scope` (default: `Laboratory.Authorization.Scope.READWRITEFOLLOW`)
+>   - __Request :__ `LaboratoryClientRequested`
+>   - __Response :__ `LaboratoryClientReceived`
+>   - __Failure :__ `LaboratoryClientFailed`
+
+The `LaboratoryClientRequested` event requests a new client id for use with OAuth.
+Laboratory will fire this event automatically as necessary during the handling of `LaboratoryAuthorizationRequested`, so it isn't something you usually need to worry about.
+However, you can request this yourself if you find yourself needing new client authorization.
+
+##  Implementation  ##
+
+###  Creating the events:
+
+Here we create the events as per our specifications.
+
+    LaboratoryEvent
+        .create "LaboratoryClientRequested",
+            name: "Laboratory"
             url: "/"
             redirect: ""
-            name: "Laboratory Web Client"
+            scope: Authorization.Scope.READ
+        .create "LaboratoryClientReceived", Client
+        .create "LaboratoryClientFailed", Failure
+        .associate "LaboratoryClientRequested", "LaboratoryClientReceived", "LaboratoryClientFailed"
 
-The `LaboratoryAuthorizationClientRequested` event fires when the Laboratory script is requesting a new client id for use with OAuth.
-Laboratory will fire this event automatically if it needs to during the handling of `LaboratoryAuthorizationRequested`, so it isn't usually something you need to worry about.
+###  Handling the events:
 
-##  `LaboratoryAuthorizationClientReceived`  ##
+Laboratory provides handlers for the following Client events:
 
->   - __Builder :__ `Laboratory.Authorization.ClientReceived`
->   - __Properties :__
->       - `data` – Provides the response from the server.
->       - `params` – Provides parameters remembered from the initial request.
+- `LaboratoryClientRequested`
 
-        ClientReceived: new Constructors.LaboratoryEvent 'LaboratoryAuthorizationClientReceived',
-            data: null
-            params: null
+####  `LaboratoryClientRequested`.
 
-The `LaboratoryAuthorizationClientReceived` event fires when the Mastodon server has responded to its request for a client id.
-Hopefully, the `data` of this request will contain a client id and secret for Laboratory to use.
-These aren't anything you should need to use yourself—especially since Laboratory will be acquiring a much-more-useful access token for you here shortly.
+The `LaboratoryClientRequested` handler requests a new client id and secret from the API, and fires `LaboratoryClientReceived` when it is granted.
 
-##  `LaboratoryAuthorizationRequested`  ##
+        .handle "LaboratoryClientRequested", (event) ->
 
->   - __Builder :__ `Laboratory.Authorization.Requested`
->   - __Properties :__
->       - `url` – Provides the URL of the Mastodon server (only the origin is used).
->       - `redirect` – Provides the base URL for your application. This URL must be in the same domain as the current page and must load the Laboratory script. Furthermore, if your application has multiple pages, this URL should be the same for each.
->       - `name` – Provides the name to use when registering the Mastodon client.
+If we weren't provided with a scope, we'll set it to the default.
 
-        Requested: new Constructors.LaboratoryEvent 'LaboratoryAuthorizationRequested',
-            url: "/"
-            redirect: ""
-            name: "Laboratory Web Client"
+            scope = Authorization.Scope.READ unless (scope = event.detail.scope) instanceof Authorization.Scope
 
-The `LaboratoryAuthorizationRequested` event asks Laboratory to seek authorization from a Mastodon server, provided with `url`.
-If it is fired with a `name`, then that name will be used when registering the Laboratory client.
-(If no client registration is needed, the `name` will be discarded.)
+First, we normalize our URL.
+We also get our redirect URI at this point.
 
-The OAuth authorization window opened by `LaboratoryAuthorizationRequested` will be treated as a popup by most browsers unless you've opened it ahead of time as the result of a click or a keypress.
-The name of this window should be `LaboratoryOAuth`.
-One good workflow is to open this window preemptively when a user clicks to submit the name of their instance.
-If you know the name of the instance ahead of time, using a "connect" button might work just as well.
+            a = document.createElement "a"
+            a.href = event.detail.url
+            origin = a.origin
+            a.href = event.detail.redirect or ""
+            redirect = a.href
 
-`LaboratoryAuthorizationClientReceived` automatically fires this event during its handler, so you don't need to dispatch it twice if client registration happens to be needed.
+If our request completes, then we want to respond with a `Client` object.
 
-##  `LaboratoryAuthorizationGranted`  ##
+            onComplete = (response, data, params) ->
+                dispatch "LaboratoryClientReceived", new Client response, data, origin
+                return
 
->   - __Builder :__ `Laboratory.Authorization.Granted`
->   - __Properties :__
->       - `window` – A reference to the `window` popup which authorized the application
->       - `code` – The authorization code which will be used to retreive an access token.
+Otherwise, we need to generate a `Failure`.
 
-        Granted: new Constructors.LaboratoryEvent 'LaboratoryAuthorizationGranted',
-            window: null
-            code: null
+            onError = (response, data, params) ->
+                dispatch "LaboratoryClientFailed", new Failure response.error, "LaboratoryClientRequested", params.status
+                return
 
-The `LaboratoryAuthorizationGranted` event is called from a Laboratory popup window once the user has signed in and authorized the application.
-The handler for this event closes the popup and requests an access token from the Mastodon API.
+Now we can send our request.
 
-##  `LaboratoryAuthorizationReceived`  ##
-
->   - __Builder :__ `Laboratory.Authorization.Received`
->   - __Properties :__
->       - `data` – The response from the server.
-
-        Received: new Constructors.LaboratoryEvent 'LaboratoryAuthorizationReceived',
-            data: null
-
-The `LaboratoryAuthorizationReceived` event fires once the server has responded to a request for an access token.
-The token is—hopefully—contained inside `data`; otherwise Laboratory will start the whole process over again from the beginning.
-It is unlikely that you would ever need access to Laboratory's access token, since the whole point of Laboratory is to make it handle the API stuff for you.
-However, if you do, **now is the time to secure it**, since after this event is fired it will disappear into the unknowable depths of the Laboratory store.
-You can access it at `event.detail.data.access_token`—note the underscore, because this is an API response.
-
-##  `LaboratoryAuthorizationVerified`  ##
-
->   - __Builder :__ `Laboratory.Authorization.Verified`
->   - __Properties :__
->       - `data` – The response from the server.
-
-        Verified: new Constructors.LaboratoryEvent 'LaboratoryAuthorizationVerified',
-            data: null
-
-The `LaboratoryAuthorizationVerified` event fires when the first request non–OAuth-related API request goes through.
-This is always a request to `/api/v1/accounts/verify_credentials`, and the response will always be the account data for the newly–signed-in user.
-If you need to know the current user's id, listing for this event is your best hope of getting it.
-A `LaboratoryAccountReceived` event with containing the account's `data` will be fired by this event's handler.
-
-##  `LaboratoryAuthorizationFavourites`  ##
-
->   - __Builder :__ `Laboratory.Authorization.Favourites`
->   - __Properties :__
->       - `callback` – A function to call with the response.
->       - `before` – The status id at which to end the request.
->       - `after` – The status id at which to start the request.
-
-        Favourites: new Constructors.LaboratoryEvent 'LaboratoryAuthorizationFavourites',
-            callback: null
-            before: null
-            after: null
-
-The `LaboratoryAuthorizationFavouritesRequested` event asks for the current user's favourites from the server.
-The `callback` will not be remembered for future instances of this request.
-
-##  `LaboratoryAuthorizationBlocks`  ##
-
->   - __Builder :__ `Laboratory.Authorization.Blocks`
->   - __Properties :__
->       - `callback` – A function to call with the response.
->       - `before` – The account id at which to end the request.
->       - `after` – The account id at which to start the request.
-
-        Blocks: new Constructors.LaboratoryEvent 'LaboratoryAuthorizationBlocks',
-            callback: null
-            before: null
-            after: null
-
-The `LaboratoryAuthorizationBlocksRequested` event asks for the current user's blocks from the server.
-The `callback` will not be remembered for future instances of this request.
+            serverRequest "POST", origin + "/api/v1/apps", {
+                client_name: event.detail.name
+                redirect_uris: event.detail.redirect
+                scopes: do ->
+                    scope = event.detail.scope
+                    scopeList = []
+                    scopeList.push "read" if scope & Authorization.Scope.READ
+                    scopeList.push "write" if scope & Authorization.Scope.WRITE
+                    scopeList.push "follow" if scope & Authorization.Scope.FOLLOW
+                    return scopeList.join " "
+            }, null, onComplete, onError
 
 
-#  COMPOSER EVENTS  #
+- - -
 
-    Events.Composer = Object.freeze
-
-The __Composer__ module of Laboratory Events is comprised of those events which are related to composing and posting statuses.
-
-| Event / Builder | Description |
-| :-------------- | :---------- |
-| `LaboratoryComposerUploadRequested` / `Laboratory.Composer.UploadRequested` | Fires when a media file should be sent to the server |
-| `LaboratoryComposerUploadReceived` / `Laboratory.Composer.UploadReceived` | Fires when a media file has been received by the server |
-| `LaboratoryComposerRequested` / `Laboratory.Composer.Requested` | Registers a composer callback function |
-| `LaboratoryComposerPost` / `Laboratory.Composer.Post` | Fires when a post should be made to the server |
-| `LaboratoryComposerRemoved` / `Laboratory.Composer.Removed` | Asks to remove a composer callback function |
-
-##  `LaboratoryComposerUploadRequested`  ##
-
->   - __Builder :__ `Laboratory.Composer.UploadRequested`
->   - __Properties :__
->       - `file` – The file which should be uploaded.
-
-        UploadRequested: new Constructors.LaboratoryEvent 'LaboratoryComposerUploadRequested',
-            file: null
-
-The `LaboratoryComposerUploadRequested` event sends a `file` to the Mastodon server for uploading.
-
-##  `LaboratoryComposerUploadReceived`  ##
-
->   - __Builder :__ `Laboratory.Composer.UploadReceived`
->   - __Properties :__
->       - `data` – The response from the server.
-
-        UploadReceived: new Constructors.LaboratoryEvent 'LaboratoryComposerUploadReceived',
-            data: null
-
-The `LaboratoryComposerUploadReceived` fires when an upload has been received by the Mastodon server, and its `data` contains the server's response.
-The handler for `LaboratoryComposerUploadReceived` will call any composer callbacks with an immutable `Laboratory.MediaAttachment` object with the following properties:
-
-| Property  | API Response  | Description |
-| :-------: | :-----------: | :---------- |
-|   `id`    |     `id`      | The id of the media attachment |
-|  `href`   |     `url`     | The url of the media attachment |
-| `preview` | `preview_url` | The url of a preview for the media attachment |
-|  `type`   |    `type`     | Either `Laboratory.MediaType.PHOTO` (for a photo attachment) or `Laboratory.MediaType.VIDEO` (for a video attachment) |
-
-##  `LaboratoryComposerRequested`:  ##
-
->   - __Builder :__ `Laboratory.Composer.Requested`
->   - __Properties :__
->       - `callback` – The callback to associate with the composer.
-
-        Requested: new Constructors.LaboratoryEvent 'LaboratoryComposerRequested',
-            file: null
-
-The `LaboratoryComposerRequested` event requests an association between composer events and a provided `callback`.
-This `callback` will receive media uploads from the handler for `LaboratoryComposerUploadReceived`; see the description of that event for more information.
-
-##  `LaboratoryComposerPost`  ##
-
->   - __Builder :__ `Laboratory.Composer.Post`
->   - __Properties :__
->       - `text` – The text of the post.
->       - `inReplyTo` – The id of the post this post is replying to.
->       - `mediaAttachments` – An array of `Laboratory.MediaAttachment`s.
->       - `message` – A message to hide the post behind.
->       - `makePublic` – Whether to make the post public.
->       - `makeListed` – Whether to make the post listed.
->       - `makeNSFW` – Whether to mark the post's media as sensitive.
-
-        Post: new Constructors.LaboratoryEvent "LaboratoryComposerPost",
-            text: ""
-            inReplyTo: null
-            mediaAttachments: null
-            message: null
-            makePublic: false
-            makeListed: false
-            makeNSFW: true
-
-The `LaboratoryComposerPost` event sends a post to the server.
-
-##  `LaboratoryComposerRemove`  ##
-
->   - __Builder :__ `Laboratory.Composer.Remove`
->   - __Properties :__
->       - `callback` – The callback to disassociate from the composer.
-
-        Remove: new Constructors.LaboratoryEvent 'LaboratoryComposerRemove',
-            callback: null
-
-The `LaboratoryComposerRemove` event requests that an association between composer events and the given `callback` be broken.
-If no association has been made, the handler for this event does nothing.
-
+> From [/src/API/Initialization.litcoffee](../src/API/Initialization.litcoffee) :
 
 #  INITIALIZATION EVENTS  #
 
-    Events.Initialization = Object.freeze
+##  Introduction  ##
 
-The __Initialization__ module of Laboratory Events is comprised of those events which are related to initialization of the Laboratory store and handlers.
-It is comprised of two events: `LaboratoryInitializationLoaded` and `LaboratoryInitializationReady`.
+The __Initialization__ module of the Laboratory API is comprised of those events which are related to initialization of the Laboratory store and handlers.
+These make up just two events: `LaboratoryInitializationLoaded` and `LaboratoryInitializationReady`.
 
 You can check `window.Laboratory.ready` as a means of verifying if these events have fired after-the-fact:
 If `window.Laboratory.ready` exists, then `LaboratoryInitializationLoaded` has fired.
 If it is `true`, then `LaboratoryInitializationReady` has fired as well.
 
-**You should not fire Laboratory Initialization Events yourself.**
+**You should not fire Laboratory Initialization events yourself.**
 They will be ignored by Laboratory proper, but may confuse other components which you might have loaded.
 However, you should listen for these events to know when proper communication with the Laboratory framework should begin.
 
-| Event / Builder | Description |
-| :-------------- | :---------- |
-| `LaboratoryInitializationLoaded` / `Laboratory.Initialization.Loaded` | Fires when the Laboratory script has been loaded and run |
-| `LaboratoryInitializationReady` / `Laboratory.Initialization.Ready` | Fires when the Laboratory event handlers are ready to receive events |
+###  Quick reference:
 
-##  `LaboratoryInitializationLoaded`  ##
+| Event | Description |
+| :---- | :---------- |
+| `LaboratoryInitializationLoaded` | Fires when the Laboratory script has been loaded and run |
+| `LaboratoryInitializationReady` | Fires when the Laboratory event handlers are ready to receive events |
 
->   - __Builder :__ `Laboratory.Initialization.Loaded`
->   - __Properties :__ None.
+##  Checking Initialization Status  ##
 
-        Loaded: new Constructors.LaboratoryEvent 'LaboratoryInitializationLoaded'
+>   - __API equivalent :__ _None_
+>   - __Miscellanous events :__
+>       - `LaboratoryInitializationLoaded`
+>       - `LaboratoryInitializationReady`
 
 The `LaboratoryInitializationLoaded` event fires when the Laboratory script has been loaded and run, and can be used when loading Laboratory in an asynchronous manner.
 After this event fires, it is safe to use the `Laboratory` object in your code.
 Before this event fires, the `Laboratory` object will likely not have been defined yet.
-
-Note that this event does not indicate whether the `Laboratory` handlers have been assigned to their appropriate events yet; for that, use `LaboratoryInitializationReady`.
-
-##  `LaboratoryInitializationReady`  ##
-
->   - __Builder :__ `Laboratory.Initialization.Ready`
->   - __Properties :__ None.
-
-        Ready: new Constructors.LaboratoryEvent 'LaboratoryInitializationReady'
 
 The `LaboratoryInitializationReady` event fires when the Laboratory handlers have been assigned to their appropriate events.
 After this event fires, it is safe to dispatch `Laboratory` events.
@@ -1518,969 +2143,779 @@ Before this event fires, it is unlikely (although not *impossible*) that they wi
 Laboratory waits for the entire document to be loaded before assigning its handlers; consequently, there is a possibility that `LaboratoryInitializationLoaded` will fire well before `LaboratoryInitializationReady`, especially with scripts loaded synchronously.
 Of the two, `LaboratoryInitializationReady` is almost always the one to listen for.
 
-
-#  STATUS EVENTS  #
-
-    Events.Status = Object.freeze
-
-The __Status__ module of Laboratory Events is comprised of those events which are related to interacting with Mastodon statuses.
-
-| Event / Builder | Description |
-| :-------------- | :---------- |
-| `LaboratoryStatusRequested` / `Laboratory.Status.Requested` | Requests a status from the Mastodon API |
-| `LaboratoryStatusReceived` / `Laboratory.Status.Received` | Fired when a status is received from the Mastodon API |
-| `LaboratoryStatusReblogs` / `Laboratory.Status.Reblogs` | Requests the users which have reblogged a status from the Mastodon API |
-| `LaboratoryStatusFavourites` / `Laboratory.Status.Favourites` | Requests the users which have favourited a status from the Mastodon API |
-| `LaboratoryStatusSetReblog` / `Laboratory.Status.SetReblog` | Informs the Mastodon API that a status should be (un-)reblogged |
-| `LaboratoryStatusSetFavourite` / `Laboratory.Status.SetFavourite` | Informs the Mastodon API that a status should be (un-)favourited |
-| `LaboratoryStatusDeletion` / `Laboratory.Status.Deletion` | Informs the Mastodon API that a status should be deleted |
-
-##  `LaboratoryStatusRequested`  ##
-
->   - __Builder :__ `Laboratory.Status.Requested`
->   - __Properties :__
->       - `id` – The id of the status.
->       - `callback` – The callback to call when the status is received.
-
-        Requested: new Constructors.LaboratoryEvent "LaboratoryStatusRequested",
-            id: null
-            callback: null
-
-The `LaboratoryStatusRequested` event requests detailed information on a status with the given `id`.
-Its `callback` will receive a [`Laboratory.Post`](../Constructors/Post.litcoffee) object containing the status.
-This callback is not remembered so be sure to specify one each time.
-
-##  `LaboratoryStatusReceived`  ##
-
->   - __Builder :__ `Laboratory.Status.Received`
->   - __Properties :__
->       - `data` – The response from the server.
-
-        Received: new Constructors.LaboratoryEvent "LaboratoryStatusReceived",
-            data: null
-
-The `LaboratoryStatusReceived` event describes a response from the server for a Laboratory status request.
-It will also update any timelines in which the status is contained.
-Generally speaking, this isn't something you need to listen for yourself, as the callback you provided when you requested the data will have also been called.
-
-##  `LaboratoryStatusReblogs`  ##
-
->   - __Builder :__ `Laboratory.Status.Reblogs`
->   - __Properties :__
->       - `id` – The id of the status.
->       - `callback` – The callback to call when the reblogs are received.
->       - `before` – The id at which to end the request.
->       - `after` – The id at which to start the request.
-
-        Reblogs: new Constructors.LaboratoryEvent "LaboratoryStatusReblogs",
-            id: null
-            callback: null
-            before: null
-            after: null
-
-The `LaboratoryStatusReblogs` event requests who has reblogged a status with the given `id`.
-Its `callback` will receive an array of [`Laboratory.Profile`](../Constructors/Profile.litcoffee) objects, containing the requested users.
-The range of ids covered by this list can be provided through `before` and `after`.
-
-##  `LaboratoryStatusFavourites`  ##
-
->   - __Builder :__ `Laboratory.Status.Favourites`
->   - __Properties :__
->       - `id` – The id of the status.
->       - `callback` – The callback to call when the favourites are received.
->       - `before` – The id at which to end the request.
->       - `after` – The id at which to start the request.
-
-        Favourites: new Constructors.LaboratoryEvent "LaboratoryStatusFavourites",
-            id: null
-            callback: null
-            before: null
-            after: null
-
-The `LaboratoryStatusFavourites` event requests who has favourited a status with the given `id`.
-Its `callback` will receive an array of [`Laboratory.Profile`](../Constructors/Profile.litcoffee) objects, containing the requested users.
-The range of ids covered by this list can be provided through `before` and `after`.
-
-##  `LaboratoryStatusSetReblog`  ##
-
->   - __Builder :__ `Laboratory.Status.SetReblog`
->   - __Properties :__
->       - `id` – The id of the status.
-
-        SetReblog: new Constructors.LaboratoryEvent "LaboratoryStatusSetReblog",
-            id: null
-
-The `LaboratoryStatusSetReblog` event requests a reblog on a status with the given `id`.
-Once this request goes through, a `LaboratoryStatusReceived` event will fire with the updated status information.
-
-##  `LaboratoryStatusSetFavourite`  ##
-
->   - __Builder :__ `Laboratory.Status.SetFavourite`
->   - __Properties :__
->       - `id` – The id of the status.
-
-        SetFavourite: new Constructors.LaboratoryEvent "LaboratoryStatusSetFavourite",
-            id: null
-
-The `LaboratoryStatusSetFavourite` event requests a favourite on a status with the given `id`.
-Once this request goes through, a `LaboratoryStatusReceived` event will fire with the updated status information.
-
-##  `LaboratoryStatusDeletion`  ##
-
->   - __Builder :__ `Laboratory.Status.Deletion`
->   - __Properties :__
->       - `id` – The id of the status.
-
-        Deletion: new Constructors.LaboratoryEvent "LaboratoryStatusDeletion",
-            id: null
-
-The `LaboratoryStatusDeletion` event requests a deletion on a status with the given `id`.
-It will also remove the status from the Laboratory internal store.
-
-
-#  TIMELINE EVENTS  #
-
-    Events.Timeline = Object.freeze
-
-The __Timeline__ module of Laboratory Events is comprised of those events which are related to Mastodon timelines.
-Laboratory makes no external distinction between timelines of statuses and timelines of notifications, and you can use these events to interface with both.
-
-| Event / Builder | Description |
-| :-------------- | :---------- |
-| `LaboratoryTimelineRequested` / `Laboratory.Timeline.Requested` | Fires when a connection to a timeline is requested |
-| `LaboratoryTimelineReceived` / `Laboratory.Timeline.Received` | Fires when information posts from a timeline have been received from the server. |
-| `LaboratoryTimelineRemoved` / `Laboratory.Timeline.Removed` | Fires when a connection to a timeline should be removed |
-
-##  `LaboratoryTimelineRequested`  ##
-
->   - __Builder :__ `Laboratory.Timeline.Requested`
->   - __Properties :__
->       - `name` – The name of the timeline.
->       - `callback` – The callback to associate with the timeline.
->       - `before` – The status id at which to end the timeline request.
->       - `after` – The status id at which to start the timeline request.
-
-        Requested: new Constructors.LaboratoryEvent 'LaboratoryTimelineRequested',
-            name: null
-            callback: null
-            before: null
-            after: null
-
-The `LaboratoryTimelineRequested` event requests a timeline's data, and associates a `callback` function to be called when the data is received.
-You can optionally specify the range to pull the timeline from with `before` and `after`.
-
-The `name` sent with the event is used to determine which timeline to fetch, and must take one of the following values:
-
-- __`home` :__ Retrieves the user's home timeline.
-- __`community` :__ Retrieves the local timeline.
-- __`global` :__ Retrieves the global timeline.
-- __`hashtag/…` :__ Retrieves the given hashtag.
-- __`user/…` :__ Retrieves the timeline for the given user.
-- __`notifications` :__ Retrieves the user's notifications timeline.
-
-Timeline data is sent to callbacks via an immutable object with two properties.
-The first, `postOrder`, is an array of the ids of every post in the timeline, in order from newest to oldest.
-The second, `posts`, is an object whose properties are post ids and whose values are either [`Laboratory.Post`](../Constructors/Post.litcoffee) objects or (in the case of a notifications timeline) [`Laboratory.Follow`](../Constructors/Follow.litcoffee) objects.
-
-##  `LaboratoryTimelineReceived`  ##
-
->   - __Builder :__ `Laboratory.Timeline.Received`
->   - __Properties :__
->       - `data` – The response from the server.
->       - `params` – Parameters passed through from the request.
-
-        Received: new Constructors.LaboratoryEvent 'LaboratoryTimelineReceived',
-            data: null
-            params: null
-
-The `LaboratoryTimelineReceived` event contains the server's response to a request for timeline data.
-This data will be processed by the handler and sent to the associated callbacks, so it is unlikely you will need to interface with this event yourself.
-The name of the timeline (see above) is stored in `params.name`, and the timeline data is stored as described in `data`.
-
-When a timeline's data is processed, any embedded accounts will be dispatched to `LaboratoryAccountReceived`.
-These will not necessarily be available in time for the callback itself (which is executed synchronously), but should be available in time for any asynchronous calls that the callback might trigger; for example, a call to the renderer.
-
-##  `LaboratoryTimelineRemoved`  ##
-
->   - __Builder :__ `Laboratory.Timeline.Removed`
->   - __Properties :__
->       - `name` – The name of the timeline.
->       - `callback` – The callback to remove from the timeline.
-
-        Removed: new Constructors.LaboratoryEvent 'LaboratoryTimelineRemoved',
-            name: null
-            callback: null
-
-The `LaboratoryTimelineRemoved` event requests that a callback be removed from a timeline.
-Unlike with accounts, timelines *must* have at least one callback associated with them or else their data will be deleted to free up memory.
-Of course, this data can always be re-requested from the server at a later time.
-
-
-#  LABORATORY EVENT HANDLERS  #
-
-The __Laboratory Event Handlers__ provide the backend for the [__Laboratory Event API__](../Events/).
-These files contain the actual server calls, information processing, and data handling of the Laboratory engine.
-
-For the most part, you probably don't need to know what actually goes on in here to use Laboratory, because you will never have direct access to the Laboratory handlers or the store.
-However, if you want to know what Laboratory is doing behind-the-scenes, this file is your answer.
+Neither of the Laboratory Initialization events have `detail`s.
 
 ##  Implementation  ##
 
-Here we set up our internal `Handlers` object.
-This object will *not* be made available to our external `window.Laboratory` object.
+###  Creating the events:
 
-    Handlers = {}
+Here we create the events as per our specifications.
 
-###  `handle()`:
+    LaboratoryEvent
+        .create "LaboratoryInitializationLoaded"
+        .create "LaboratoryInitializationReady"
 
-The `handle()` function just associates a `type` with a `callback`.
-It sets things up so we can easily add our handlers to the document later.
-We also do a few checks before running the callback to make sure it actually is receiving an appropriate event response.
+###  Handling the events:
 
-    handle = (builder, callback) ->
-        console.log callback if not builder
-        typedCallback = (event) ->
-            return unless event? and this? and event.type is builder.type
-            callback.call this, event
-        typedCallback.type = builder.type
-        return Object.freeze typedCallback
+Laboratory Initialization events do not have handlers.
 
-###  `serverRequest()`:
 
-The `serverRequest()` function conveniently performs an `XMLHttpRequest` and binds it to a callback with the response `data` and additional `params`.
-We will use it in our handlers to actually send our requests to the API.
+- - -
 
-    serverRequest = (method, location, contents, accessToken, onComplete, params) ->
+> From [/src/API/Post.litcoffee](../src/API/Post.litcoffee) :
 
-####  Creating the request.
+#  POST EVENTS  #
 
-This is fairly simple; we just create an XMLHttpRequest.
-You can see we set the `Authorization` header using our access token, if one was provided.
+##  Introduction  ##
 
-        return unless method is "GET" or method is "POST" or method is "DELETE"
-        request = new XMLHttpRequest()
-        request.open method, location
-        if method is "POST" and not (contents instanceof FormData) then request.setRequestHeader "Content-type", "application/x-www-form-urlencoded"
-        else if method isnt "POST" then contents = undefined
-        request.setRequestHeader "Authorization", "Bearer " + accessToken if accessToken
+The __Post__ module of the Laboratory API is comprised of those events which are related to Mastodon accounts.
 
-####  The callback.
+###  Quick reference:
 
-This is the function that is called once the request finishes loading.
-We define it inside our `requestFromAPI()` function so that it has access to our `request` and `onComplete` variables.
-We also pass through any provided `params`.
+| Event | Description |
+| :---- | :---------- |
+| `LaboratoryPostRequested` | Requests a `Laboratory.Post` for a specified status or notification |
+| `LaboratoryPostReceived` | Fires when a `Laboratory.Post` has been processed |
+| `LaboratoryPostFailed` | Fires when a `Laboratory.Post` fails to process |
+| `LaboratoryPostCreation` | Petitions the Mastodon server to create a new status |
+| `LaboratoryPostDeletion` | Petitions the Mastodon server to delete the provided status |
+| `LaboratoryPostSetReblog` | Petitions the Mastodon server to reblog or unreblog the provided status |
+| `LaboratoryPostSetFavourite` | Petitions the Mastodon server to favourite or unfavourite the provided status |
 
-        callback = ->
-            prevMatches = request.getResponseHeader("Link")?.match /<\s*([^,]*)\s*>\s*;[^,]*[;\s]rel="?prev(?:ious)?"?/
-            nextMatches = request.getResponseHeader("Link")?.match /<\s*([^,]*)\s*>\s*;[^,]*[;\s]rel="?next"?/
-            return unless request.readyState is XMLHttpRequest.DONE and 200 <= request.status <= 205
-            onComplete
-                params: params
-                data: if request.status <= 202 then JSON.parse request.responseText else null
-                prev: if prevMatches? then prevMatches[1] else null
-                next: if nextMatches? then nextMatches[1] else null
-            request.removeEventListener "readystatechange", callback, false
+##  Requesting a Status  ##
 
-####  Sending the request.
+>   - __API equivalent :__ `/api/v1/statuses/:id`, `/api/v1/notifications/:id`
+>   - __Request parameters :__
+>       - __`id` :__ The id of the status or notification to request
+>       - __`type` :__ A `Post.Type` (default: `Post.Type.STATUS`)
+>   - __Request :__ `LaboratoryPostRequested`
+>   - __Response :__ `LaboratoryPostReceived`
+>   - __Failure :__ `LaboratoryPostFailed`
 
-We can now add our event listener and send the request.
+Laboratory Post events are used to request [`Post`](../Constructors/Post.litcoffee)s containing data on a specified status or notification.
+The request, `LaboratoryPostRequested`, takes an object whose `id` parameter specifies the account to fetch and whose `type` specifies whether the post is a status or notification.
 
-        request.addEventListener "readystatechange", callback, false
-        request.send contents
+Laboratory keeps track of all of the `Post`s it receives in its internal store.
+If there is already information on the requested `Post` in the Laboratory store, it will fire `LaboratoryPostReceived` immediately, and then again once the server request completes.
+However, Laboratory will only fire as many responses as necessary; if nothing has changed from the stored value, then only one response will be given.
 
-        return
+##  Creating and Deleting Posts  ##
 
+>   - __API equivalent :__ `/api/v1/statuses`, `/api/v1/statuses/:id`
+>   - __Miscellaneous events :__
+>       - `LaboratoryPostCreation`
+>       - `LaboratoryPostDeletion`
 
-#  ACCOUNT HANDLERS  #
+The `LaboratoryPostCreation` event attempts to create a new status on the Mastodon server.
+It should be fired with a `detail` containing the following properties:
 
-    Handlers.Account = Object.freeze
+- __`text` :__ The text of the post
+- __`visibility` :__ A `Post.Visibility` (default: `Post.Visibility.PRIVATE`)
+- __`inReplyTo` :__ A status id if the post is a reply
+- __`attachments` :__ An array of `Attachment`s
+- __`message` :__ A content/spoiler warning
+- __`makeNSFW` :__ Whether or not the attached media contains NSFW content (default: `true`)
 
-##  `LaboratoryAccountRelationshipsRequested`  ##
+The `LaboratoryPostDeletion` event attempts to delete an existing status from the Mastodon server.
+The `id` property of its `detail` should provide the id of the status to delete.
 
-When an account's relationships are requested, we just forward the request to the server, with `Events.RelationshipsReceived()` as our callback.
+##  Favouriting and Reblogging Posts  ##
 
-        RelationshipsRequested: handle Events.Account.RelationshipsRequested, (event) ->
-            return unless isFinite id = Number event.detail.id
-            serverRequest "GET", @auth.api + "/accounts/relationships?id=" + id, null, @auth.accessToken, Events.Account.RelationshipsReceived.dispatch
-            return
+>   - __API equivalent :__ `/api/v1/statuses/:id/reblog`, `/api/v1/statuses/:id/unreblog`, `/api/v1/statuses/:id/favourite`, `/api/v1/statuses/:id/unfavourite`
+>   - __Miscellanous events :__
+>       - `LaboratoryPostSetReblog`
+>       - `LaboratoryPostSetFavourite`
 
-##  `LaboratoryAccountRelationshipsReceived`  ##
+The `LaboratoryPostSetReblog` and `LaboratoryPostSetFavourite` events can be used to set the reblog or favourite status of posts.
+They should be fired with a `detail` which has two properties: `id`, which gives the id of the account, and `value`, which should be `true` if the post should be favourited/reblogged, or `false` if it should be unfavourited/unreblogged.
 
-When an account's relationships are received, we need to update the related accounts to reflect this.
-We also call any related callbacks with the new information.
+##  Implementation  ##
 
-        RelationshipsReceived: handle Events.Account.RelationshipsReceived, (event) ->
+###  Creating the events:
 
-            return unless (data = event.detail.data) instanceof Array
+Here we create the events as per our specifications.
 
-            for relationships in data
-                continue unless isFinite(id = Number relationships.id) and @accounts[id]?
-                relationship = Enumerals.Relationship.fromValue(
-                    Enumerals.Relationship.FOLLOWED_BY * relationships.followed_by +
-                    Enumerals.Relationship.FOLLOWING * relationships.following +
-                    Enumerals.Relationship.REQUESTED * relationships.requested +
-                    Enumerals.Relationship.BLOCKING * relationships.blocking +
-                    Enumerals.Relationship.SELF * (relationships.id is @auth.me)
-                ) || Enumerals.Relationship.UNKNOWN
-                if @accounts[id].relationship isnt relationship
-                    @accounts[id] = new Constructors.Profile @accounts[id], @auth.origin, relationship
-                    continue unless @interfaces.accounts[id]?
-                    callback @accounts[id] for callback in @interfaces.accounts[id]
+    LaboratoryEvent
+        .create "LaboratoryPostRequested",
+            id: undefined
+            type: Post.Type.STATUS
+        .create "LaboratoryPostReceived", Post
+        .create "LaboratoryPostFailed", Failure
+        .associate "LaboratoryPostRequested", "LaboratoryPostReceived", "LaboratoryPostFailed"
 
-            return
-
-##  `LaboratoryAccountRequested`  ##
-
-We have two things that we need to do when an account is requested: query the server for its information, and hold onto the callback requesting access.
-We do those here.
-
-        Requested: handle Events.Account.Requested, (event) ->
-
-            return unless isFinite id = Number event.detail.id
-            callback = null unless typeof (callback = event.detail.callback) is "function"
-
-The `interfaces.accounts` object will store our account callbacks, organized by the account ids.
-We need to create an array to store our callback in if one doesn't already exist:
-
-            Object.defineProperty @interfaces.accounts, id, {value: [], enumerable: yes} unless @interfaces.accounts[id] instanceof Array
-
-We can now add our callback, if applicable.
-
-            @interfaces.accounts[id].push callback unless not callback? or callback in @interfaces.accounts[id]
-
-If we already have information on this account loaded into our store, we can send the callback that information right away.
-Note that accounts are stored as immutable objects.
-
-            callback @accounts[id] if @accounts[id] and callback?
-
-Next, we send the request.
-Upon completion, it should trigger an `LaboratoryAccountReceived` event so that we can handle the data.
-
-            serverRequest "GET", @auth.api + "/accounts/" + id, null, @auth.accessToken, Events.Account.Received.dispatch
-
-We also need to request the user's relationship to the account, since that doesn't come with our first request.
-We can do that with a `LaboratoryAccountRelationshipsRequested` event.
-
-            Events.Account.RelationshipsRequested.dispatch {id}
-
-            return
-
-##  `LaboratoryAccountReceived`  ##
-
-When an account's data is received, we need to update its information both inside our store, and with any callbacks which might also be depending on it.
-
-        Received: handle Events.Account.Received, (event) ->
-
-            return unless (data = event.detail.data) instanceof Object and isFinite id = Number data.id
-
-Right away, we can generate a `Profile` from our `data`.
-
-            profile = new Constructors.Profile data, @auth.origin
-
-If we already have a profile associated with this account id, then we need to check if anything has changed.
-If it hasn't, we have nothing more to do.
-
-            return if @accounts[id] and profile.compare @accounts[id]
-
-Otherwise, something has changed.
-We overwrite the previous data and fire all of our associated callback functions.
-
-            @accounts[id] = profile
-            return unless @interfaces.accounts[id]?
-            callback @accounts[id] for callback in @interfaces.accounts[id]
-
-            return
-
-##  `LaboratoryAccountRemoved`  ##
-
-`LaboratoryAccountRemoved` has a much simpler handler than our previous two:
-We just look for the provided callback, and remove it from our account interface if it exists.
-
-        Removed: handle Events.Account.Removed, (event) ->
-
-Of course, if we don't have any callbacks assigned to the provided id, we can't do anything.
-
-            return unless isFinite(id = Number event.detail.id) and typeof (callback = event.detail.callback) is "function" and @interfaces.accounts[id] instanceof Array
-
-This iterates over our callbacks until we find the right one, and removes it from the array.
-
-            index = 0;
-            index++ until @interfaces.accounts[id][index] is callback or index >= @interfaces.accounts[id].length
-            @interfaces.accounts[id].splice index, 1
-
-…And we're done!
-
-            return
-
-##  `LaboratoryAccountFollowers`  ##
-
-When a `LaboratoryAccountFollowers` event is fired, we simply petition the server for a list of followers and pass this to our callback.
-We wrap the callback in a function which formats the follower list for us.
-
-        Followers: handle Events.Account.Followers, (event) ->
-
-            return unless isFinite(id = Number event.detail.id) and typeof (callback = event.detail.callback) is "function"
-
-            query = ""
-            query += "?max_id=" + Number event.detail.before if isFinite event.detail.before
-            query += (if query then "&" else "?") + "since_id=" + Number event.detail.after if isFinite event.detail.after
-
-            serverRequest "GET", @auth.api + "/accounts/" + id + "/followers" + query, null, @auth.accessToken, (response) -> callback(Constructors.Profile(data) for data in response.data)
-
-##  `LaboratoryAccountFollowing`  ##
-
-When a `LaboratoryAccountFollowing` event is fired, we simply petition the server for a list of people following the user and pass this to our callback.
-We wrap the callback in a function which formats the list for us.
-
-        Following: handle Events.Account.Following, (event) ->
-
-            return unless isFinite(id = Number event.detail.id) and typeof (callback = event.detail.callback) is "function"
-
-            query = ""
-            query += "?max_id=" + Number event.detail.before if isFinite event.detail.before
-            query += (if query then "&" else "?") + "since_id=" + Number event.detail.after if isFinite event.detail.after
-
-            serverRequest "GET", @auth.api + "/accounts/" + id + "/following" + query, null, @auth.accessToken, (response) -> callback(Constructors.Profile(data) for data in response.data)
-
-##  `LaboratoryAccountSearch`  ##
-
-When a `LaboratoryAccountSearch` event is fired, we send the server a user search query and pass this to our callback.
-We wrap the callback in a function which formats the list of results for us.
-
-        Search: handle Events.Account.Search, (event) ->
-
-            return unless isFinite(id = Number event.detail.id) and typeof (callback = event.detail.callback) is "function"
-
-            query = ""
-            query += "?q=" + event.detail.query if event.detail.query
-            query += (if query then "&" else "?") + "limit=" + Number event.detail.limit if isFinite event.detail.limit
-
-            serverRequest "GET", @auth.api + "/accounts/" + id + "/search" + query, null, @auth.accessToken, (response) -> callback(Constructors.Profile(data) for data in response.data)
-
-##  `LaboratoryAccountFollow`  ##
-
-When a `LaboratoryAccountFollow` event is fired, we send the server a request to follow/unfollow the specified user.
-We issue `Events.Account.RelationshipsReceived()` as our callback function, since the result of this request should be an object giving the account's updated relationship to the user.
-
-        Follow: handle Events.Account.Follow, (event) ->
-
-            return unless isFinite(id = Number event.detail.id)
-
-            serverRequest "POST", @auth.api + "/accounts/" + id + (if event.detail.value then "/follow" else "/unfollow"), null, @auth.accessToken, Events.Account.RelationshipsReceived.dispatch
-
-##  `LaboratoryAccountBlock`  ##
-
-When a `LaboratoryAccountBlock` event is fired, we send the server a request to block/unblock the specified user.
-We issue `Events.Account.RelationshipsReceived()` as our callback function, since the result of this request should be an object giving the account's updated relationship to the user.
-
-        Block: handle Events.Account.Block, (event) ->
-
-            return unless isFinite(id = Number event.detail.id)
-
-            serverRequest "POST", @auth.api + "/accounts/" + id + (if event.detail.value then "/block" else "/unblock"), null, @auth.accessToken, Events.Account.RelationshipsReceived.dispatch
-
-
-#  AUTHORIZATION HANDLERS  #
-
-    Handlers.Authorization = Object.freeze
-
-##  `LaboratoryAuthorizationClientRequested`  ##
-
-The `LaboratoryAuthorizationClientRequested` handler requests a new client id and secret from the API, and fires `LaboratoryAuthorizationClientReceived` when it is granted.
-
-        ClientRequested: handle Events.Authorization.ClientRequested,  (event) ->
-
-First, we normalize our URL.
-We also get our redirect URI at this point.
-
-            a = document.createElement("a")
-            a.href = event.detail.url
-            url = a.origin
-            a.href = event.detail.redirect || ""
-            authURL = a.href
-
-Now we can send our request.
-
-            serverRequest "POST", url + "/api/v1/apps", "client_name=" + encodeURIComponent(String(event.detail.name).replace " ", "+") + "&redirect_uris=" + encodeURIComponent(authURL) + "&scopes=read+write+follow", null, Events.Authorization.ClientReceived.dispatch, {url, redirect: authURL}
-
-            return
-
-##  `LaboratoryAuthorizationClientReceived`  ##
-
-The `LaboratoryAuthorizationClientReceived` handler stores a received client id and secret from the API in `localStorage`.
-It then fires `LaboratoryAuthorizationRequested` to attempt to authenticate the user.
-
-        ClientReceived: handle Events.Authorization.ClientReceived, (event) ->
-
-            localStorage.setItem "Laboratory | " + event.detail.params.url, event.detail.params.redirect + " " + event.detail.data.client_id + " " + event.detail.data.client_secret
-
-            Events.Authorization.Requested.dispatch
-                url: event.detail.params.url
-                redirect: event.detail.params.redirect
-
-            return
-
-###  `LaboratoryAuthorizationRequested`:
-
-The `LaboratoryAuthorizationRequested` handler requests authorization from the user through the API.
-
-        Requested: handle Events.Authorization.Requested,  (event) ->
-
-First, we normalize our URL.
-We also get our redirect URI at this point.
-
-            a = document.createElement "a"
-            a.href = event.detail.url
-            url = a.origin
-            a.href = event.detail.redirect || ""
-            authURL = a.href
-
-
-If we don't have a client id or secret we need to get one.
-
-            if localStorage.getItem("Laboratory | " + url) then [redirect, clientID, clientSecret, accessToken] = localStorage.getItem("Laboratory | " + url).split " ", 4
-
-            unless (redirect and not event.detail.redirect? or redirect is authURL) and clientID? and clientSecret?
-                Events.Authorization.ClientRequested.dispatch {url, redirect: authURL, name: event.detail.name}
+        .create "LaboratoryPostCreation",
+            text: ""
+            visibility: Post.Visibility.PRIVATE
+            inReplyTo: undefined
+            attachments: undefined
+            message: undefined
+            makeNSFW: yes
+        .create "LaboratoryPostDeletion",
+            id: undefined
+
+        .create "LaboratoryPostSetReblog",
+            id: undefined
+            value: on
+        .create "LaboratoryPostSetFavourite",
+            id: undefined
+            value: on
+
+###  Handling the events:
+
+Laboratory provides handlers for the following Authorization events:
+
+- `LaboratoryPostRequested`
+- `LaboratoryPostReceived`
+- `LaboratoryPostCreation`
+- `LaboratoryPostDeletion`
+- `LaboratoryPostSetReblog`
+- `LaboratoryPostSetFavourite`
+
+####  `LaboratoryPostRequested`.
+
+The `LaboratoryPostRequested` event requests a status or notification from the Mastodon API, processes it, and fires a `LaboratoryPostReceived` event with the resultant `Post`.
+
+        .handle "LaboratoryPostRequested", (event) ->
+
+            unless isFinite id = Number event.detail.id
+                dispatch "LaboratoryPostFailed", new Failure "Unable to fetch post; no id specified", "LaboratoryPostRequested"
+                return
+            unless (type = event.detail.type) instanceof Post.Type
+                dispatch "LaboratoryPostFailed", new Failure "Unable to fetch post; no type specified", "LaboratoryPostRequested"
+                return
+            isANotification = type & Post.Type.Notification
+
+If we already have information for the specified post loaded into our `Store`, we can go ahead and fire a `LaboratoryPostReceived` event with that information now.
+
+            dispatch "LaboratoryPostReceived", Store.statuses[id] if not isANotification and Store.statuses[id]?
+            dispatch "LaboratoryPostReceived", Store.notifications[id] if isANotification and Store.notifications[id]?
+
+When our new post data is received, we'll process it and do the same—*if* something has changed.
+
+            onComplete = (response, data, params) ->
+                unless response.id is id
+                    dispatch "LaboratoryPostFailed", new Failure "Unable to fetch post; returned post did not match requested id", "LaboratoryPostRequested"
+                    return
+                post = new Post response
+                unless (post.type & Post.Type.NOTIFICATION) is isANotification
+                    dispatch "LaboratoryPostFailed", new Failure "Unable to fetch post; returned post was not of specified type", "LaboratoryPostRequested"
+                    return
+                store = if isANotification then Store.notifications else Store.statuses
+                dispatch "LaboratoryPostReceived", post unless post.compare store[id]
                 return
 
-Otherwise, we can load our authorization data into our state for later use.
+If something goes wrong, then we need to throw an error.
 
-            @auth.origin = url
-            @auth.api = @auth.origin + "/api/v1"
-            @auth.clientID = clientID
-            @auth.clientSecret = clientSecret
-            @auth.redirect = authURL
-
-If we have an access token, then we close our window (if open) and skip straight to verification.
-
-            if accessToken
-                @auth.accessToken = accessToken
-                window.open("about:blank", "LaboratoryOAuth").close()
-                serverRequest "GET", @auth.api + "/accounts/verify_credentials", null, @auth.accessToken, Events.Authorization.Verified.dispatch
+            onError = (response, data, params) ->
+                dispatch "LaboratoryPostFailed", new Failure response.error, "LaboratoryPostRequested", params.status
                 return
 
-Otherwise, we open a popup for authorization.
-It will fire `LaboratoryAuthorizationGranted` with the granted code if it succeeds.
+Finally, we can make our server request.
 
-            window.open url + "/oauth/authorize?client_id=" + clientID + "&response_type=code&redirect_uri=" + encodeURIComponent(authURL), "LaboratoryOAuth"
-
-            return
-
-###  `LaboratoryAuthorizationGranted`:
-
-The `LaboratoryAuthorizationGranted` handler is called when the user grants access to the Laboratory app from a popup.
-
-        Granted: handle Events.Authorization.Granted, (event) ->
-
-If our authentication data hasn't been loaded into the state, then this event must have been called erroneously.
-
-            return unless @auth.origin? and @auth.clientID? and @auth.clientSecret? and @auth.redirect?
-
-We can now close our popup.
-
-            event.detail.window.close() if event.detail.window?
-
-Finally, we can request our authorization token from the server using the code we were just given.
-
-            serverRequest "POST", @auth.origin + "/oauth/token", "client_id=" + @auth.clientID + "&client_secret=" + @auth.clientSecret + "&redirect_uri=" + encodeURIComponent(@auth.redirect) + "&grant_type=authorization_code&code=" + event.detail.code, null, Events.Authorization.Received.dispatch
+            serverRequest "GET", Store.auth.origin + (if isANotification then "/api/v1/notifications/" else "/api/v1/statuses/") + id, null, Store.auth.accessToken, onComplete, onError
 
             return
 
-###  `LaboratoryAuthorizationReceived`:
+####  `LaboratoryPostReceived`.
 
-The `LaboratoryAuthorizationReceived` handler is called when the user grants access to the Laboratory app from a popup.
+The `LaboratoryPostReceived` event simply adds a received post to our store.
 
-        Received: handle Events.Authorization.Received, (event) ->
+        .handle "LaboratoryPostReceived", (event) ->
+            return unless event.detail instanceof Post and event.detail.type instanceof Post.Type and isFinite id = Number event.detail.id
+            (if event.detail.type & Post.Type.NOTIFICATION then Store.notifications else Store.statuses)[id] = event.detail
+            return
 
-If our authorization failed, then we *sigh* have to start all over again from scratch.
+####  `LaboratoryPostCreation`.
 
-            unless event.detail.data?.access_token
-                localStorage.setItem "Laboratory | " + @auth.origin, ""
-                Events.Authorization.Requested
-                    url: @auth.origin
-                    clientID: @auth.clientID
-                    clientSecret: @auth.clientSecret
+The `LaboratoryPostCreation` event attempts to create a new status, and fires a `LaboratoryPostReceived` event with the new `Post` if it succeeds.
+
+        .handle "LaboratoryPostCreation", (event) ->
+
+            onComplete = (response, data, params) ->
+                dispatch "LaboratoryPostReceived", new Post response
                 return
 
-We can now load our tokens.
-We store our access token in `localStorage` for later use as well.
-
-            @auth.accessToken = event.detail.data.access_token
-            localStorage.setItem "Laboratory | " + @auth.origin, @auth.redirect + " " + @auth.clientID + " " + @auth.clientSecret + " " + @auth.accessToken
-
-*Finally*, we try to grab the account of the newly-signed-in user, using `Authorization.Verified` as our callback.
-
-            serverRequest "GET", @auth.api + "/accounts/verify_credentials", null, @auth.accessToken, Events.Authorization.Verified.dispatch
-
-            return
-
-###  `LaboratoryAuthorizationVerified`:
-
-The `LaboratoryAuthorizationVerified` handler is called when the credentials of a user have been verified.
-Its `data` contains the account information for the just-signed-in user.
-We keep track of its id, but pass the rest on to `LaboratoryAccountReceived`.
-
-        Verified: handle Events.Authorization.Verified, (event) ->
-            unless isFinite event.detail.data?.id
-                localStorage.setItem "Laboratory | " + @auth.origin, ""
-                Events.Authorization.Requested
-                    url: @auth.origin
-                    clientID: @auth.clientID
-                    clientSecret: @auth.clientSecret
+            onError = (response, data, params) ->
+                dispatch "LaboratoryPostFailed", new Failure response.error, "LaboratoryPostCreation", params.status
                 return
-            @auth.me = Number event.detail.data.id
-            Events.Account.Received.dispatch {data: event.detail.data}
-            return
 
-##  `LaboratoryAuthorizationFavourites`  ##
+            serverRequest "POST", Store.auth.origin + "/api/v1/statuses/", (
+                status: event.detail.text
+                in_reply_to_id: if (inReplyTo = event.detail.inReplyTo) > 0 and isFinite inReplyTo then inReplyTo else undefined
+                media_ids: if (attachments = event.detail.attachments) instanceof Array then (attachment.id for attachment in attachments when attachment instanceof Attachment) else undefined
+                sensitive: if event.detail.makeNSFW then "true" else undefined
+                spoiler_text: if (message = event.detail.message) then String message else undefined
+                visibility: switch event.detail.visibility
+                    when Post.Visibility.PUBLIC then "public"
+                    when Post.Visibility.REBLOGGABLE then "unlisted"
+                    else "private"
+            ), Store.auth.accessToken, onComplete, onError
 
-When a `LaboratoryAuthorizationFavourites` event is fired, we simply petition the server for a list of favourites for the current user.
-We wrap the callback in a function which formats the list for us.
+####  `LaboratoryPostDeletion`.
 
-        Favourites: handle Events.Authorization.Favourites, (event) ->
+The `LaboratoryPostDeletion` event attempts to delete an existing status.
 
-            return unless typeof (callback = event.detail.callback) is "function"
+        .handle "LaboratoryPostDeletion", (event) ->
 
-            query = ""
-            query += "?max_id=" + Number event.detail.before if isFinite event.detail.before
-            query += (if query then "&" else "?") + "since_id=" + Number event.detail.after if isFinite event.detail.after
+            unless isFinite id = Number event.detail.id
+                dispatch "LaboratoryPostFailed", new Failure "Unable to delete post; no id specified", "LaboratoryPostDeletion"
+                return
 
-            serverRequest "GET", @auth.api + "/favourites" + query, null, @auth.accessToken, (response) -> callback(Constructors.Post(data) for data in response.data)
+            onComplete = ->
+            onError = (response, data, params) ->
+                dispatch "LaboratoryPostFailed", new Failure response.error, "LaboratoryPostDeletion", params.status
+                return
 
-##  `LaboratoryAuthorizationBlocks`  ##
+            serverRequest "DELETE", Store.auth.origin + "/api/v1/statuses/" + id, null, Store.auth.accessToken, onComplete, onError
 
-When a `LaboratoryAuthorizationBlocks` event is fired, we simply petition the server for a list of people following the user and pass this to our callback.
-We wrap the callback in a function which formats the list for us.
+####  `LaboratoryPostSetReblog`.
 
-        Blocks: handle Events.Authorization.Blocks, (event) ->
+The `LaboratoryPostSetReblog` event attempts to set the reblog status of a post according to the specified `value`.
+It will fire a new `LaboratoryPostReceived` event updating the post's information if it succeeds.
 
-            return unless typeof (callback = event.detail.callback) is "function"
+        .handle "LaboratoryPostSetReblog", (event) ->
 
-            query = ""
-            query += "?max_id=" + Number event.detail.before if isFinite event.detail.before
-            query += (if query then "&" else "?") + "since_id=" + Number event.detail.after if isFinite event.detail.after
+Obviously we need an `id` and `value` to do our work.
 
-            serverRequest "GET", @auth.api + "/blocks" + query, null, @auth.accessToken, (response) -> callback(Constructors.Profile(data) for data in response.data)
+            dispatch "LaboratoryPostFailed", new Failure "Cannot set reblog status for post: Either value or id is missing", "LaboratoryPostSetReblog" unless (value = !!event.detail.value)? and isFinite id = Number event.detail.id
 
+Here we handle the server response for our relationship setting:
 
-#  COMPOSER HANDLERS  #
+            onComplete = (response, data, params) ->
+                dispatch "LaboratoryPostReceived", new Post response
+                return
 
-    Handlers.Composer = Object.freeze
+            onError = (response, data, params) ->
+                dispatch "LaboratoryPostFailed", new Failure response.error, "LaboratoryPostSetReblog", params.status
+                return
 
-##  `LaboratoryComposerUploadRequested`  ##
+If we already have a post for the specified id loaded into our `Store`, then we can test its current reblog value to avoid unnecessary requests.
+We'll only send the request if the values differ.
 
-The `LaboratoryComposerUploadRequested` handler simply uploads the provided file to the server.
-
-        UploadRequested: handle Events.Composer.UploadRequested, (event) ->
-
-            return unless (file = event.detail.file) instanceof File
-
-            form = new FormData()
-            form.append "file", file
-            serverRequest "POST", @auth.api + "/media", form, @auth.accessToken, Events.Composer.UploadReceived.dispatch
-
-            return
-
-##  `LaboratoryComposerUploadReceived`  ##
-
-The `LaboratoryComposerUploadReceived` handler calls any registered composer callbacks with the `MediaAttachment` sent from the server as its response.
-
-        UploadReceived: handle Events.Composer.UploadReceived, (event) ->
-            callback new MediaAttachment event.detail.data for callback in @interfaces.composer
-            return
-
-##  `LaboratoryComposerRequested`  ##
-
-The `LaboratoryComposerRequested` handler registers a callback with the composer if it hasn't been already.
-
-        Requested: handle Events.Composer.Requested, (event) ->
-
-            callback = null unless typeof (callback = event.detail.callback) is "function"
-            @interfaces.composer.push callback unless not callback? or callback in @interfaces.composer
+            serverRequest "POST", Store.auth.origin + "/api/v1/statuses/" + id + (if value then "/reblog" else "/unreblog"), null, Store.auth.accessToken, onComplete, onError unless Store.statuses[id]?.isReblogged is value
 
             return
 
-##  `LaboratoryComposerPost`  ##
+####  `LaboratoryPostSetFavourite`.
 
-The `LaboratoryComposerPost` handler posts the given status, with the provided settings.
+The `LaboratoryPostSetFavourite` event attempts to set the favourite status of a post according to the specified `value`.
+It will fire a new `LaboratoryPostReceived` event updating the post's information if it succeeds.
 
-        Requested: handle Events.Composer.Requested, (event) ->
-            form = new FormData()
-            form.append "status", String event.detail.text
-            form.append "in_reply_to_id", String Number event.detail.inReplyTo if isFinite event.detail.inReplyTo
-            if event.detail.mediaAttachments instanceof Array
-                form.append "media_ids[]", String Number attachment for attachment, index in event.detail.mediaAttachments when isFinite attachment
-            form.append "sensitive", "true" if event.detail.makeNSFW
-            form.append "spoiler_text", String event.detail.message if event.detail.message
-            form.append "visibility", switch
-                when not event.detail.makePublic then "private"
-                when not event.detail.makeListed then "unlisted"
-                else "public"
-            serverRequest "POST", @auth.api + "/statuses", form, @auth.accessToken, Events.Status.Received.dispatch
+        .handle "LaboratoryPostSetFavourite", (event) ->
 
-            return
+Obviously we need an `id` and `value` to do our work.
 
-##  `LaboratoryComposerRemoved`  ##
+            dispatch "LaboratoryPostFailed", new Failure "Cannot set favourite status for post: Either value or id is missing", "LaboratoryPostSetFavourite" unless (value = !!event.detail.value)? and isFinite id = Number event.detail.id
 
-The `LaboratoryComposerRemoved` handler removes a callback from the composer.
+Here we handle the server response for our relationship setting:
 
-        Requested: handle Events.Composer.Requested, (event) ->
+            onComplete = (response, data, params) ->
+                dispatch "LaboratoryPostReceived", new Post response
+                return
 
-            index = 0;
-            index++ until @interfaces.composer[index] is callback or index >= @interfaces.composer.length
-            @interfaces.composer.splice index, 1
+            onError = (response, data, params) ->
+                dispatch "LaboratoryPostFailed", new Failure response.error, "LaboratoryPostSetFavourite", params.status
+                return
+
+If we already have a post for the specified id loaded into our `Store`, then we can test its current favourite value to avoid unnecessary requests.
+We'll only send the request if the values differ.
+
+            serverRequest "POST", Store.auth.origin + "/api/v1/statuses/" + id + (if value then "/favourite" else "/unfavourite"), null, Store.auth.accessToken, onComplete, onError unless Store.statuses[id]?.isFavourited is value
 
             return
 
 
-#  INITIALIZATION HANDLERS  #
+- - -
 
-    Handlers.Initialization = Object.freeze {}
+> From [/src/API/Profile.litcoffee](../src/API/Profile.litcoffee) :
 
-Laboratory doesn't handle its initialization events.
-They exist for the sake of users only!
+#  PROFILE EVENTS  #
 
+##  Introduction  ##
 
-#  STATUS HANDLERS  #
+The __Profile__ module of the Laboratory API is comprised of those events which are related to Mastodon accounts.
 
-    Handlers.Status = Object.freeze
+###  Quick reference:
 
-##  `LaboratoryStatusRequested`  ##
+| Event | Description |
+| :---- | :---------- |
+| `LaboratoryProfileRequested` | Requests a `Laboratory.Profile` for a specified account |
+| `LaboratoryProfileReceived` | Fires when a `Laboratory.Profile` has been processed |
+| `LaboratoryProfileFailed` | Fires when a `Laboratory.Profile` fails to process |
+| `LaboratoryProfileSetRelationship` | Petitions the Mastodon server to change the relationship between the user and the specified account |
 
-When a `LaboratoryStatusRequested` event is fired, we send the server a request for a status and pass the result simultaneously to our callback and to `LaboratoryStatusReceived`.
+##  Requesting a Profile  ##
 
-        Requested: handle Events.Status.Requested, (event) ->
+>   - __API equivalent :__ `/api/v1/accounts/:id`, `/api/v1/accounts/relationships`
+>   - __Request parameters :__
+>       - __`id` :__ The id of the profile to request
+>       - __`requestRelationships` :__ Whether to request current relationship information regarding the specified account (default: `true`)
+>   - __Request :__ `LaboratoryProfileRequested`
+>   - __Response :__ `LaboratoryProfileReceived`
+>   - __Failure :__ `LaboratoryProfileFailed`
 
-            return unless isFinite(id = Number event.detail.id)
-            callback = null unless typeof (callback = event.detail.callback) is "function"
+Laboratory Profile events are used to request [`Profile`](../Constructors/Profile.litcoffee)s containing data on a specified account.
+The request, `LaboratoryProfileRequested`, takes an object whose `id` parameter specifies the account to fetch.
+Laboratory Profile events automatically request up-to-date relationship information for the accounts they fetch; if this is not needed, you can set the `requestRelationships` to `false`.
 
-            serverRequest "GET", @auth.api + "/statuses/" + id, null, @auth.accessToken, (response) ->
-                Events.Status.Received response
-                callback Constructors.Post response.data if callback
+Laboratory keeps track of all of the `Profile`s it receives in its internal store.
+This means that for each `LaboratoryProfileRequested` event, there could be as many as *three* `LaboratoryProfileReceived` responses: one containing the cached data from the store, one containing updated information from the server, and a third if the relationship information has changed as well.
+However, Laboratory will only fire as many responses as necessary; if nothing has changed from the stored value, then only one response will be given.
 
-            return
+##  Changing Relationship Status  ##
 
-##  `LaboratoryStatusReceived`  ##
+>   - __API equivalent :__ `/api/v1/accounts/follow`, `/api/v1/accounts/unfollow`, `/api/v1/accounts/block`, `/api/v1/accounts/unblock`, `/api/v1/accounts/mute`, `/api/v1/accounts/unmute`
+>   - __Miscellanous events :__
+>       - `LaboratoryProfileSetRelationship`
 
-The `LaboratoryStatusReceived` event attempts to update any timelines which contain a given status with new information.
-We just call a `LaboratoryTimelineReceived` event for each affected timeline with an array containing the status.
+The `LaboratoryProfileSetRelationship` event can be used to set the relationship status for an account.
+It should be fired with a `detail` which has two properties: `id`, which gives the id of the account, and `relationship`, which gives a new [`Laboratory.Profile.Relationship`](../Constructors/Profile.litcoffee) for the account.
 
-        Received: handle Events.Status.Received, (event) ->
+Note that only some relationship aspects can be changed; you can't, for example, make an account stop following you using `LaboratoryProfileSetRelationship`.
+For the purposes of this event, a follow and a follow request are treated as equivalent.
 
-            timelinesToUpdate = (name for name, timeline of @timelines when event.detail.data.id in timeline.postOrder)
-            Events.Timeline.Received.dispatch {data: [event.detail.data], params: {name}} for name in timelinesToUpdate
+##  Implementation  ##
 
-            return
+###  Creating the events:
 
-##  `LaboratoryStatusReblogs`  ##
+Here we create the events as per our specifications.
 
-When a `LaboratoryStatusReblogs` event is fired, we simply petition the server for a list of users who reblogged the given status, and pass this to our callback.
-We wrap the callback in a function which formats the user list for us.
+    LaboratoryEvent
+        .create "LaboratoryProfileRequested",
+            id: undefined
+            requestRelationships: yes
+        .create "LaboratoryProfileReceived", Profile
+        .create "LaboratoryProfileFailed", Failure
+        .associate "LaboratoryProfileRequested", "LaboratoryProfileReceived", "LaboratoryProfileFailed"
 
-        Reblogs: handle Events.Status.Reblogs, (event) ->
+        .create "LaboratoryProfileSetRelationship",
+            id: undefined
+            relationship: undefined
 
-            return unless isFinite(id = Number event.detail.id) and typeof (callback = event.detail.callback) is "function"
+###  Handling the events:
 
-            query = ""
-            query += "?max_id=" + Number event.detail.before if isFinite event.detail.before
-            query += (if query then "&" else "?") + "since_id=" + Number event.detail.after if isFinite event.detail.after
+Laboratory provides handlers for the following Authorization events:
 
-            serverRequest "GET", @auth.api + "/statuses/" + id + "/reblogged_by" + query, null, @auth.accessToken, (response) -> callback(Constructors.Profile(data) for data in response.data)
+- `LaboratoryProfileRequested`
+- `LaboratoryProfileReceived`
+- `LaboratoryProfileSetRelationship`
 
-##  `LaboratoryStatusFavourites`  ##
+####  `LaboratoryProfileRequested`.
 
-When a `LaboratoryStatusFavourites` event is fired, we simply petition the server for a list of users who favourited the given status, and pass this to our callback.
-We wrap the callback in a function which formats the list for us.
+The `LaboratoryProfileRequested` event requests an account from the Mastodon API, processes it, and fires a `LaboratoryProfileReceived` event with the resultant `Profile`.
 
-        Favourites: handle Events.Status.Favourites, (event) ->
+        .handle "LaboratoryProfileRequested", (event) ->
 
-            return unless isFinite(id = Number event.detail.id) and typeof (callback = event.detail.callback) is "function"
+            unless isFinite id = Number event.detail.id
+                dispatch "LaboratoryProfileFailed", new Failure "Unable to fetch profile; no id specified", "LaboratoryProfileRequested"
+                return
 
-            query = ""
-            query += "?max_id=" + Number event.detail.before if isFinite event.detail.before
-            query += (if query then "&" else "?") + "since_id=" + Number event.detail.after if isFinite event.detail.after
+If we already have information for the specified account loaded into our `Store`, we can go ahead and fire a `LaboratoryProfileReceived` event with that information now.
 
-            serverRequest "GET", @auth.api + "/statuses/" + id + "/favourited_by" + query, null, @auth.accessToken, (response) -> callback(Constructors.Profile(data) for data in response.data)
+            dispatch "LaboratoryProfileReceived", Store.profiles[id] if Store.profiles[id]?
 
-##  `LaboratoryStatusSetReblog`  ##
+When our new profile data is received, we'll process it and do the same—*if* something has changed.
+We'll also request the account's relationships if necessary.
 
-When a `LaboratoryStatusSetReblog` event is fired, we send the server a request to reblog/unreblog the specified status.
-We issue `Events.Status.Received()` as our callback function, with the response from the server.
-This will be (in the case of a reblog) a new reblog-post, or (in the case of an unreblog) the original.
+            onComplete = (response, data, params) ->
+                unless response.id is id
+                    dispatch "LaboratoryProfileFailed", new Failure "Unable to fetch profile; returned profile did not match requested id", "LaboratoryProfileRequested"
+                    return
+                profile = new Profile response
+                dispatch "LaboratoryProfileReceived", profile unless profile.compare Store.profiles[id]
+                serverRequest "GET", Store.auth.origin + "/api/v1/accounts/relationships", {id}, Store.auth.accessToken, onRelationshipsComplete, onError if event.detail.requestRelationships
+                return
 
-        Follow: handle Events.Status.SetReblog, (event) ->
+The function call is a little different, but the same is true with our profile relationships.
 
-            return unless isFinite(id = Number event.detail.id)
+            onRelationshipsComplete = (response, data, params) ->
+                relationships = response[0]
+                return if Store.profiles[id]?.relationship is relationship = Profile.Relationship.fromValue (
+                    (
+                        Profile.Relationship.FOLLOWER * relationships.followed_by +
+                        Profile.Relationship.FOLLOWING * relationships.following +
+                        Profile.Relationship.REQUESTED * relationships.requested +
+                        Profile.Relationship.BLOCKING * relationships.blocking +
+                        Profile.Relationship.MUTING * relationships.muting +
+                        Profile.Relationship.SELF * (relationships.id is Store.auth.me)
+                    ) or Profile.Relationship.UNKNOWN
+                )
+                dispatch "LaboratoryProfileReceived", new Profile Store.profiles[id], relationship
+                return
 
-            serverRequest "POST", @auth.api + "/statuses/" + id + (if event.detail.value then "/reblog" else "/unreblog"), null, @auth.accessToken, Events.Status.Received.dispatch
+If something goes wrong, then we need to throw an error.
 
-##  `LaboratoryStatusSetFavourite`  ##
+            onError = (response, data, params) ->
+                dispatch "LaboratoryProfileFailed", new Failure response.error, "LaboratoryProfileRequested", params.status
+                return
 
-When a `LaboratoryStatusSetFavourite` event is fired, we send the server a request to favourite/unfavourite the specified status.
-We issue `Events.Status.Received()` as our callback function, since the result of this request should be an updated representation of the favourited status.
+Finally, we can make our server request.
 
-        SetFavourite: handle Events.Status.SetFavourite, (event) ->
-
-            return unless isFinite(id = Number event.detail.id)
-
-            serverRequest "POST", @auth.api + "/statuses/" + id + (if event.detail.value then "/favourite" else "/unfavourite"), null, @auth.accessToken, Events.Status.Received.dispatch
-
-##  `LaboratoryStatusDeletion`  ##
-
-When a `LaboratoryStatusDeletion` event is fired, we send the server a request to delete the specified status.
-We also need to update any timelines which used to contain the status such that they don't any longer.
-
-        Deletion: handle Events.Status.Deletion, (event) ->
-
-            return unless isFinite(id = Number event.detail.id)
-
-            serverRequest "DELETE", @auth.api + "/statuses/" + id, null, @auth.accessToken
-
-            timelinesToUpdate = (name for name, timeline of @timelines when id in timeline.postOrder)
-            Events.Timeline.Received.dispatch {data: [{id}], params: {name}} for name in timelinesToUpdate
-
-
-#  TIMELINE HANDLERS  #
-
-    Handlers.Timeline = Object.freeze
-
-##  `LaboratoryTimelineRequested`  ##
-
-We have two things that we need to do when timeline is requested: query the server for its information, and hold onto the callback requesting access.
-We do this here.
-
-        Requested: handle Events.Timeline.Requested, (event) ->
-
-            callback = null unless typeof (callback = event.detail.callback) is "function"
-
-The name of the timeline doesn't directly correspond to the API URL we use to access it, so we derive that here.
-
-            name = String event.detail.name
-            url = @auth.api + switch
-                when name is "global" then "/timelines/public"
-                when name is "community" then "/timelines/public?local=true"
-                when name is "home" then "/timelines/home"
-                when name.substr(0, 8) is "hashtag/" then "/timelines/tag/" + name.substr(8)
-                when name.substr(0, 5) is "user/" then "/accounts/" + name.substr(5) + "/statuses"
-                when name is "notifications" then "/notifications"
-                else name
-
-If we want to adjust the slice of time our timeline is taken from, we can do that now.
-
-            url += (if name isnt community then "?" else "&") + "max_id=" + event.detail.before if event.detail.before?
-            url += (if name isnt community and not event.detail.before? then "?" else "&") + "since_id=" + event.detail.since if event.detail.since?
-
-The `interfaces.timelines` object will store our timeline callbacks, organized by name.
-We need to create an array to store our callback in if one doesn't already exist:
-
-            Object.defineProperty @interfaces.timelines, name, {value: [], enumerable: yes} unless @interfaces.timelines[name] instanceof Array
-
-We can now add our callback.
-
-            @interfaces.timelines[name].push event.detail.callback if event.detail.callback?
-
-Next, we send the request.
-Upon completion, it should trigger an `LaboratoryTimelineReceived` event so that we can handle the data.
-
-            serverRequest "GET", url, null, @auth.accessToken, Events.Timeline.Received.dispatch, {name}
+            serverRequest "GET", Store.auth.origin + "/api/v1/accounts/" + id, null, Store.auth.accessToken, onComplete, onError
 
             return
 
-###  `LaboratoryTimelineReceived`
+####  `LaboratoryProfileReceived`.
 
-When an timeline's data is received, we need to send an update to any callbacks which might be using it.
+The `LaboratoryProfileReceived` event simply adds a received profile to our store.
 
-        Received: handle Events.Timeline.Received, (event) ->
+        .handle "LaboratoryProfileReceived", (event) ->
+            return unless event.detail instanceof Profile and isFinite id = Number event.detail.id
+            Store.profiles[id] = event.detail
+            return
 
-            name = String event.detail.params.name
-            return unless (data = event.detail.data) instanceof Array
+####  `LaboratoryProfileSetRelationship`.
 
-If there aren't any callbacks depending on our data, then we do nothing.
+The `LaboratoryProfileSetRelationship` event attempts to set the relationship of an account to match that given by the `relationship` parameter of its detail.
+It will fire a new `LaboratoryProfileReceived` event updating the account's information if it succeeds.
 
-            return unless @interfaces.timelines[name]?.length
+        .handle "LaboratoryProfileSetRelationship", (event) ->
 
-If we don't have a place to stick our data yet, let's create it:
+Obviously we need an `id` and `relationship` to do our work.
 
-            Object.defineProperty @timelines, name, {value: Object.seal {posts: {}, postOrder: []}, enumerable: yes} unless (@timelines[name] instanceof Object) and (@timelines[name].posts instanceof Object) and (@timelines[name].postOrder instanceof Array)
+            dispatch "LaboratoryProfileFailed", new Failure "Cannot set relationship for account: Either relationship or id is missing", "LaboratoryProfileSetRelationship" unless (relationship = event.detail.relationship) instanceof Profile.Relationship and isFinite id = Number event.detail.id
 
-We want to merge our timeline data with any existing data in our timelines and then provide our components with the result.
+Here we handle the server response for our relationship setting:
 
-            posts = {}
-            postOrder = []
+            onComplete = (response, data, params) ->
+                dispatch "LaboratoryProfileReceived", new Profile response
+                return
 
-We load the new information first because it will have the most recent data.
-If an item has an id but not an account, then we take this to signify that the post has been deleted.
-We also fire an `LaboratoryAccountReceived` event containing the account data we received with the post.
+            onError = (response, data, params) ->
+                dispatch "LaboratoryProfileFailed", new Failure response.error, "LaboratoryProfileSetRelationship", params.status
+                return
 
-            receivedAccounts = []
+If we already have a profile for the specified account loaded into our `Store`, then we can test its current relationship to avoid unnecessary requests.
+The XOR operation `profile.relationship ^ relationship` will allow us to identify which aspects of the relationship have changed.
+We'll store this information in `changes`.
 
-            for item in data
-                continue unless item.id
-                unless item.account?
-                    posts[id] = null
-                    continue
-                unless item.id in postOrder
-                    post = if item.type is "follow" then new Constructors.Follow(item, @accounts) else new Constructors.Post item, @accounts
-                    postOrder.push item.id
-                    posts[item.id] = post
-                unless item.account.id in receivedAccounts
-                    receivedAccounts.push item.account.id
-                    Events.Account.Received.dispatch {data: item.account}
-                unless not item.status? or item.status.account.id in receivedAccounts
-                    receivedAccounts.push item.status.account.id
-                    Events.Account.Received.dispatch {data: item.status.account}
-                unless not item.reblog? or item.reblog.account.id in receivedAccounts
-                    receivedAccounts.push item.reblog.account.id
-                    Events.Account.Received.dispatch {data: item.reblog.account}
+            if (profile = Store.profiles[id]) instanceof Profile
+                changes = profile.relationship ^ relationship
+                if changes & Profile.FOLLOWING then serverRequest "POST", Store.auth.origin + "/api/v1/accounts/" + id + (if relationship & Profile.FOLLOWING then "/follow" else "/unfollow"), null, Store.auth.accessToken, onComplete, onError
+                else if changes & Profile.REQUESTED then serverRequest "POST", Store.auth.origin + "/api/v1/accounts/" + id + (if relationship & Profile.REQUESTED then "/follow" else "/unfollow"), null, Store.auth.accessToken, onComplete, onError
+                if changes & Profile.BLOCKING then serverRequest "POST", Store.auth.origin + "/api/v1/accounts/" + id + (if relationship & Profile.BLOCKING then "/block" else "/unblock"), null, Store.auth.accessToken, onComplete, onError
+                if changes & Profile.MUTING then serverRequest "POST", Store.auth.origin + "/api/v1/accounts/" + id + (if relationship & Profile.MUTING then "/mute" else "/unmute"), null, Store.auth.accessToken, onComplete, onError
 
-Then we load any previously-existing posts if they haven't already been loaded.
+Otherwise (if we don't have a profile on file), we have no choice but to send a request for everything.
 
-            for id in @timelines[name].postOrder when not (id of posts)
-                posts[id] = @timelines[name].posts[id]
-                postOrder.push(id)
-
-We can now sort our post order and save our data, giving our timeline callbacks the end result.
-
-            postOrder.sort (a, b) -> b - a
-
-            @timelines[name].postOrder = Object.freeze postOrder
-            @timelines[name].posts = Object.freeze posts
-
-            response = Object.freeze {posts, postOrder}
-            callback response for callback in @interfaces.timelines[name]
+            else
+                serverRequest "POST", Store.auth.origin + "/api/v1/accounts/" + id + (if relationship & Profile.FOLLOWING or relationship & Profile.REQUESTED then "/follow" else "/unfollow"), null, Store.auth.accessToken, onComplete, onError
+                serverRequest "POST", Store.auth.origin + "/api/v1/accounts/" + id + (if relationship & Profile.BLOCKING then "/block" else "/unblock"), null, Store.auth.accessToken, onComplete, onError
+                serverRequest "POST", Store.auth.origin + "/api/v1/accounts/" + id + (if relationship & Profile.MUTING then "/mute" else "/unmute"), null, Store.auth.accessToken, onComplete, onError
 
             return
 
-##  `Timeline.Removed`  ##
 
-`Timeline.Removed` has a much simpler handler than our previous two:
-We just look for the provided callback, and remove it from our timeline interface.
-Then, if there are no remaining timelines for that `name` (as is probable), we go ahead and get rid of that information to conserve memory.
+- - -
 
-        Removed: handle Events.Timeline.Removed, (event) ->
+> From [/src/API/Request.litcoffee](../src/API/Request.litcoffee) :
 
-Of course, if we don't have any callbacks assigned to the provided name, we can't do anything.
+#  REQUEST EVENTS  #
 
-            return unless @interfaces.timelines[name = String event.detail.name]?.length and typeof (callback = event.detail.callback) is "function"
+##  Introduction  ##
 
-This iterates over our callbacks until we find the right one, and removes it from the array.
+The __Request__ module of the Laboratory API is comprised of those events which are related to Laboratory's various `XMLHttpRequest`s.
+Generally speaking you shouldn't have to interact with these events yourself, but they provide an interface for logging which events Laboratory currently has open.
 
-            index = 0;
-            index++ until @interfaces.timelines[name][index] is callback or index >= @interfaces.timelines[name].length
-            @interfaces.timelines[name].splice index, 1
+###  Quick reference:
 
-If we no longer have any callbacks assigned to the timeline, we re-initialize it in our store:
+| Event | Description |
+| :---- | :---------- |
+| `LaboratoryRequestOpen` | Fires when an XMLHttpRequest is opened |
+| `LaboratoryRequestUpdate` | Fires when an XMLHttpRequest is updated |
+| `LaboratoryRequestComplete` | Fires when an XMLHttpRequest is done loading |
+| `LaboratoryRequestError` | Fires when an XMLHttpRequest fails |
 
-            return unless @timelines[name] instanceof Object
-            unless @interfaces.timelines[name].length
-                @timelines[name].posts = Object.freeze {}
-                @timelines[name].postOrder = Object.freeze []
+##  Listening For Requests  ##
 
-…And we're done!
+>   - __API equivalent :__ _None_
+>   - __Miscellanous events :__
+>       - `LaboratoryRequestOpen`
+>       - `LaboratoryRequestUpdate`
+>       - `LaboratoryRequestComplete`
+>       - `LaboratoryRequestError`
+
+Laboratory Request events fire whenever the `readystate` of an `XMLHttpRequest` changes.
+`LaboratoryRequestComplete` signifies that the request was successful; that is, it had an HTTP status code in the range `200`–`205` and its response could be parsed.
+Alternatively, `LaboratoryRequestError` indicates that the request completed but one or both of those conditions was not true.
+
+The `detail` of each Laboratory Request event is the associated `XMLHttpRequest`.
+
+##  Implementation  ##
+
+###  Creating the events:
+
+Here we create the events as per our specifications.
+
+    LaboratoryEvent
+        .create "LaboratoryRequestOpen", XMLHttpRequest
+        .create "LaboratoryRequestUpdate", XMLHttpRequest
+        .create "LaboratoryRequestComplete", XMLHttpRequest
+        .create "LaboratoryRequestError", XMLHttpRequest
+
+###  Handling the events:
+
+Laboratory Request events do not have handlers.
+
+
+- - -
+
+> From [/src/API/Rolodex.litcoffee](../src/API/Rolodex.litcoffee) :
+
+#  ROLODEX EVENTS  #
+
+##  Introduction  ##
+
+The __Rolodex__ module of the Laboratory API is comprised of those events which are related to rolodexes of Mastodon accounts.
+
+###  Quick reference:
+
+| Event | Description |
+| :---- | :---------- |
+| `LaboratoryRolodexRequested` | Requests a `Rolodex` for a specified query |
+| `LaboratoryRolodexReceived` | Fires when a `Rolodex` has been processed |
+| `LaboratoryRolodexFailed` | Fires when a `Rolodex` fails to process |
+
+##  Requesting a Rolodex  ##
+
+>   - __API equivalent :__ `/api/v1/accounts/search`, `/api/v1/accounts/:id/followers`, `/api/v1/accounts/:id/following`, `/api/v1/statuses/:id/reblogged_by`, `/api/v1/statuses/:id/favourited_by`, `/api/v1/blocks`, `/api/v1/mutes`
+>   - __Request parameters :__
+>       - __`type` :__ The [`Laboratory.Rolodex.Type`](../Constructors/Rolodex.litcoffee) of the `Rolodex`
+>       - __`query` :__ The associated query
+>       - __`before` :__ The id at which to end the rolodex
+>       - __`after` :__ The id at which to begin the rolodex
+>       - __`limit` :__ The number of accounts to show (for searches only)
+>   - __Request :__ `LaboratoryRolodexRequested`
+>   - __Response :__ `LaboratoryRolodexReceived`
+>   - __Failure :__ `LaboratoryRolodexFailed`
+
+Laboratory Rolodex events are used to request lists of [`Profile`](../Constructors/Profile.litcoffee)s according to the specified `type` and `query`.
+If the `type` is `Rolodex.Type.SEARCH`, then `query` should provide the string to search for; otherwise, `query` should be the id of the relevant account or status.
+In the case of `Rolodex.Type.BLOCKS` and `Rolodex.Type.MUTES`, no `query` is required.
+
+For `Rolodex.Type.SEARCH`es, the number of accounts to return can be specified using the `limit` parameter; otherwise, the `before` and `after` parameters can be used to change the range of accounts returned.
+
+##  Implementation  ##
+
+###  Creating the events:
+
+Here we create the events as per our specifications.
+
+    LaboratoryEvent
+        .create "LaboratoryRolodexRequested",
+            type: Rolodex.Type.SEARCH
+            query: ""
+            before: undefined
+            after: undefined
+            limit: undefined
+        .create "LaboratoryRolodexReceived", Rolodex
+        .create "LaboratoryRolodexFailed", Failure
+        .associate "LaboratoryRolodexRequested", "LaboratoryRolodexReceived", "LaboratoryRolodexFailed"
+
+###  Handling the events:
+
+Laboratory provides handlers for the following Authorization events:
+
+- `LaboratoryRolodexRequested`
+
+####  `LaboratoryRolodexRequested`.
+
+The `LaboratoryRolodexRequested` event requests an account from the Mastodon API, processes it, and fires a `LaboratoryRolodexReceived` event with the resultant `Rolodex`.
+
+        .handle "LaboratoryRolodexRequested", (event) ->
+
+            query = String event.detail.query
+            limit = null unless isFinite limit = Number event.detail.limit
+            before = null unless isFinite before = Number event.detail.before
+            after = null unless isFinite after = Number event.detail.after
+            unless (type = event.detail.type) instanceof Rolodex.Type and type isnt Rolodex.Type.UNDEFINED
+                dispatch "LaboratoryRolodexFailed", new Failure "Unable to fetch rolodex; no type specified", "LaboratoryRolodexRequested"
+                return
+
+When our list of accounts is received, we'll process it and call a `LaboratoryRolodexReceived` event with the resulting `Rolodex`.
+We'll also dispatch a `LaboratoryProfileReceived` event with each profile contained in the response.
+
+            onComplete = (response, data, params) ->
+                ids = []
+                dispatch "LaboratoryProfileReceived", account for account in response when (ids.indexOf account.id) is -1 and ids.push account.id
+                dispatch "LaboratoryRolodexReceived", new Rolodex response,
+                    type: type
+                    query: query
+                    before: ((params.prev.match /.*since_id=([0-9]+)/) or [])[1]
+                    after: ((params.next.match /.*max_id=([0-9]+)/) or [])[1]
+                return
+
+If something goes wrong, then we need to throw an error.
+
+            onError = (response, data, params) ->
+                dispatch "LaboratoryRolodexFailed", new Failure response.error, "LaboratoryRolodexRequested", params.status
+                return
+
+Finally, we can make our server request.
+Note that `serverRequest` ignores data parameters which have a value of `undefined` or `null`.
+
+            serverRequest "GET", Store.auth.origin + (
+                switch type
+                    when Rolodex.Type.SEARCH then "/api/v1/accounts/search"
+                    when Rolodex.Type.FOLLOWERS then "/api/v1/accounts/" + query + "/followers"
+                    when Rolodex.Type.FOLLOWING then "/api/v1/accounts/" + query + "/following"
+                    when Rolodex.Type.FAVOURITED_BY then "/api/v1/statuses/" + query + "/favourited_by"
+                    when Rolodex.Type.REBLOGGED_BY then "/api/v1/statuses/" + query + "/reblogged_by"
+                    when Rolodex.Type.BLOCKS then "/api/v1/blocks"
+                    when Rolodex.Type.MUTES then "/api/v1/mutes"
+                    else "/api/v1"
+            ), (
+                switch type
+                    when Rolodex.Type.SEARCH
+                        q: query
+                        limit: limit
+                    when Rolodex.Type.FOLLOWERS, Rolodex.Type.FOLLOWING, Rolodex.Type.FAVOURITED_BY, Rolodex.Type.REBLOGGED_BY, Rolodex.Type.BLOCKS, Rolodes.Type.MUTES
+                        max_id: before
+                        since_id: after
+                    else null
+            ), Store.auth.accessToken, onComplete, onError
 
             return
 
+
+- - -
+
+> From [/src/API/Timeline.litcoffee](../src/API/Timeline.litcoffee) :
+
+#  TIMELINE EVENTS  #
+
+##  Introduction  ##
+
+The __Timeline__ module of the Laboratory API is comprised of those events which are related to timelines of Mastodon accounts.
+
+###  Quick reference:
+
+| Event | Description |
+| :---- | :---------- |
+| `LaboratoryTimelineRequested` | Requests a `Laboratory.Timeline` for a specified query |
+| `LaboratoryTimelineReceived` | Fires when a `Laboratory.Timeline` has been processed |
+| `LaboratoryTimelineFailed` | Fires when a `Laboratory.Timeline` fails to process |
+
+##  Requesting a Rolodex  ##
+
+>   - __API equivalent :__ `/api/v1/timelines/home`, `/api/v1/timelines/public`, `/api/v1/timelines/tag/:hashtag`, `/api/v1/notifications/`, `/api/v1/favourites`
+>   - __Request parameters :__
+>       - __`type` :__ The [`Laboratory.Timeline.Type`](../Constructors/Timeline.litcoffee) of the `Timeline`
+>       - __`query` :__ The associated query
+>       - __`before` :__ The id at which to end the timeline
+>       - __`after` :__ The id at which to begin the timeline
+>   - __Request :__ `LaboratoryTimelineRequested`
+>   - __Response :__ `LaboratoryTimelineReceived`
+>   - __Failure :__ `LaboratoryTimelineFailed`
+
+Laboratory Timeline events are used to request lists of [`Post`](../Constructors/Post.litcoffee)s according to the specified `type` and `query`.
+If the `type` is `Timeline.Type.HASHTAG`, then `query` should provide the hashtag; in the case of `Timeline.Type.ACCOUNT`, then `query` should provide the account id; otherwise, no `query` is required.
+
+The `before` and `after` parameters can be used to change the range of statuses returned.
+
+##  Implementation  ##
+
+###  Creating the events:
+
+Here we create the events as per our specifications.
+
+    LaboratoryEvent
+        .create "LaboratoryTimelineRequested",
+            type: Timeline.Type.HOME
+            query: ""
+            before: undefined
+            after: undefined
+        .create "LaboratoryTimelineReceived", Timeline
+        .create "LaboratoryTimelineFailed", Failure
+        .associate "LaboratoryTimelineRequested", "LaboratoryTimelineReceived", "LaboratoryTimelineFailed"
+
+###  Handling the events:
+
+Laboratory provides handlers for the following Authorization events:
+
+- `LaboratoryTimelineRequested`
+
+####  `LaboratoryTimelineRequested`.
+
+The `LaboratoryTimelineRequested` event requests an account from the Mastodon API, processes it, and fires a `LaboratoryTimelineReceived` event with the resultant `Timeline`.
+
+        .handle "LaboratoryTimelineRequested", (event) ->
+
+            query = String event.detail.query
+            before = null unless isFinite before = Number event.detail.before
+            after = null unless isFinite after = Number event.detail.after
+            unless (type = event.detail.type) instanceof Timeline.Type and type isnt Timeline.Type.UNDEFINED
+                dispatch "LaboratoryTimelineFailed", new Failure "Unable to fetch timeline; no type specified", "LaboratoryTimelineRequested"
+                return
+
+When our list of accounts is received, we'll process it and call a `LaboratoryTimelineReceived` event with the resulting `Timeline`.
+We'll also dispatch a `LaboratoryPostReceived` event with each post contained in the response, and a `LaboratoryProfileReceived` containing the profile data of each post author and mention.
+
+>   __Note :__
+>   In order to prevent duplicates, `LaboratoryPostReceived` only fires for unique ids in the API response.
+>   While it is possible for a status to have the same id as a (different) notification, we don't need to worry about this since statuses and notifications are never grouped together by the Mastodon API.
+
+>   __Note :__
+>   Note that the account data provided by mentions is not as complete as that which would be in a normal API response.
+
+            onComplete = (response, data, params) ->
+                acctIDs = []
+                mentions = []
+                mentionIDs = []
+                ids = []
+                for status in response when (ids.indexOf status.id) is -1 and ids.push status.id
+                    dispatch "LaboratoryProfileReceived", new Profile status.account if (acctIDs.indexOf status.account.id) is -1 and acctIDs.push status.account.id
+                    dispatch "LaboratoryProfileReceived", new Profile status.status.account if status.status?.account? and (acctIDs.indexOf status.status.account.id) is -1 and acctIDs.push status.status.account.id
+                    dispatch "LaboratoryProfileReceived", new Profile status.reblog.account if status.reblog?.account? and (acctIDs.indexOf status.reblog.account.id) is -1 and acctIDs.push status.reblog.account.id
+                    if status.mentions instanceof Array
+                        for account in status.mentions when (mentionIDs.indexOf account.id) is -1
+                            mentionIDs.push account.id
+                            mentions.push account
+                    dispatch "LaboratoryPostReceived", new Post status
+                dispatch "LaboratoryProfileReceived", new Profile mention for mention in mentions when (acctIDs.indexOf mention.id) is -1 and not Store.profiles[mention.id]?
+                dispatch "LaboratoryTimelineReceived", new Timeline response,
+                    type: type
+                    query: query
+                    before: ((params.prev.match /.*since_id=([0-9]+)/) or [])[1]
+                    after: ((params.next.match /.*max_id=([0-9]+)/) or [])[1]
+                return
+
+If something goes wrong, then we need to throw an error.
+
+            onError = (response, data, params) ->
+                dispatch "LaboratoryTimelineFailed", new Failure response.error, "LaboratoryTimelineRequested", params.status
+                return
+
+Finally, we can make our server request.
+Note that `serverRequest` ignores data parameters which have a value of `undefined` or `null`.
+
+            serverRequest "GET", Store.auth.origin + (
+                switch type
+                    when Timeline.Type.HASHTAG then "/api/v1/timelines/tag/" + query
+                    when Timeline.Type.LOCAL then "/api/v1/timelines/public"
+                    when Timeline.Type.GLOBAL then "/api/v1/timelines/public"
+                    when Timeline.Type.HOME then "/api/v1/timelines/home"
+                    when Timeline.Type.NOTIFICATIONS then "/api/v1/notifications"
+                    when Timeline.Type.FAVOURITES then "/api/v1/favourites"
+                    when Timeline.Type.ACCOUNT then "/api/v1/accounts/" + query + "/statuses"
+                    else "/api/v1"
+            ), (
+                switch type
+                    when Timeline.Type.LOCAL
+                        local: yes
+                        max_id: before
+                        since_id: after
+                    else
+                        max_id: before
+                        since_id: after
+            ), Store.auth.accessToken, onComplete, onError
+
+            return
+
+
+- - -
+
+> From [/src/INSTALLING.litcoffee](../src/INSTALLING.litcoffee) :
 
 #  INSTALLING  #
 
@@ -2497,111 +2932,54 @@ Laboratory doesn't have any external dependencies, and should run in any modern 
 This script loads and runs the Laboratory engine.
 Consequently, it is the last thing we load.
 
-###  First steps:
-
-We include informative text about the `Laboratory` package on `Laboratory.ℹ` and give the version number on `Laboratory.Nº` for intersted parties.
-Laboratory follows semantic versioning, which translates into `Nº` as follows: `Major * 100 + Minor + Patch / 100`.
-Laboratory thus assures that minor and patch numbers will never exceed `99` (indeed this would be quite excessive!).
-
-    Laboratory =
-        ℹ: """
-                ............. LABORATORY ..............
-
-                A client-side API for Mastodon, a free,
-                   open-source social network server
-                          - - by Kibigo! - -
-
-                    Licensed under the MIT License.
-                       Source code available at:
-                https://github.com/marrus-sh/laboratory
-
-                            Version 0.2.0
-            """
-        Nº: 2.0
-
-####  Exposing Laboratory objects.
-
-We don't expose *all* of Laboratory to the `window`—just the useful bits for extensions.
-Thus, the following parts are exposed:
-
-- `Constructors`
-- `Events`
-- `Enumerals`
-
-The following parts are *not* exposed:
-
-- Local functions/variables
-- `Handlers`
-
-To keep things compact, we merge everything onto a single `Laboratory` object.
-This of course means that none of the submodules in `Constructors`, `Events`, or `Enumerals` can share the same name.
-We also merge in our `Exposed` properties at this time.
-
-    for module in [Constructors, Events, Enumerals]
-        Object.defineProperty Laboratory, name, {value: submodule, enumerable: yes} for own name, submodule of module
-    Object.defineProperty Laboratory, prop, {get: (-> Exposed[prop]), enumerable: yes} for prop of Exposed
-    Object.defineProperty window, "Laboratory",
-        value: Object.freeze Laboratory
-        enumerable: yes
-
-####  Declaring our objects have loaded.
-
-Now that the `Laboratory` object is available to the `window`, we can fire our `Initialization.Loaded` event.
-
-    Events.Initialization.Loaded.dispatch()
-
 ###  The Store:
 
-Laboratory data is all stored in a single store, and then acted upon through events and event listeners.
-The store is not available outside of those events specified below.
+Laboratory data is all stored in a single `Store`, and then acted upon through events and event listeners.
+The store is not exposed to the window.
 
-####  Loading the store.
-
-We can now load the store.
-We'll wrap this all in a closure to make extra sure that nobody has access to it except our handlers.
-
-    run = ->
-
-        store = Object.freeze
-            accounts: {}
-            auth: Object.seal
-                accessToken: null
-                api: null
-                clientID: null
-                clientSecret: null
-                me: null
-                origin: null
-                redirect: null
-            interfaces: Object.freeze
-                accounts: {}
-                composer: []
-                timelines: {}
-            timelines: {}
+    Store =
+        auth: null
+        notifications: {}
+        profiles: {}
+        statuses: {}
 
 Because Laboratory is still in active development, `window["🏪"]` can be used to gain convenient access to our store.
 Obviously, you shouldn't expect this to last.
 
-        window["🏪"] = store
+    window["🏪"] = Store
+
+###  Loading Laboratory:
+
+We now make our `Laboratory` object available to the window.
+
+    Object.defineProperty window, "Laboratory",
+        value: Object.freeze Laboratory
+        enumerable: yes
+
+Now that the `Laboratory` object is available to the `window`, we can fire our `LaboratoryInitializationLoaded` event.
+
+    dispatch "LaboratoryInitializationLoaded"
+
+###  Running Laboratory:
+
+The `run()` function runs Laboratory once the document has finished loaded.
+
+    run = ->
 
 ####  Adding our listeners.
 
-Now that our store is created, we can initialize our event handlers, binding them to its value.
-It's pretty easy; we just enumerate over `Handlers`.
+Our first task is to initialize our event handlers.
+It's pretty easy; we just enumerate over `LaboratoryEvent.Handlers`.
 
-        for category, object of Handlers
-            document.addEventListener handler.type, handler.bind store for name, handler of object
+        listen handler.type, handler for handler in LaboratoryEvent.Handlers
 
 ####  Starting operations.
 
-Finally, we fire our `Initialization.Ready` event, signalling that our handlers are ready to go.
-We also set `Exposed.ready` to `true` so that scripts can tell Laboratory is running after-the fact, and make `Exposed.user` just point to `auth.me` in our `store`.
+Finally, we fire our `LaboratoryInitializationReady` event, signalling that our handlers are ready to go.
+We also set `Exposed.ready` to `true` so that scripts can tell Laboratory is running after-the fact.
 
         Exposed.ready = yes
-        Object.defineProperty Exposed, "user",
-            get: -> store.auth.me
-            enumerable: yes
-            configurable: no
-        Events.Initialization.Ready.dispatch()
+        dispatch "LaboratoryInitializationReady"
 
         return
 

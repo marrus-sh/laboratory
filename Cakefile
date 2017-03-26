@@ -4,33 +4,26 @@ fs     = require 'fs'
 files = [
   'README'
   'Constructors/README'
+  'Constructors/Enumeral' #  The Enumeral constructor is used by other constructors
   'Constructors/Application'
-  'Constructors/Enumeral'
-  'Constructors/Follow'
-  'Constructors/LaboratoryEvent'
-  'Constructors/MediaAttachment'
-  'Constructors/Mention'
+  'Constructors/Attachment'
+  'Constructors/Authorization'
+  'Constructors/Client'
+  'Constructors/Failure'
   'Constructors/Post'
   'Constructors/Profile'
-  'Enumerals/README'
-  'Enumerals/MediaType'
-  'Enumerals/PostType'
-  'Enumerals/Relationship'
-  'Enumerals/Visibility'
-  'Events/README'
-  'Events/Account'
-  'Events/Authorization'
-  'Events/Composer'
-  'Events/Initialization'
-  'Events/Status'
-  'Events/Timeline'
-  'Handlers/README'
-  'Handlers/Account'
-  'Handlers/Authorization'
-  'Handlers/Composer'
-  'Handlers/Initialization'
-  'Handlers/Status'
-  'Handlers/Timeline'
+  'Constructors/Rolodex'
+  'Constructors/Timeline'
+  'API/README'
+  'API/Attachment'
+  'API/Authorization'
+  'API/Client'
+  'API/Initialization'
+  'API/Post'
+  'API/Profile'
+  'API/Request'
+  'API/Rolodex'
+  'API/Timeline'
   'INSTALLING'
 ]
 
@@ -39,10 +32,10 @@ task 'build', 'Build single application file from source files', ->
   for file, index in files then do (file, index) ->
     fs.readFile "src/#{file}.litcoffee", "utf8", (err, fileContents) ->
       throw err if err
-      contents[index] = fileContents
-      process() if --remaining is 0
+      contents[index] = "> From [/src/#{file}.litcoffee](../src/#{file}.litcoffee) :\n\n" + fileContents
+      do process if --remaining is 0
   process = ->
-    fs.writeFile "dist/laboratory.litcoffee", contents.join('\n\n'), 'utf8', (err) ->
+    fs.writeFile "dist/laboratory.litcoffee", (contents.join '\n\n- - -\n\n'), 'utf8', (err) ->
       throw err if err
       exec "coffee --compile dist/laboratory.litcoffee", (err, stdout, stderr) ->
         throw err if err

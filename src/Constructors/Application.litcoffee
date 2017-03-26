@@ -1,5 +1,7 @@
 #  THE APPLICATION CONSTRUCTOR  #
 
+##  Introduction  ##
+
 The `Application()` constructor creates a unique, read-only object which represents an application used to interface with the Mastodon API.
 Its properties are summarized below, alongside their Mastodon API equivalents:
 
@@ -14,9 +16,10 @@ Its properties are summarized below, alongside their Mastodon API equivalents:
 
 The `Application()` constructor takes a `data` object from an API response and reads its attributes into an instance's properties.
 
-    Constructors.Application = (data) ->
+    Laboratory.Application = Application = (data) ->
 
-        return unless this and (this instanceof Constructors.Application) and data?
+        throw new Error "Laboratory Error : `Application()` must be called as a constructor" unless this and this instanceof Application
+        throw new Error "Laboratory Error : `Application()` was called without any `data`" unless data?
 
         @name = data.name
         @href = data.website
@@ -27,5 +30,5 @@ The `Application()` constructor takes a `data` object from an API response and r
 
 The `Application` prototype just inherits from `Object`.
 
-    Object.defineProperty Constructors.Application, "prototype",
+    Object.defineProperty Application, "prototype",
         value: Object.freeze {}
