@@ -1,17 +1,27 @@
-#  README  #
+_Laboratory_<br>
+Source Code and Documentation<br>
+API Version: _0.3.1_
+
+#  INTRODUCTION  #
+
+>   File location: `README.litcoffee`
+
+ - - -
+
+##  Description  ##
 
 Welcome to the Laboratory source code!
 Laboratory is an open-source, client-side engine for Mastodon written in Literate CoffeeScript.
 Its source files are parseable as regular Markdown documents, and this file is in fact part of the Laboratory source!
 
-##  How to Read Laboratory Source Code  ##
+###  How to read Laboratory source code:
 
 Each Laboratory source code file is broadly split up into two parts: the *description*, which describes what the file does and how to use it, and the *implementation*, which actually implements the described algorithms and processes.
 The implementation will always be the last section in the document, and it is the one that it is safest to ignore—any important information should have already been covered in the description of what goes on in the file.
 However, you can turn to the implementation if you are curious on how specific Laboratory features are actually coded.
 (And, of course, if you are a computer, the compiled implementation is the only part of this file you will ever see!)
 
-###  What to read:
+####  What to read.
 
 If you're looking to use Laboratory in your project, then you should definitely familiarize yourself with the [Events API](API/), as this is the primary means of interfacing with the Laboratory engine.
 Each file of the API provides a different module, and you should probably take a look at the descriptions for each.
@@ -19,6 +29,16 @@ These will give you an overview of each API component and direct you towards fur
 
 The [Constructors](Constructors/) documentation provides details on the various data types you might encounter while interacting with Laboratory.
 You should turn to these files whenever you are unclear on what specific properties or methods an object provides.
+
+####  Notable conventions.
+
+Laboratory contains a number of constructors, functions, and objects which are made available on the `window.Laboratory` object.
+For simplicity's sake, this documentation omits the `Laboratory` part in prose; for example, `Laboratory.Authorization` will be referred to as `Authorization` and `Laboratory.dispatch()` will be represented as `dispatch()`.
+In code examples, the `Laboratory` prefix should be included.
+
+Laboratory follows the conventions set forward in the [Laboratory Style Guide](https://github.com/marrus-sh/laboratory-style).
+
+ - - -
 
 ##  Implementation  ##
 
@@ -47,7 +67,7 @@ This is the first file in our compiled source, so let's identify ourselves real 
                Source code available at:
         https://github.com/marrus-sh/laboratory
 
-                    Version 0.3.0
+                    Version 0.3.1
 
     ###
 
@@ -62,7 +82,7 @@ Laboratory thus assures that minor and patch numbers will never exceed `99` (ind
 
     Laboratory =
         ℹ: "https://github.com/marrus-sh/laboratory"
-        Nº: 3.0
+        Nº: 3.1
 
 ###  Popup handling:
 

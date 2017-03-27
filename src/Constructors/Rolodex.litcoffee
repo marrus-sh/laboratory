@@ -1,6 +1,14 @@
+_Laboratory_<br>
+Source Code and Documentation<br>
+API Version: _0.3.1_
+
 #  THE ROLODEX CONSTRUCTOR  #
 
-##  Introduction  ##
+>   File location: `Constructors/Rolodex.litcoffee`
+
+ - - -
+
+##  Description  ##
 
 The `Rolodex()` constructor creates a unique, read-only object which represents a list of [`Profile`](Profile.litcoffee)s.
 Its properties are summarized below, alongside their Mastodon API equivalents:
@@ -32,9 +40,9 @@ The possible `Rolodex.Type`s are as follows:
 
 The `Rolodex()` constructor does not use or remember its `Rolodex.Type`, but these values are used when requesting new `Rolodex`es using `LaboratoryRolodexRequested`.
 
-##  Prototype Methods ##
+###  Prototype methods:
 
-###  `join()`:
+####  `join()`.
 
 >   ```javascript
 >       Laboratory.Rolodex.prototype.join(data);
@@ -48,7 +56,7 @@ Otherwise, the `type` of the resultant `Rolodex` will be `Rolodex.Type.UNDEFINED
 
 When joining a `Rolodex` with a different data type, the `type`, `query`, `before`, and `after` parameters remain unchanged.
 
-###  `remove()`:
+####  `remove()`.
 
 >   ```javascript
 >       Laboratory.Rolodex.prototype.remove(data);
@@ -58,6 +66,8 @@ When joining a `Rolodex` with a different data type, the `type`, `query`, `befor
 
 The `remove()` prototype method collects the `Profile`s of a `Rolodex` except for those of the provided `data`, and returns a new `Rolodex` of the results.
 The `type`, `query`, `before`, and `after` parameters are preserved from the original.
+
+ - - -
 
 ##  Implementation  ##
 

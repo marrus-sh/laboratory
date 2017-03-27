@@ -1,6 +1,14 @@
+_Laboratory_<br>
+Source Code and Documentation<br>
+API Version: _0.3.1_
+
 #  THE ATTACHMENT CONSTRUCTOR  #
 
-##  Introduction  ##
+>   File location: `Constructors/Attachment.litcoffee`
+
+ - - -
+
+##  Description  ##
 
 The `Attachment()` constructor creates a unique, read-only object which represents an attached piece of media sent through the Mastodon API.
 Its properties are summarized below, alongside their Mastodon API equivalents:
@@ -22,6 +30,8 @@ The possible `Attachment.Type`s are as follows:
 | `Attachment.Type.PHOTO` | `01` | The media is a photo |
 | `Attachment.Type.VIDEO` | `10` | The media is a video |
 | `Attachment.Type.GIFV` | `11` | The media is a gif-video |
+
+ - - -
 
 ##  Implementation  ##
 

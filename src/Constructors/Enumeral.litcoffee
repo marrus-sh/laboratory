@@ -1,6 +1,14 @@
+_Laboratory_<br>
+Source Code and Documentation<br>
+API Version: _0.3.1_
+
 #  LABORATORY ENUMERALS  #
 
-##  Introduction  ##
+>   File location: `Constructors/Enumeral.litcoffee`
+
+ - - -
+
+##  Description  ##
 
 If you have experience working with JavaScript and the DOM, you may have encountered DOM attributes whose values are described by an enumerated type.
 For example, `Node.NodeType` can have values which include `Node.ELEMENT_NODE`, with a value of `1`, and `Node.TEXT_NODE`, with a value of `3`.
@@ -21,7 +29,7 @@ They aim to accomplish these things:
 4.  **Guarantee uniqueness of value.**
     It is guaranteed that no two enumerals of a given type will share the same value.
 
-##  Enumeral Types  ##
+###  Enumeral types:
 
 Enumeral types can be created by calling `Enumeral.generate()` with an object whose properties and values give the names and values for the resultant enumerals, like so:
 
@@ -38,15 +46,17 @@ Enumeral types can be created by calling `Enumeral.generate()` with an object wh
 
 Further discussion of specific enumeral types takes place in the various files in which they are defined.
 
-###  `fromValue()`:
+####  `fromValue()`.
 
 >   ```javascript
->       Type.fromValue(n);
+>       MyType.fromValue(n);
 >   ```
 >
 >   - __`n` :__ An integer value
 
 The `fromValue()` method of an enumeral type can be used to get the enumeral associated with the given value.
+
+ - - -
 
 ##  Implementation  ##
 

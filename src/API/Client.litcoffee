@@ -1,6 +1,14 @@
+_Laboratory_<br>
+Source Code and Documentation<br>
+API Version: _0.3.1_
+
 #  CLIENT EVENTS  #
 
-##  Introduction  ##
+>   File location: `API/Client.litcoffee`
+
+ - - -
+
+##  Description  ##
 
 The __Client__ module of Laboratory Events is comprised of those events which are related to OAuth registration of the Laboratory client with the Mastodon server.
 
@@ -12,7 +20,7 @@ The __Client__ module of Laboratory Events is comprised of those events which ar
 | `LaboratoryClientReceived` | Fires when a client id and secret have been received from the OAuth server |
 | `LaboratoryClientFailed` | Fires when a request for a client id and secret from the OAuth server failed |
 
-##  Requesting Client Authorization  ##
+###  Requesting client authorization:
 
 >   - __API equivalent :__ `/api/v1/apps`
 >   - __Request parameters :__
@@ -27,6 +35,8 @@ The __Client__ module of Laboratory Events is comprised of those events which ar
 The `LaboratoryClientRequested` event requests a new client id for use with OAuth.
 Laboratory will fire this event automatically as necessary during the handling of `LaboratoryAuthorizationRequested`, so it isn't something you usually need to worry about.
 However, you can request this yourself if you find yourself needing new client authorization.
+
+ - - -
 
 ##  Implementation  ##
 

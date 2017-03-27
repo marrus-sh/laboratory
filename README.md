@@ -56,7 +56,7 @@ If your system doesn't support these features, you should still be able to safel
 
 ##  API Quick Reference  ##
 
->  Current version: *0.3.0*
+>  Current version: *0.3.1*
 
 ###  Request pipelines:
 

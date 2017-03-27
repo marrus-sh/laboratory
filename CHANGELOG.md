@@ -9,6 +9,7 @@
 #####  CHANGED
 
 * Fixed [Issue #3](https://github.com/marrus-sh/laboratory/issues/3) where Laboratory would request an access token even when it had a perfectly good one already
+* Improved documentation in a couple of areas
 
 #####  REMOVED
 

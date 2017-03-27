@@ -1,6 +1,14 @@
+_Laboratory_<br>
+Source Code and Documentation<br>
+API Version: _0.3.1_
+
 #  PROFILE EVENTS  #
 
-##  Introduction  ##
+>   File location: `API/Profile.litcoffee`
+
+ - - -
+
+##  Description  ##
 
 The __Profile__ module of the Laboratory API is comprised of those events which are related to Mastodon accounts.
 
@@ -13,7 +21,7 @@ The __Profile__ module of the Laboratory API is comprised of those events which 
 | `LaboratoryProfileFailed` | Fires when a `Laboratory.Profile` fails to process |
 | `LaboratoryProfileSetRelationship` | Petitions the Mastodon server to change the relationship between the user and the specified account |
 
-##  Requesting a Profile  ##
+###  Requesting a profile:
 
 >   - __API equivalent :__ `/api/v1/accounts/:id`, `/api/v1/accounts/relationships`
 >   - __Request parameters :__
@@ -31,7 +39,7 @@ Laboratory keeps track of all of the `Profile`s it receives in its internal stor
 This means that for each `LaboratoryProfileRequested` event, there could be as many as *three* `LaboratoryProfileReceived` responses: one containing the cached data from the store, one containing updated information from the server, and a third if the relationship information has changed as well.
 However, Laboratory will only fire as many responses as necessary; if nothing has changed from the stored value, then only one response will be given.
 
-##  Changing Relationship Status  ##
+###  Changing relationship status:
 
 >   - __API equivalent :__ `/api/v1/accounts/follow`, `/api/v1/accounts/unfollow`, `/api/v1/accounts/block`, `/api/v1/accounts/unblock`, `/api/v1/accounts/mute`, `/api/v1/accounts/unmute`
 >   - __Miscellanous events :__
@@ -42,6 +50,8 @@ It should be fired with a `detail` which has two properties: `id`, which gives t
 
 Note that only some relationship aspects can be changed; you can't, for example, make an account stop following you using `LaboratoryProfileSetRelationship`.
 For the purposes of this event, a follow and a follow request are treated as equivalent.
+
+ - - -
 
 ##  Implementation  ##
 

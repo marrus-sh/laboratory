@@ -1,6 +1,14 @@
+_Laboratory_<br>
+Source Code and Documentation<br>
+API Version: _0.3.1_
+
 #  THE FAILURE CONSTRUCTOR  #
 
-##  Introduction  ##
+>   File location: `Constructors/Failure.litcoffee`
+
+ - - -
+
+##  Description  ##
 
 The `Failure()` constructor creates a unique, read-only object which represents a failed request.
 Its properties are summarized below, alongside their Mastodon API equivalents:
@@ -10,6 +18,8 @@ Its properties are summarized below, alongside their Mastodon API equivalents:
 |  `error`  |    `error`     | The text of the error |
 |  `code`   | *Not provided* | The HTTP access code of the error, if applicable |
 | `request` | *Not provided* | The request which failed |
+
+ - - -
 
 ##  Implementation  ##
 

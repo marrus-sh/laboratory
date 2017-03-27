@@ -1,6 +1,14 @@
+_Laboratory_<br>
+Source Code and Documentation<br>
+API Version: _0.3.1_
+
 #  THE CLIENT CONSTRUCTOR  #
 
-##  Introduction  ##
+>   File location: `Constructors/Client.litcoffee`
+
+ - - -
+
+##  Description  ##
 
 The `Client()` constructor creates a unique, read-only object which represents a registered Mastodon client.
 It is unlikely you will ever need to call this constructor yourself.
@@ -15,6 +23,8 @@ Its properties are summarized below, alongside their Mastodon API equivalents:
 | `clientSecret` | `client_secret` | The private (secret) id of the client |
 |    `scope`     | *Not provided*  | The [`Authorization.Scope`](Authorization.litcoffee) associated with the client |
 |   `redirect`   | `redirect_uri`  | The redirect URL associated with the client |
+
+ - - -
 
 ##  Implementation  ##
 

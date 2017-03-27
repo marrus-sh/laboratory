@@ -1,12 +1,24 @@
-#  INSTALLING  #
+_Laboratory_<br>
+Source Code and Documentation<br>
+API Version: _0.3.1_
+
+#  USING LABORATORY  #
+
+>   File location: `INSTALLING.litcoffee`
+
+ - - -
+
+##  Description  ##
 
 Laboratory is written in Literate CoffeeScript, designed to compile to a single minified JavaScript file.
 This file is available in [`/dist/laboratory.min.js`](../dist/laboratory.min.js).
 If for some reason you feel the need to compile Laboratory from source yourself, the [`Cakefile`](../Cakefile) can be used to do so.
 
 All of Laboratory's components are available through the `window.Laboratory` object, which this file provides.
-Additionally, the `window.Laboratory.ready` property can be used to check if `LaboratoryInitializationReady` has already fired, and the `window.Laboratory.user` property can be used to obtain the id of the currently-logged-in user.
+Additionally, the `window.Laboratory.ready` property can be used to check if `LaboratoryInitializationReady` has already fired, and the `window.Laboratory.auth` property can be used to obtain the current [`Authorization`](Constructors/Authorization.litcoffee) object.
 Laboratory doesn't have any external dependencies, and should run in any modern (ECMAScript 5–compliant; eg IE9) browser.
+
+ - - -
 
 ##  Implementation  ##
 
@@ -26,6 +38,10 @@ The store is not exposed to the window.
 
 Because Laboratory is still in active development, `window["🏪"]` can be used to gain convenient access to our store.
 Obviously, you shouldn't expect this to last.
+
+>   __Note :__
+>   It's an emoji because you're not supposed to use it in production code.
+>   Don't use it in production code lol.
 
     window["🏪"] = Store
 

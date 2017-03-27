@@ -1,4 +1,12 @@
+_Laboratory_<br>
+Source Code and Documentation<br>
+API Version: _0.3.1_
+
 #  REQUEST EVENTS  #
+
+>   File location: `API/Request.litcoffee`
+
+ - - -
 
 ##  Introduction  ##
 
@@ -14,7 +22,7 @@ Generally speaking you shouldn't have to interact with these events yourself, bu
 | `LaboratoryRequestComplete` | Fires when an XMLHttpRequest is done loading |
 | `LaboratoryRequestError` | Fires when an XMLHttpRequest fails |
 
-##  Listening For Requests  ##
+###  Listening for requests:
 
 >   - __API equivalent :__ _None_
 >   - __Miscellanous events :__
@@ -28,6 +36,8 @@ Laboratory Request events fire whenever the `readystate` of an `XMLHttpRequest` 
 Alternatively, `LaboratoryRequestError` indicates that the request completed but one or both of those conditions was not true.
 
 The `detail` of each Laboratory Request event is the associated `XMLHttpRequest`.
+
+ - - -
 
 ##  Implementation  ##
 

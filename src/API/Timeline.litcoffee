@@ -1,6 +1,14 @@
+_Laboratory_<br>
+Source Code and Documentation<br>
+API Version: _0.3.1_
+
 #  TIMELINE EVENTS  #
 
-##  Introduction  ##
+>   File location: `API/Timeline.litcoffee`
+
+ - - -
+
+##  Description  ##
 
 The __Timeline__ module of the Laboratory API is comprised of those events which are related to timelines of Mastodon accounts.
 
@@ -12,7 +20,7 @@ The __Timeline__ module of the Laboratory API is comprised of those events which
 | `LaboratoryTimelineReceived` | Fires when a `Laboratory.Timeline` has been processed |
 | `LaboratoryTimelineFailed` | Fires when a `Laboratory.Timeline` fails to process |
 
-##  Requesting a Rolodex  ##
+###  Requesting a timeline:
 
 >   - __API equivalent :__ `/api/v1/timelines/home`, `/api/v1/timelines/public`, `/api/v1/timelines/tag/:hashtag`, `/api/v1/notifications/`, `/api/v1/favourites`
 >   - __Request parameters :__
@@ -28,6 +36,8 @@ Laboratory Timeline events are used to request lists of [`Post`](../Constructors
 If the `type` is `Timeline.Type.HASHTAG`, then `query` should provide the hashtag; in the case of `Timeline.Type.ACCOUNT`, then `query` should provide the account id; otherwise, no `query` is required.
 
 The `before` and `after` parameters can be used to change the range of statuses returned.
+
+ - - -
 
 ##  Implementation  ##
 

@@ -1,6 +1,14 @@
+_Laboratory_<br>
+Source Code and Documentation<br>
+API Version: _0.3.1_
+
 #  THE PROFILE CONSTRUCTOR  #
 
-##  Introduction  ##
+>   File location: `Constructors/Profile.litcoffee`
+
+ - - -
+
+##  Description  ##
 
 The `Profile()` constructor creates a unique, read-only object which represents an account's profile information.
 Its properties are summarized below, alongside their Mastodon API equivalents:
@@ -58,9 +66,9 @@ Of course, many combinations are not possible.
 | `01000000` | `Profile.Relationship.UNKNOWN` | The relationship status between the user and the account is unknown |
 | `10000000` | `Profile.Relationship.SELF` | The user is the same as the account |
 
-##  Prototype Methods  ##
+###  Prototype methods:
 
-###  `compare()`:
+####  `compare()`.
 
 >   ```javascript
 >       Laboratory.Profile.prototype.compare(profile);
@@ -69,6 +77,8 @@ Of course, many combinations are not possible.
 >   - __`profile` :__ A `Profile` to compare with
 
 The `profile()` prototype method compares a `Profile` with another and returns `true` if they have the same properties.
+
+ - - -
 
 ##  Implementation  ##
 

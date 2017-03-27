@@ -1,6 +1,14 @@
+_Laboratory_<br>
+Source Code and Documentation<br>
+API Version: _0.3.1_
+
 #  POST EVENTS  #
 
-##  Introduction  ##
+>   File location: `API/Post.litcoffee`
+
+ - - -
+
+##  Description  ##
 
 The __Post__ module of the Laboratory API is comprised of those events which are related to Mastodon accounts.
 
@@ -16,7 +24,7 @@ The __Post__ module of the Laboratory API is comprised of those events which are
 | `LaboratoryPostSetReblog` | Petitions the Mastodon server to reblog or unreblog the provided status |
 | `LaboratoryPostSetFavourite` | Petitions the Mastodon server to favourite or unfavourite the provided status |
 
-##  Requesting a Status  ##
+###  Requesting a status:
 
 >   - __API equivalent :__ `/api/v1/statuses/:id`, `/api/v1/notifications/:id`
 >   - __Request parameters :__
@@ -33,7 +41,7 @@ Laboratory keeps track of all of the `Post`s it receives in its internal store.
 If there is already information on the requested `Post` in the Laboratory store, it will fire `LaboratoryPostReceived` immediately, and then again once the server request completes.
 However, Laboratory will only fire as many responses as necessary; if nothing has changed from the stored value, then only one response will be given.
 
-##  Creating and Deleting Posts  ##
+###  Creating and deleting posts:
 
 >   - __API equivalent :__ `/api/v1/statuses`, `/api/v1/statuses/:id`
 >   - __Miscellaneous events :__
@@ -53,7 +61,7 @@ It should be fired with a `detail` containing the following properties:
 The `LaboratoryPostDeletion` event attempts to delete an existing status from the Mastodon server.
 The `id` property of its `detail` should provide the id of the status to delete.
 
-##  Favouriting and Reblogging Posts  ##
+###  Favouriting and reblogging posts:
 
 >   - __API equivalent :__ `/api/v1/statuses/:id/reblog`, `/api/v1/statuses/:id/unreblog`, `/api/v1/statuses/:id/favourite`, `/api/v1/statuses/:id/unfavourite`
 >   - __Miscellanous events :__
@@ -62,6 +70,8 @@ The `id` property of its `detail` should provide the id of the status to delete.
 
 The `LaboratoryPostSetReblog` and `LaboratoryPostSetFavourite` events can be used to set the reblog or favourite status of posts.
 They should be fired with a `detail` which has two properties: `id`, which gives the id of the account, and `value`, which should be `true` if the post should be favourited/reblogged, or `false` if it should be unfavourited/unreblogged.
+
+ - - -
 
 ##  Implementation  ##
 

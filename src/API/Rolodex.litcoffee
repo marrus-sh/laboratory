@@ -1,6 +1,14 @@
+_Laboratory_<br>
+Source Code and Documentation<br>
+API Version: _0.3.1_
+
 #  ROLODEX EVENTS  #
 
-##  Introduction  ##
+>   File location: `API/Rolodex.litcoffee`
+
+ - - -
+
+##  Description  ##
 
 The __Rolodex__ module of the Laboratory API is comprised of those events which are related to rolodexes of Mastodon accounts.
 
@@ -12,7 +20,7 @@ The __Rolodex__ module of the Laboratory API is comprised of those events which 
 | `LaboratoryRolodexReceived` | Fires when a `Rolodex` has been processed |
 | `LaboratoryRolodexFailed` | Fires when a `Rolodex` fails to process |
 
-##  Requesting a Rolodex  ##
+###  Requesting a rolodex:
 
 >   - __API equivalent :__ `/api/v1/accounts/search`, `/api/v1/accounts/:id/followers`, `/api/v1/accounts/:id/following`, `/api/v1/statuses/:id/reblogged_by`, `/api/v1/statuses/:id/favourited_by`, `/api/v1/blocks`, `/api/v1/mutes`
 >   - __Request parameters :__
@@ -30,6 +38,8 @@ If the `type` is `Rolodex.Type.SEARCH`, then `query` should provide the string t
 In the case of `Rolodex.Type.BLOCKS` and `Rolodex.Type.MUTES`, no `query` is required.
 
 For `Rolodex.Type.SEARCH`es, the number of accounts to return can be specified using the `limit` parameter; otherwise, the `before` and `after` parameters can be used to change the range of accounts returned.
+
+ - - -
 
 ##  Implementation  ##
 

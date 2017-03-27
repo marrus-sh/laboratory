@@ -1,6 +1,14 @@
+_Laboratory_<br>
+Source Code and Documentation<br>
+API Version: _0.3.1_
+
 #  AUTHORIZATION EVENTS  #
 
-##  Introduction  ##
+>   File location: `API/Authorization.litcoffee`
+
+ - - -
+
+##  Description  ##
 
 The __Authorization__ module of Laboratory Events is comprised of those events which are related to OAuth registration of the Laboratory client with the Mastodon server.
 
@@ -13,7 +21,7 @@ The __Authorization__ module of Laboratory Events is comprised of those events w
 | `LaboratoryAuthorizationFailed` | Fires when a request for an access token failed |
 | `LaboratoryAuthorizationGranted` | Fires when a popup receives an authorization code |
 
-##  Requesting Authorization  ##
+###  Requesting authorization:
 
 >   - __API equivalent :__ `/oauth/token`, `/api/v1/verify_credentials`
 >   - __Request parameters :__
@@ -35,6 +43,8 @@ The `LaboratoryAuthorizationGranted` event fires when a user has granted authori
 Its `detail` will contain either a `code` or an `accessToken`, alongside an optional `window`, `origin` and `scope`.
 If you have somehow acquired an access token from somewhere else, passing this value to `LaboratoryAuthorizationGranted` alongside its origin and scope will allow Laboratory to use it as well.
 Alternatively, you can pass an `Authorization` object to `LaboratoryAuthorizationReceived`, but note that doing so requires more information.
+
+ - - -
 
 ##  Implementation  ##
 

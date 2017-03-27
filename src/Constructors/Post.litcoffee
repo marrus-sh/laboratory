@@ -1,6 +1,14 @@
+_Laboratory_<br>
+Source Code and Documentation<br>
+API Version: _0.3.1_
+
 #  THE POST CONSTRUCTOR  #
 
-##  Introduction  ##
+>   File location: `Constructors/Post.litcoffee`
+
+ - - -
+
+##  Description  ##
 
 The `Post()` constructor creates a unique, read-only object which represents an account's profile information.
 Its properties are summarized below, alongside their Mastodon API equivalents:
@@ -64,9 +72,9 @@ However, note that `Visibility.LISTED` (`0x02`) is not a valid visibility for a 
 
 The visibility of the post can be evaluating using bitwise comparisons: `visibility & Post.Visibility.LISTED` will detect whether a post is listed or unlisted, for example.
 
-##  Prototype Methods  ##
+###  Prototype methods:
 
-###  `compare()`:
+####  `compare()`.
 
 >   ```javascript
 >       Laboratory.Post.prototype.compare(post);
@@ -76,6 +84,8 @@ The visibility of the post can be evaluating using bitwise comparisons: `visibil
 
 The `compare()` prototype method compares a `Post` with another and returns `true` if they have the same properties.
 For efficiency, if two `Post`s have the same `id` then `compare()` will only test those properties which are likely to change.
+
+ - - -
 
 ##  Implementation  ##
 

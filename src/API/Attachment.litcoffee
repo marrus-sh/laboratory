@@ -1,6 +1,14 @@
+_Laboratory_<br>
+Source Code and Documentation<br>
+API Version: _0.3.1_
+
 #  ATTACHMENT EVENTS  #
 
-##  Introduction  ##
+>   File location: `API/Attachment.litcoffee`
+
+ - - -
+
+##  Description  ##
 
 The __Attachment__ module of the Laboratory API is comprised of those events which are related to Mastodon media attachments.
 
@@ -12,7 +20,7 @@ The __Attachment__ module of the Laboratory API is comprised of those events whi
 | `LaboratoryAttachmentReceived` | Fires when an `Attachment` has been processed |
 | `LaboratoryAttachmentFailed` | Fires when an `Attachment` fails to process |
 
-##  Requesting an Attachment  ##
+###  Requesting an attachment:
 
 >   - __API equivalent :__ `/api/v1/media`
 >   - __Request parameters :__
@@ -23,6 +31,8 @@ The __Attachment__ module of the Laboratory API is comprised of those events whi
 
 Laboratory Attachment events are used to upload files to the server and receive media `Attachment`s which can then be linked to posts.
 The only relevant parameter is `file`, which should be the `File` to upload.
+
+ - - -
 
 ##  Implementation  ##
 

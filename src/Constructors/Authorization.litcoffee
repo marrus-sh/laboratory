@@ -1,6 +1,14 @@
+_Laboratory_<br>
+Source Code and Documentation<br>
+API Version: _0.3.1_
+
 #  THE AUTHORIZATION CONSTRUCTOR  #
 
-##  Introduction  ##
+>   File location: `Constructors/Authorization.litcoffee`
+
+ - - -
+
+##  Description  ##
 
 The `Authorization()` constructor creates a unique, read-only object which represents a successful authorization request.
 Its properties are summarized below, alongside their Mastodon API equivalents:
@@ -28,6 +36,8 @@ The possible `Authorization.Scope`s are as follows:
 | `Authorization.Scope.READFOLLOW` | `101` | The scope is `"read follow"` |
 | `Authorization.Scope.WRITEFOLLOW` | `110` | The scope is `"write follow"` |
 | `Authorization.Scope.READWRITEFOLLOW` | `111` | The scope is `"read write follow"` |
+
+ - - -
 
 ##  Implementation  ##
 

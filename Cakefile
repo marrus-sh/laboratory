@@ -4,7 +4,7 @@ fs     = require 'fs'
 files = [
   'README'
   'Constructors/README'
-  'Constructors/Enumeral' #  The Enumeral constructor is used by other constructors
+  'Constructors/Enumeral' #  Note the Enumeral constructor is used by other constructors
   'Constructors/Application'
   'Constructors/Attachment'
   'Constructors/Authorization'
@@ -32,7 +32,7 @@ task 'build', 'Build single application file from source files', ->
   for file, index in files then do (file, index) ->
     fs.readFile "src/#{file}.litcoffee", "utf8", (err, fileContents) ->
       throw err if err
-      contents[index] = "> From [/src/#{file}.litcoffee](../src/#{file}.litcoffee) :\n\n" + fileContents
+      contents[index] = fileContents
       do process if --remaining is 0
   process = ->
     fs.writeFile "dist/laboratory.litcoffee", (contents.join '\n\n- - -\n\n'), 'utf8', (err) ->

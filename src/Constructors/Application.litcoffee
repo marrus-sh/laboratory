@@ -1,6 +1,14 @@
+_Laboratory_<br>
+Source Code and Documentation<br>
+API Version: _0.3.1_
+
 #  THE APPLICATION CONSTRUCTOR  #
 
-##  Introduction  ##
+>   File location: `Constructors/Application.litcoffee`
+
+ - - -
+
+##  Description  ##
 
 The `Application()` constructor creates a unique, read-only object which represents an application used to interface with the Mastodon API.
 Its properties are summarized below, alongside their Mastodon API equivalents:
@@ -9,6 +17,8 @@ Its properties are summarized below, alongside their Mastodon API equivalents:
 | :------: | :----------: | :---------- |
 |  `name`  |    `name`    | The name of the application |
 |  `href`  |  `website`   | The url of the application's homepage or website |
+
+ - - -
 
 ##  Implementation  ##
 

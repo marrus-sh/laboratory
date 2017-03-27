@@ -1,10 +1,20 @@
+_Laboratory_<br>
+Source Code and Documentation<br>
+API Version: _0.3.1_
+
 #  LABORATORY EVENT API  #
+
+>   File location: `API/README.litcoffee`
+
+ - - -
+
+##  Description  ##
 
 Laboratory does not give you direct access to the information it receives from a Mastodon server.
 Instead, it makes this information available using a special __Event API,__ which is documented here.
 This page will provide the basics on the API and how it works, and then direct you to further resources for specific components.
 
-##  Understanding the Event API  ##
+###  Understanding the Event API:
 
 In order to understand Laboratory's Event API, you first need to understand how Laboratory stores its data.
 All of the information that Laboratory receives and keeps track of from a Mastodon server is kept within a single central __store,__ which is a large JavaScript object with numerous different parts.
@@ -14,12 +24,12 @@ However, unlike with Redux, many areas of Laboratory's store are left fully muta
 This means that the store can be quickly modified in-place to add and remove data.
 However, it also means that, in order to maintain the sanctity of its data, the Laboratory store can't be exposed to the public view.
 **Laboratory's store is declared inside of a closure for which there is no external access.**
-The only functions which are allowed to act on the Laboratory store are a collection of __Laboratory Event Handlers__ (colloquially, just "handlers"), which have been bound to the store and listen for Laboratory-specific events dispatched to the `document`.
+The only functions which are allowed to modify the Laboratory store are a collection of __Laboratory Event Handlers__ (colloquially, just "handlers"), which listen for Laboratory-specific events dispatched to the `document`.
 
-Consequently, the only means outside programs have to interact with the Laboratory store is through a series of pre-defined __Laboratory Events__, which can be issued, listened for, and logged by external parties.
+The only means outside programs have to interact with the Laboratory store is then through a series of pre-defined __Laboratory Events__, which can be issued, listened for, and logged by external parties.
 The Laboratory Event API describes these events and their function.
 
-##  Creating and Issuing Laboratory Events ##
+###  Creating and issuing Laboratory Events:
 
 Laboratory Events are implemented as DOM `CustomEvents`.
 Consequently, each event has just two pieces of information that you need to account for: its `type`, which identifies the event, and its `detail`, which is an object holding the event's data.
@@ -46,7 +56,7 @@ This code can be used to forget the previous association:
 >       Laboratory.forget("LaboratorySomethingReceived", callback);
 >   ```
 
-###  Three types of event:
+####  Three types of event.
 
 Laboratory Events are broken up into three general categories: __requests__, __responses__, and __failures__.
 (There are a few miscellaneous events which don't fall into one of these categories, but they are few and far between.)
@@ -55,7 +65,7 @@ Typically, you will dispatch requests, and listen for their associated responses
 Of course, there is nothing stopping you from dispatching your own responses and failures, or from listening for others' requests.
 However, generally speaking this should not be necessary.
 
-###  Event promises:
+####  Event promises.
 
 If your environment supports `Promise`s, then the `Laboratory.request()` function will handle the request/response/failure pipeline for you; for example:
 
@@ -63,7 +73,7 @@ If your environment supports `Promise`s, then the `Laboratory.request()` functio
 >       Laboratory.request("LaboratorySomethingRequested", detail).then(callback).else(onError);
 >   ```
 
-###  Event details:
+####  Event details.
 
 Dispatching most events requires calling `Laboratory.dispatch()` with not only a string specifying the event, but also a `detail`, which is an object containing additional event information.
 The kind of information expected by a `detail` varies from event to event, so be sure to check the documentation to see what is required.
@@ -72,7 +82,7 @@ When you listen for an event using `Laboratory.listen()`, the callback function 
 For responses, `detail`s will be instances of the modules to which the events belong; for example, the detail for a `LaboratoryProfileRequested` event is an instance of `Laboratory.Profile`.
 The `detail`s for failures are all objects of type `Laboratory.Failure`.
 
-##  Laboratory Event Reference  ##
+###  Laboratory Event reference:
 
 Laboratory Events are broken up into several __modules__, each of which is documented within its source.
 These are as follows:
@@ -86,6 +96,8 @@ These are as follows:
 - [__Attachment__](Attachment.litcoffee)
 - [__Post__](Post.litcoffee)
 - [__Timeline__](Timeline.litcoffee)
+
+ - - -
 
 ##  Implementation  ##
 

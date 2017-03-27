@@ -1,6 +1,14 @@
+_Laboratory_<br>
+Source Code and Documentation<br>
+API Version: _0.3.1_
+
 #  THE TIMELINE CONSTRUCTOR  #
 
-##  Introduction  ##
+>   File location: `Constructors/Timeline.litcoffee`
+
+ - - -
+
+##  Description  ##
 
 The `Timeline()` constructor creates a unique, read-only object which represents a Mastodon timeline.
 Its properties are summarized below, alongside their Mastodon API equivalents:
@@ -30,9 +38,9 @@ The possible `Timeline.Type`s are as follows:
 
 The `Timeline()` constructor does not use or remember its `Timeline.Type`, but these values are used when requesting new `Timeline`s using `LaboratoryTimelineRequested`.
 
-##  Prototype Methods ##
+###  Prototype methods:
 
-###  `join()`:
+####  `join()`.
 
 >   ```javascript
 >       Laboratory.Timeline.prototype.join(data);
@@ -46,7 +54,7 @@ Otherwise, the `type` of the resultant `Timeline` will be `Timeline.Type.UNDEFIN
 
 When joining a `Timeline` with a different data type, the `type`, `query`, `before`, and `after` parameters remain unchanged.
 
-###  `remove()`:
+####  `remove()`.
 
 >   ```javascript
 >       Laboratory.Timeline.prototype.remove(data);
@@ -56,6 +64,8 @@ When joining a `Timeline` with a different data type, the `type`, `query`, `befo
 
 The `remove()` prototype method collects the `Post`s of a timeline except for those of the provided `data`, and returns a new `Timeline` of the results.
 The `type`, `query`, `before`, and `after` parameters are preserved from the original.
+
+ - - -
 
 ##  Implementation  ##
 

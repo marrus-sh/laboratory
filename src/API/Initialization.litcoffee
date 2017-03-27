@@ -1,6 +1,14 @@
+_Laboratory_<br>
+Source Code and Documentation<br>
+API Version: _0.3.1_
+
 #  INITIALIZATION EVENTS  #
 
-##  Introduction  ##
+>   File location: `API/Initialization.litcoffee`
+
+ - - -
+
+##  Description  ##
 
 The __Initialization__ module of the Laboratory API is comprised of those events which are related to initialization of the Laboratory store and handlers.
 These make up just two events: `LaboratoryInitializationLoaded` and `LaboratoryInitializationReady`.
@@ -20,7 +28,7 @@ However, you should listen for these events to know when proper communication wi
 | `LaboratoryInitializationLoaded` | Fires when the Laboratory script has been loaded and run |
 | `LaboratoryInitializationReady` | Fires when the Laboratory event handlers are ready to receive events |
 
-##  Checking Initialization Status  ##
+###  Checking initialization status:
 
 >   - __API equivalent :__ _None_
 >   - __Miscellanous events :__
@@ -39,6 +47,8 @@ Laboratory waits for the entire document to be loaded before assigning its handl
 Of the two, `LaboratoryInitializationReady` is almost always the one to listen for.
 
 Neither of the Laboratory Initialization events have `detail`s.
+
+ - - -
 
 ##  Implementation  ##
 
