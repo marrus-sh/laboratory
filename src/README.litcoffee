@@ -1,6 +1,6 @@
-<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.3.1</i> <br> <code>API/README.litcoffee</code></p>
+<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.3.1</i> <br> <code>README.litcoffee</code></p>
 
-#  INTRODUCTION  #
+#  _LABORATORY_  #
 
  - - -
 
