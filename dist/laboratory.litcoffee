@@ -84,10 +84,7 @@ Laboratory thus assures that minor and patch numbers will never exceed `99` (ind
 
 If this is a popup (`window.opener.Laboratory` exists) and an API redirect (a `code` parameter exists in our query), then we hand our opener our code.
 
-    do ->
-        return unless (code = (location.search.match(/code=([^&]*)/) || [])[1]) and Mommy = window.opener.Laboratory
-        Mommy.dispatch "LaboratoryAuthorizationGranted", {code}
-        return
+    do -> Mommy.dispatch "LaboratoryAuthorizationGranted", {code} if (code = (location.search.match(/code=([^&]*)/) || [])[1]) and Mommy = window.opener.Laboratory
 
 ###  API and exposed properties:
 
@@ -208,7 +205,6 @@ Laboratory doesn't support HTTP status codes like `206 PARTIAL CONTENT`.
                             onError response, data, params
                             dispatch "LaboratoryRequestError", request
                     request.removeEventListener "readystatechange", callback
-            return
 
 ####  Sending the request.
 
@@ -216,8 +212,6 @@ We can now add our event listener and send the request.
 
         request.addEventListener "readystatechange", callback
         if method is "POST" then request.send contents else do request.send
-
-        return
 
 
 - - -
@@ -1798,21 +1792,13 @@ The `LaboratoryAttachmentRequested` event uploads a file to the Mastodon API and
             unless FormData?
                 dispatch "LaboratoryAttachmentFailed", new Failure "Unable to create attachment; `FormData` is not supported on this platform"
 
-            onComplete = (response, data, params) ->
-                dispatch "LaboratoryAttachmentReceived", new Attachment response
-                return
-
-            onError = (response, data, params) ->
-                dispatch "LaboratoryAttachmentFailed", new Failure response.error, "LaboratoryAttachmentRequested", params.status
-                return
-
+            onComplete = (response, data, params) -> dispatch "LaboratoryAttachmentReceived", new Attachment response
+            onError = (response, data, params) -> dispatch "LaboratoryAttachmentFailed", new Failure response.error, "LaboratoryAttachmentRequested", params.status
             serverRequest "POST", Store.auth.origin + "/api/v1/media", (
                 form = new FormData
                 form.append "file", file
                 form
             ), Store.auth.accessToken, onComplete, onError
-
-            return
 
 
 - - -
@@ -1942,19 +1928,19 @@ The actual token requesting takes place after authorization has been granted by 
                                 client_id: clientID
                                 response_type: "code"
                                 redirect_uri: redirect
-                                scope: do ->
+                                scope: (
                                     scopeList = []
                                     scopeList.push "read" if scope & Authorization.Scope.READ
                                     scopeList.push "write" if scope & Authorization.Scope.WRITE
                                     scopeList.push "follow" if scope & Authorization.Scope.FOLLOW
-                                    return scopeList.join " "
+                                    scopeList.join " "
+                                )
                             }
                         ).join "&"
                     ), "LaboratoryOAuth"
                     recalledOrigin = origin
                     recalledClient = clientID
                     recalledSecret = clientSecret
-                    return
 
 We can only make our request once we have been registered as a client.
 Laboratory stores its client and authorization data in `localStorage`.
@@ -1964,6 +1950,7 @@ Here we try to access that data if present:
 
 If we have an access token which supports our requested `scope` then we can immediately try using it.
 We'll just forward it to `LaboratoryAuthorizationGranted`.
+It is important that we `return` here or else we'll end up requesting another token anyway.
 
                 if accessToken and (scope & storedScope) is +scope
                     dispatch "LaboratoryAuthorizationGranted",
@@ -1987,7 +1974,6 @@ Otherwise, we need to get new client credentials before proceeding.
                         forget "LaboratoryClientReceived", handleClient
                         clearTimeout timeout
                         do makeRequest
-                        return
 
                     listen "LaboratoryClientReceived", handleClient
 
@@ -2003,10 +1989,7 @@ If we aren't able to acquire a client ID within 30 seconds, we timeout.
                         ->
                             forget "LaboratoryClientReceived", handleClient
                             dispatch "LaboratoryAuthorizationFailed", new Failure "Unable to authorize client", "LaboratoryAuthorizationRequested"
-                            return
                     ), 30000
-
-                return
 
 ####  `LaboratoryAuthorizationGranted`.
 
@@ -2032,12 +2015,11 @@ We also initialize our `scope`, `datetime`, and `tokenType` variables now.
 We'll only use these initial values if an `accessToken` was directly provided, otherwise we'll overwrite them using the server's response.
 
                 scope = if event.detail.scope instanceof Authorization.Scope then (
-                    do ->
-                        scopeList = []
-                        scopeList.push "read" if scope & Authorization.Scope.READ
-                        scopeList.push "write" if scope & Authorization.Scope.WRITE
-                        scopeList.push "follow" if scope & Authorization.Scope.FOLLOW
-                        return scopeList.join " "
+                    scopeList = []
+                    scopeList.push "read" if scope & Authorization.Scope.READ
+                    scopeList.push "write" if scope & Authorization.Scope.WRITE
+                    scopeList.push "follow" if scope & Authorization.Scope.FOLLOW
+                    scopeList.join " "
                 ) else ""
                 datetime = NaN
                 tokenType = "bearer"
@@ -2056,11 +2038,8 @@ The response should be an account object.
                         }, origin, response.id
                         localStorage.setItem "Laboratory | " + origin, [redirect, clientID, clientSecret, Authorization.Scope.READ * (((scopes = scope.split /[\s\+]+/g).indexOf "read") isnt -1) + Authorization.Scope.WRITE * ((scopes.indexOf "write") isnt -1) + Authorization.Scope.FOLLOW * ((scopes.indexOf "follow") isnt -1), accessToken].join " "
                         dispatch "LaboratoryProfileReceived", new Profile response
-                        return
 
-                    verifyError = (response, data, params) ->
-                        dispatch "LaboratoryAuthorizationFailed", new Failure response.error, "LaboratoryAuthorizationRequested", params.status
-                        return
+                    verifyError = (response, data, params) -> dispatch "LaboratoryAuthorizationFailed", new Failure response.error, "LaboratoryAuthorizationRequested", params.status
 
                     serverRequest "GET", origin + "/api/v1/accounts/verify_credentials", null, accessToken, verifyComplete, verifyError
 
@@ -2087,10 +2066,7 @@ Here we make the actual request.
                         scope = response.scope
                         tokenType = response.token_type
                         do verify
-                        return
-                    onError = (response, data, params) ->
-                        dispatch "LaboratoryAuthorizationFailed", new Failure response.error, "LaboratoryAuthorizationRequested", params.status
-                        return
+                    onError = (response, data, params) -> dispatch "LaboratoryAuthorizationFailed", new Failure response.error, "LaboratoryAuthorizationRequested", params.status
                     serverRequest "POST", origin + "/oauth/token", {
                         client_id: clientID
                         client_secret: clientSecret
@@ -2106,17 +2082,13 @@ If we weren't given an `accessToken` *or* a `code`, that's an error.
 We can now reset our recalled variables.
 
                 recalledOrigin = recalledClient = recalledSecret = undefined
-                return
 
 ####  `LaboratoryAuthorizationReceived`.
 
 The `LaboratoryAuthorizationReceived` handler just saves the provided `Authorization` to the `Store`.
 It also exposes it to the window through `Exposed`.
 
-            .handle "LaboratoryAuthorizationReceived", (event) ->
-                return unless event.detail instanceof Authorization
-                Exposed.auth = Store.auth = event.detail
-                return
+            .handle "LaboratoryAuthorizationReceived", (event) -> Exposed.auth = Store.auth = event.detail if event.detail instanceof Authorization
 
 
 - - -
@@ -2200,15 +2172,11 @@ We also get our redirect URI at this point.
 
 If our request completes, then we want to respond with a `Client` object.
 
-            onComplete = (response, data, params) ->
-                dispatch "LaboratoryClientReceived", new Client response, data, origin
-                return
+            onComplete = (response, data, params) -> dispatch "LaboratoryClientReceived", new Client response, data, origin
 
 Otherwise, we need to generate a `Failure`.
 
-            onError = (response, data, params) ->
-                dispatch "LaboratoryClientFailed", new Failure response.error, "LaboratoryClientRequested", params.status
-                return
+            onError = (response, data, params) -> dispatch "LaboratoryClientFailed", new Failure response.error, "LaboratoryClientRequested", params.status
 
 Now we can send our request.
 
@@ -2436,28 +2404,20 @@ When our new post data is received, we'll process it and do the same—*if* some
                     return
                 store = if isANotification then Store.notifications else Store.statuses
                 dispatch "LaboratoryPostReceived", post unless post.compare store[id]
-                return
 
 If something goes wrong, then we need to throw an error.
 
-            onError = (response, data, params) ->
-                dispatch "LaboratoryPostFailed", new Failure response.error, "LaboratoryPostRequested", params.status
-                return
+            onError = (response, data, params) -> dispatch "LaboratoryPostFailed", new Failure response.error, "LaboratoryPostRequested", params.status
 
 Finally, we can make our server request.
 
             serverRequest "GET", Store.auth.origin + (if isANotification then "/api/v1/notifications/" else "/api/v1/statuses/") + id, null, Store.auth.accessToken, onComplete, onError
 
-            return
-
 ####  `LaboratoryPostReceived`.
 
 The `LaboratoryPostReceived` event simply adds a received post to our store.
 
-        .handle "LaboratoryPostReceived", (event) ->
-            return unless event.detail instanceof Post and event.detail.type instanceof Post.Type and isFinite id = Number event.detail.id
-            (if event.detail.type & Post.Type.NOTIFICATION then Store.notifications else Store.statuses)[id] = event.detail
-            return
+        .handle "LaboratoryPostReceived", (event) -> (if event.detail.type & Post.Type.NOTIFICATION then Store.notifications else Store.statuses)[id] = event.detail if event.detail instanceof Post and event.detail.type instanceof Post.Type and isFinite id = Number event.detail.id
 
 ####  `LaboratoryPostCreation`.
 
@@ -2465,13 +2425,9 @@ The `LaboratoryPostCreation` event attempts to create a new status, and fires a 
 
         .handle "LaboratoryPostCreation", (event) ->
 
-            onComplete = (response, data, params) ->
-                dispatch "LaboratoryPostReceived", new Post response
-                return
+            onComplete = (response, data, params) -> dispatch "LaboratoryPostReceived", new Post response
 
-            onError = (response, data, params) ->
-                dispatch "LaboratoryPostFailed", new Failure response.error, "LaboratoryPostCreation", params.status
-                return
+            onError = (response, data, params) -> dispatch "LaboratoryPostFailed", new Failure response.error, "LaboratoryPostCreation", params.status
 
             serverRequest "POST", Store.auth.origin + "/api/v1/statuses/", (
                 status: event.detail.text
@@ -2499,9 +2455,7 @@ The `LaboratoryPostDeletion` event attempts to delete an existing status.
                 return
 
             onComplete = ->
-            onError = (response, data, params) ->
-                dispatch "LaboratoryPostFailed", new Failure response.error, "LaboratoryPostDeletion", params.status
-                return
+            onError = (response, data, params) -> dispatch "LaboratoryPostFailed", new Failure response.error, "LaboratoryPostDeletion", params.status
 
             serverRequest "DELETE", Store.auth.origin + "/api/v1/statuses/" + id, null, Store.auth.accessToken, onComplete, onError
 
@@ -2516,22 +2470,15 @@ Obviously we need an `id` and `value` to do our work.
 
             dispatch "LaboratoryPostFailed", new Failure "Cannot set reblog status for post: Either value or id is missing", "LaboratoryPostSetReblog" unless (value = !!event.detail.value)? and isFinite id = Number event.detail.id
 
-Here we handle the server response for our relationship setting:
+Here we handle the server response for our reblog setting:
 
-            onComplete = (response, data, params) ->
-                dispatch "LaboratoryPostReceived", new Post response
-                return
-
-            onError = (response, data, params) ->
-                dispatch "LaboratoryPostFailed", new Failure response.error, "LaboratoryPostSetReblog", params.status
-                return
+            onComplete = (response, data, params) -> dispatch "LaboratoryPostReceived", new Post response
+            onError = (response, data, params) -> dispatch "LaboratoryPostFailed", new Failure response.error, "LaboratoryPostSetReblog", params.status
 
 If we already have a post for the specified id loaded into our `Store`, then we can test its current reblog value to avoid unnecessary requests.
 We'll only send the request if the values differ.
 
             serverRequest "POST", Store.auth.origin + "/api/v1/statuses/" + id + (if value then "/reblog" else "/unreblog"), null, Store.auth.accessToken, onComplete, onError unless Store.statuses[id]?.isReblogged is value
-
-            return
 
 ####  `LaboratoryPostSetFavourite`.
 
@@ -2544,22 +2491,15 @@ Obviously we need an `id` and `value` to do our work.
 
             dispatch "LaboratoryPostFailed", new Failure "Cannot set favourite status for post: Either value or id is missing", "LaboratoryPostSetFavourite" unless (value = !!event.detail.value)? and isFinite id = Number event.detail.id
 
-Here we handle the server response for our relationship setting:
+Here we handle the server response for our favourite setting:
 
-            onComplete = (response, data, params) ->
-                dispatch "LaboratoryPostReceived", new Post response
-                return
-
-            onError = (response, data, params) ->
-                dispatch "LaboratoryPostFailed", new Failure response.error, "LaboratoryPostSetFavourite", params.status
-                return
+            onComplete = (response, data, params) -> dispatch "LaboratoryPostReceived", new Post response
+            onError = (response, data, params) -> dispatch "LaboratoryPostFailed", new Failure response.error, "LaboratoryPostSetFavourite", params.status
 
 If we already have a post for the specified id loaded into our `Store`, then we can test its current favourite value to avoid unnecessary requests.
 We'll only send the request if the values differ.
 
             serverRequest "POST", Store.auth.origin + "/api/v1/statuses/" + id + (if value then "/favourite" else "/unfavourite"), null, Store.auth.accessToken, onComplete, onError unless Store.statuses[id]?.isFavourited is value
-
-            return
 
 
 - - -
@@ -2665,7 +2605,6 @@ We'll also request the account's relationships if necessary.
                 profile = new Profile response
                 dispatch "LaboratoryProfileReceived", profile unless profile.compare Store.profiles[id]
                 serverRequest "GET", Store.auth.origin + "/api/v1/accounts/relationships", {id}, Store.auth.accessToken, onRelationshipsComplete, onError if event.detail.requestRelationships
-                return
 
 The function call is a little different, but the same is true with our profile relationships.
 
@@ -2682,28 +2621,20 @@ The function call is a little different, but the same is true with our profile r
                     ) or Profile.Relationship.UNKNOWN
                 )
                 dispatch "LaboratoryProfileReceived", new Profile Store.profiles[id], relationship
-                return
 
 If something goes wrong, then we need to throw an error.
 
-            onError = (response, data, params) ->
-                dispatch "LaboratoryProfileFailed", new Failure response.error, "LaboratoryProfileRequested", params.status
-                return
+            onError = (response, data, params) -> dispatch "LaboratoryProfileFailed", new Failure response.error, "LaboratoryProfileRequested", params.status
 
 Finally, we can make our server request.
 
             serverRequest "GET", Store.auth.origin + "/api/v1/accounts/" + id, null, Store.auth.accessToken, onComplete, onError
 
-            return
-
 ####  `LaboratoryProfileReceived`.
 
 The `LaboratoryProfileReceived` event simply adds a received profile to our store.
 
-        .handle "LaboratoryProfileReceived", (event) ->
-            return unless event.detail instanceof Profile and isFinite id = Number event.detail.id
-            Store.profiles[id] = event.detail
-            return
+        .handle "LaboratoryProfileReceived", (event) -> Store.profiles[id] = event.detail if event.detail instanceof Profile and isFinite id = Number event.detail.id
 
 ####  `LaboratoryProfileSetRelationship`.
 
@@ -2718,13 +2649,9 @@ Obviously we need an `id` and `relationship` to do our work.
 
 Here we handle the server response for our relationship setting:
 
-            onComplete = (response, data, params) ->
-                dispatch "LaboratoryProfileReceived", new Profile response
-                return
+            onComplete = (response, data, params) -> dispatch "LaboratoryProfileReceived", new Profile response
 
-            onError = (response, data, params) ->
-                dispatch "LaboratoryProfileFailed", new Failure response.error, "LaboratoryProfileSetRelationship", params.status
-                return
+            onError = (response, data, params) -> dispatch "LaboratoryProfileFailed", new Failure response.error, "LaboratoryProfileSetRelationship", params.status
 
 If we already have a profile for the specified account loaded into our `Store`, then we can test its current relationship to avoid unnecessary requests.
 The XOR operation `profile.relationship ^ relationship` will allow us to identify which aspects of the relationship have changed.
@@ -2743,8 +2670,6 @@ Otherwise (if we don't have a profile on file), we have no choice but to send a 
                 serverRequest "POST", Store.auth.origin + "/api/v1/accounts/" + id + (if relationship & Profile.FOLLOWING or relationship & Profile.REQUESTED then "/follow" else "/unfollow"), null, Store.auth.accessToken, onComplete, onError
                 serverRequest "POST", Store.auth.origin + "/api/v1/accounts/" + id + (if relationship & Profile.BLOCKING then "/block" else "/unblock"), null, Store.auth.accessToken, onComplete, onError
                 serverRequest "POST", Store.auth.origin + "/api/v1/accounts/" + id + (if relationship & Profile.MUTING then "/mute" else "/unmute"), null, Store.auth.accessToken, onComplete, onError
-
-            return
 
 
 - - -
@@ -2898,13 +2823,10 @@ We'll also dispatch a `LaboratoryProfileReceived` event with each profile contai
                     query: query
                     before: ((params.prev.match /.*since_id=([0-9]+)/) or [])[1]
                     after: ((params.next.match /.*max_id=([0-9]+)/) or [])[1]
-                return
 
 If something goes wrong, then we need to throw an error.
 
-            onError = (response, data, params) ->
-                dispatch "LaboratoryRolodexFailed", new Failure response.error, "LaboratoryRolodexRequested", params.status
-                return
+            onError = (response, data, params) -> dispatch "LaboratoryRolodexFailed", new Failure response.error, "LaboratoryRolodexRequested", params.status
 
 Finally, we can make our server request.
 Note that `serverRequest` ignores data parameters which have a value of `undefined` or `null`.
@@ -2929,8 +2851,6 @@ Note that `serverRequest` ignores data parameters which have a value of `undefin
                         since_id: after
                     else null
             ), Store.auth.accessToken, onComplete, onError
-
-            return
 
 
 - - -
@@ -3043,13 +2963,10 @@ We'll also dispatch a `LaboratoryPostReceived` event with each post contained in
                     query: query
                     before: ((params.prev.match /.*since_id=([0-9]+)/) or [])[1]
                     after: ((params.next.match /.*max_id=([0-9]+)/) or [])[1]
-                return
 
 If something goes wrong, then we need to throw an error.
 
-            onError = (response, data, params) ->
-                dispatch "LaboratoryTimelineFailed", new Failure response.error, "LaboratoryTimelineRequested", params.status
-                return
+            onError = (response, data, params) -> dispatch "LaboratoryTimelineFailed", new Failure response.error, "LaboratoryTimelineRequested", params.status
 
 Finally, we can make our server request.
 Note that `serverRequest` ignores data parameters which have a value of `undefined` or `null`.
@@ -3074,8 +2991,6 @@ Note that `serverRequest` ignores data parameters which have a value of `undefin
                         max_id: before
                         since_id: after
             ), Store.auth.accessToken, onComplete, onError
-
-            return
 
 
 - - -
@@ -3155,8 +3070,6 @@ We also set `Exposed.ready` to `true` so that scripts can tell Laboratory is run
 
         Exposed.ready = yes
         dispatch "LaboratoryInitializationReady"
-
-        return
 
 ####  Running asynchronously.
 

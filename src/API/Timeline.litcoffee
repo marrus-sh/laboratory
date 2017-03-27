@@ -106,13 +106,10 @@ We'll also dispatch a `LaboratoryPostReceived` event with each post contained in
                     query: query
                     before: ((params.prev.match /.*since_id=([0-9]+)/) or [])[1]
                     after: ((params.next.match /.*max_id=([0-9]+)/) or [])[1]
-                return
 
 If something goes wrong, then we need to throw an error.
 
-            onError = (response, data, params) ->
-                dispatch "LaboratoryTimelineFailed", new Failure response.error, "LaboratoryTimelineRequested", params.status
-                return
+            onError = (response, data, params) -> dispatch "LaboratoryTimelineFailed", new Failure response.error, "LaboratoryTimelineRequested", params.status
 
 Finally, we can make our server request.
 Note that `serverRequest` ignores data parameters which have a value of `undefined` or `null`.
@@ -137,5 +134,3 @@ Note that `serverRequest` ignores data parameters which have a value of `undefin
                         max_id: before
                         since_id: after
             ), Store.auth.accessToken, onComplete, onError
-
-            return

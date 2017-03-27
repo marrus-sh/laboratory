@@ -142,28 +142,20 @@ When our new post data is received, we'll process it and do the same—*if* some
                     return
                 store = if isANotification then Store.notifications else Store.statuses
                 dispatch "LaboratoryPostReceived", post unless post.compare store[id]
-                return
 
 If something goes wrong, then we need to throw an error.
 
-            onError = (response, data, params) ->
-                dispatch "LaboratoryPostFailed", new Failure response.error, "LaboratoryPostRequested", params.status
-                return
+            onError = (response, data, params) -> dispatch "LaboratoryPostFailed", new Failure response.error, "LaboratoryPostRequested", params.status
 
 Finally, we can make our server request.
 
             serverRequest "GET", Store.auth.origin + (if isANotification then "/api/v1/notifications/" else "/api/v1/statuses/") + id, null, Store.auth.accessToken, onComplete, onError
 
-            return
-
 ####  `LaboratoryPostReceived`.
 
 The `LaboratoryPostReceived` event simply adds a received post to our store.
 
-        .handle "LaboratoryPostReceived", (event) ->
-            return unless event.detail instanceof Post and event.detail.type instanceof Post.Type and isFinite id = Number event.detail.id
-            (if event.detail.type & Post.Type.NOTIFICATION then Store.notifications else Store.statuses)[id] = event.detail
-            return
+        .handle "LaboratoryPostReceived", (event) -> (if event.detail.type & Post.Type.NOTIFICATION then Store.notifications else Store.statuses)[id] = event.detail if event.detail instanceof Post and event.detail.type instanceof Post.Type and isFinite id = Number event.detail.id
 
 ####  `LaboratoryPostCreation`.
 
@@ -171,13 +163,9 @@ The `LaboratoryPostCreation` event attempts to create a new status, and fires a 
 
         .handle "LaboratoryPostCreation", (event) ->
 
-            onComplete = (response, data, params) ->
-                dispatch "LaboratoryPostReceived", new Post response
-                return
+            onComplete = (response, data, params) -> dispatch "LaboratoryPostReceived", new Post response
 
-            onError = (response, data, params) ->
-                dispatch "LaboratoryPostFailed", new Failure response.error, "LaboratoryPostCreation", params.status
-                return
+            onError = (response, data, params) -> dispatch "LaboratoryPostFailed", new Failure response.error, "LaboratoryPostCreation", params.status
 
             serverRequest "POST", Store.auth.origin + "/api/v1/statuses/", (
                 status: event.detail.text
@@ -205,9 +193,7 @@ The `LaboratoryPostDeletion` event attempts to delete an existing status.
                 return
 
             onComplete = ->
-            onError = (response, data, params) ->
-                dispatch "LaboratoryPostFailed", new Failure response.error, "LaboratoryPostDeletion", params.status
-                return
+            onError = (response, data, params) -> dispatch "LaboratoryPostFailed", new Failure response.error, "LaboratoryPostDeletion", params.status
 
             serverRequest "DELETE", Store.auth.origin + "/api/v1/statuses/" + id, null, Store.auth.accessToken, onComplete, onError
 
@@ -222,22 +208,15 @@ Obviously we need an `id` and `value` to do our work.
 
             dispatch "LaboratoryPostFailed", new Failure "Cannot set reblog status for post: Either value or id is missing", "LaboratoryPostSetReblog" unless (value = !!event.detail.value)? and isFinite id = Number event.detail.id
 
-Here we handle the server response for our relationship setting:
+Here we handle the server response for our reblog setting:
 
-            onComplete = (response, data, params) ->
-                dispatch "LaboratoryPostReceived", new Post response
-                return
-
-            onError = (response, data, params) ->
-                dispatch "LaboratoryPostFailed", new Failure response.error, "LaboratoryPostSetReblog", params.status
-                return
+            onComplete = (response, data, params) -> dispatch "LaboratoryPostReceived", new Post response
+            onError = (response, data, params) -> dispatch "LaboratoryPostFailed", new Failure response.error, "LaboratoryPostSetReblog", params.status
 
 If we already have a post for the specified id loaded into our `Store`, then we can test its current reblog value to avoid unnecessary requests.
 We'll only send the request if the values differ.
 
             serverRequest "POST", Store.auth.origin + "/api/v1/statuses/" + id + (if value then "/reblog" else "/unreblog"), null, Store.auth.accessToken, onComplete, onError unless Store.statuses[id]?.isReblogged is value
-
-            return
 
 ####  `LaboratoryPostSetFavourite`.
 
@@ -250,19 +229,12 @@ Obviously we need an `id` and `value` to do our work.
 
             dispatch "LaboratoryPostFailed", new Failure "Cannot set favourite status for post: Either value or id is missing", "LaboratoryPostSetFavourite" unless (value = !!event.detail.value)? and isFinite id = Number event.detail.id
 
-Here we handle the server response for our relationship setting:
+Here we handle the server response for our favourite setting:
 
-            onComplete = (response, data, params) ->
-                dispatch "LaboratoryPostReceived", new Post response
-                return
-
-            onError = (response, data, params) ->
-                dispatch "LaboratoryPostFailed", new Failure response.error, "LaboratoryPostSetFavourite", params.status
-                return
+            onComplete = (response, data, params) -> dispatch "LaboratoryPostReceived", new Post response
+            onError = (response, data, params) -> dispatch "LaboratoryPostFailed", new Failure response.error, "LaboratoryPostSetFavourite", params.status
 
 If we already have a post for the specified id loaded into our `Store`, then we can test its current favourite value to avoid unnecessary requests.
 We'll only send the request if the values differ.
 
             serverRequest "POST", Store.auth.origin + "/api/v1/statuses/" + id + (if value then "/favourite" else "/unfavourite"), null, Store.auth.accessToken, onComplete, onError unless Store.statuses[id]?.isFavourited is value
-
-            return

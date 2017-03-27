@@ -74,8 +74,6 @@ We also set `Exposed.ready` to `true` so that scripts can tell Laboratory is run
         Exposed.ready = yes
         dispatch "LaboratoryInitializationReady"
 
-        return
-
 ####  Running asynchronously.
 
 We don't want the store loading before `document.body` or any of our other scripts, so we'll attach a `window.onload` event handler if our window isn't currently loaded.

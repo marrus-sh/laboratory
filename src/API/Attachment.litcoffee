@@ -61,18 +61,10 @@ The `LaboratoryAttachmentRequested` event uploads a file to the Mastodon API and
             unless FormData?
                 dispatch "LaboratoryAttachmentFailed", new Failure "Unable to create attachment; `FormData` is not supported on this platform"
 
-            onComplete = (response, data, params) ->
-                dispatch "LaboratoryAttachmentReceived", new Attachment response
-                return
-
-            onError = (response, data, params) ->
-                dispatch "LaboratoryAttachmentFailed", new Failure response.error, "LaboratoryAttachmentRequested", params.status
-                return
-
+            onComplete = (response, data, params) -> dispatch "LaboratoryAttachmentReceived", new Attachment response
+            onError = (response, data, params) -> dispatch "LaboratoryAttachmentFailed", new Failure response.error, "LaboratoryAttachmentRequested", params.status
             serverRequest "POST", Store.auth.origin + "/api/v1/media", (
                 form = new FormData
                 form.append "file", file
                 form
             ), Store.auth.accessToken, onComplete, onError
-
-            return

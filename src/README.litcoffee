@@ -84,10 +84,7 @@ Laboratory thus assures that minor and patch numbers will never exceed `99` (ind
 
 If this is a popup (`window.opener.Laboratory` exists) and an API redirect (a `code` parameter exists in our query), then we hand our opener our code.
 
-    do ->
-        return unless (code = (location.search.match(/code=([^&]*)/) || [])[1]) and Mommy = window.opener.Laboratory
-        Mommy.dispatch "LaboratoryAuthorizationGranted", {code}
-        return
+    do -> Mommy.dispatch "LaboratoryAuthorizationGranted", {code} if (code = (location.search.match(/code=([^&]*)/) || [])[1]) and Mommy = window.opener.Laboratory
 
 ###  API and exposed properties:
 
@@ -208,7 +205,6 @@ Laboratory doesn't support HTTP status codes like `206 PARTIAL CONTENT`.
                             onError response, data, params
                             dispatch "LaboratoryRequestError", request
                     request.removeEventListener "readystatechange", callback
-            return
 
 ####  Sending the request.
 
@@ -216,5 +212,3 @@ We can now add our event listener and send the request.
 
         request.addEventListener "readystatechange", callback
         if method is "POST" then request.send contents else do request.send
-
-        return

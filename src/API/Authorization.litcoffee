@@ -123,19 +123,19 @@ The actual token requesting takes place after authorization has been granted by 
                                 client_id: clientID
                                 response_type: "code"
                                 redirect_uri: redirect
-                                scope: do ->
+                                scope: (
                                     scopeList = []
                                     scopeList.push "read" if scope & Authorization.Scope.READ
                                     scopeList.push "write" if scope & Authorization.Scope.WRITE
                                     scopeList.push "follow" if scope & Authorization.Scope.FOLLOW
-                                    return scopeList.join " "
+                                    scopeList.join " "
+                                )
                             }
                         ).join "&"
                     ), "LaboratoryOAuth"
                     recalledOrigin = origin
                     recalledClient = clientID
                     recalledSecret = clientSecret
-                    return
 
 We can only make our request once we have been registered as a client.
 Laboratory stores its client and authorization data in `localStorage`.
@@ -145,6 +145,7 @@ Here we try to access that data if present:
 
 If we have an access token which supports our requested `scope` then we can immediately try using it.
 We'll just forward it to `LaboratoryAuthorizationGranted`.
+It is important that we `return` here or else we'll end up requesting another token anyway.
 
                 if accessToken and (scope & storedScope) is +scope
                     dispatch "LaboratoryAuthorizationGranted",
@@ -168,7 +169,6 @@ Otherwise, we need to get new client credentials before proceeding.
                         forget "LaboratoryClientReceived", handleClient
                         clearTimeout timeout
                         do makeRequest
-                        return
 
                     listen "LaboratoryClientReceived", handleClient
 
@@ -184,10 +184,7 @@ If we aren't able to acquire a client ID within 30 seconds, we timeout.
                         ->
                             forget "LaboratoryClientReceived", handleClient
                             dispatch "LaboratoryAuthorizationFailed", new Failure "Unable to authorize client", "LaboratoryAuthorizationRequested"
-                            return
                     ), 30000
-
-                return
 
 ####  `LaboratoryAuthorizationGranted`.
 
@@ -213,12 +210,11 @@ We also initialize our `scope`, `datetime`, and `tokenType` variables now.
 We'll only use these initial values if an `accessToken` was directly provided, otherwise we'll overwrite them using the server's response.
 
                 scope = if event.detail.scope instanceof Authorization.Scope then (
-                    do ->
-                        scopeList = []
-                        scopeList.push "read" if scope & Authorization.Scope.READ
-                        scopeList.push "write" if scope & Authorization.Scope.WRITE
-                        scopeList.push "follow" if scope & Authorization.Scope.FOLLOW
-                        return scopeList.join " "
+                    scopeList = []
+                    scopeList.push "read" if scope & Authorization.Scope.READ
+                    scopeList.push "write" if scope & Authorization.Scope.WRITE
+                    scopeList.push "follow" if scope & Authorization.Scope.FOLLOW
+                    scopeList.join " "
                 ) else ""
                 datetime = NaN
                 tokenType = "bearer"
@@ -237,11 +233,8 @@ The response should be an account object.
                         }, origin, response.id
                         localStorage.setItem "Laboratory | " + origin, [redirect, clientID, clientSecret, Authorization.Scope.READ * (((scopes = scope.split /[\s\+]+/g).indexOf "read") isnt -1) + Authorization.Scope.WRITE * ((scopes.indexOf "write") isnt -1) + Authorization.Scope.FOLLOW * ((scopes.indexOf "follow") isnt -1), accessToken].join " "
                         dispatch "LaboratoryProfileReceived", new Profile response
-                        return
 
-                    verifyError = (response, data, params) ->
-                        dispatch "LaboratoryAuthorizationFailed", new Failure response.error, "LaboratoryAuthorizationRequested", params.status
-                        return
+                    verifyError = (response, data, params) -> dispatch "LaboratoryAuthorizationFailed", new Failure response.error, "LaboratoryAuthorizationRequested", params.status
 
                     serverRequest "GET", origin + "/api/v1/accounts/verify_credentials", null, accessToken, verifyComplete, verifyError
 
@@ -268,10 +261,7 @@ Here we make the actual request.
                         scope = response.scope
                         tokenType = response.token_type
                         do verify
-                        return
-                    onError = (response, data, params) ->
-                        dispatch "LaboratoryAuthorizationFailed", new Failure response.error, "LaboratoryAuthorizationRequested", params.status
-                        return
+                    onError = (response, data, params) -> dispatch "LaboratoryAuthorizationFailed", new Failure response.error, "LaboratoryAuthorizationRequested", params.status
                     serverRequest "POST", origin + "/oauth/token", {
                         client_id: clientID
                         client_secret: clientSecret
@@ -287,14 +277,10 @@ If we weren't given an `accessToken` *or* a `code`, that's an error.
 We can now reset our recalled variables.
 
                 recalledOrigin = recalledClient = recalledSecret = undefined
-                return
 
 ####  `LaboratoryAuthorizationReceived`.
 
 The `LaboratoryAuthorizationReceived` handler just saves the provided `Authorization` to the `Store`.
 It also exposes it to the window through `Exposed`.
 
-            .handle "LaboratoryAuthorizationReceived", (event) ->
-                return unless event.detail instanceof Authorization
-                Exposed.auth = Store.auth = event.detail
-                return
+            .handle "LaboratoryAuthorizationReceived", (event) -> Exposed.auth = Store.auth = event.detail if event.detail instanceof Authorization

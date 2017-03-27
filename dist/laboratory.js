@@ -26,12 +26,11 @@
 
   (function() {
     var Mommy, code;
-    if (!((code = (location.search.match(/code=([^&]*)/) || [])[1]) && (Mommy = window.opener.Laboratory))) {
-      return;
+    if ((code = (location.search.match(/code=([^&]*)/) || [])[1]) && (Mommy = window.opener.Laboratory)) {
+      return Mommy.dispatch("LaboratoryAuthorizationGranted", {
+        code: code
+      });
     }
-    Mommy.dispatch("LaboratoryAuthorizationGranted", {
-      code: code
-    });
   })();
 
   Exposed = {
@@ -119,12 +118,10 @@
         case 0:
           break;
         case 1:
-          dispatch("LaboratoryRequestOpen", request);
-          break;
+          return dispatch("LaboratoryRequestOpen", request);
         case 2:
         case 3:
-          dispatch("LaboratoryRequestUpdate", request);
-          break;
+          return dispatch("LaboratoryRequestUpdate", request);
         case 4:
           status = request.status;
           response = (function() {
@@ -160,14 +157,14 @@
               onError(response, data, params);
               dispatch("LaboratoryRequestError", request);
           }
-          request.removeEventListener("readystatechange", callback);
+          return request.removeEventListener("readystatechange", callback);
       }
     };
     request.addEventListener("readystatechange", callback);
     if (method === "POST") {
-      request.send(contents);
+      return request.send(contents);
     } else {
-      request.send();
+      return request.send();
     }
   };
 
@@ -1006,12 +1003,12 @@
       dispatch("LaboratoryAttachmentFailed", new Failure("Unable to create attachment; `FormData` is not supported on this platform"));
     }
     onComplete = function(response, data, params) {
-      dispatch("LaboratoryAttachmentReceived", new Attachment(response));
+      return dispatch("LaboratoryAttachmentReceived", new Attachment(response));
     };
     onError = function(response, data, params) {
-      dispatch("LaboratoryAttachmentFailed", new Failure(response.error, "LaboratoryAttachmentRequested", params.status));
+      return dispatch("LaboratoryAttachmentFailed", new Failure(response.error, "LaboratoryAttachmentRequested", params.status));
     };
-    serverRequest("POST", Store.auth.origin + "/api/v1/media", (form = new FormData, form.append("file", file), form), Store.auth.accessToken, onComplete, onError);
+    return serverRequest("POST", Store.auth.origin + "/api/v1/media", (form = new FormData, form.append("file", file), form), Store.auth.accessToken, onComplete, onError);
   });
 
   (function() {
@@ -1040,27 +1037,14 @@
       a.href = event.detail.redirect || "";
       redirect = a.href;
       makeRequest = function() {
-        var key, value;
+        var key, scopeList, value;
         window.open(origin + "/oauth/authorize?" + (((function() {
           var ref, results;
           ref = {
             client_id: clientID,
             response_type: "code",
             redirect_uri: redirect,
-            scope: (function() {
-              var scopeList;
-              scopeList = [];
-              if (scope & Authorization.Scope.READ) {
-                scopeList.push("read");
-              }
-              if (scope & Authorization.Scope.WRITE) {
-                scopeList.push("write");
-              }
-              if (scope & Authorization.Scope.FOLLOW) {
-                scopeList.push("follow");
-              }
-              return scopeList.join(" ");
-            })()
+            scope: (scopeList = [], scope & Authorization.Scope.READ ? scopeList.push("read") : void 0, scope & Authorization.Scope.WRITE ? scopeList.push("write") : void 0, scope & Authorization.Scope.FOLLOW ? scopeList.push("follow") : void 0, scopeList.join(" "))
           };
           results = [];
           for (key in ref) {
@@ -1071,7 +1055,7 @@
         })()).join("&")), "LaboratoryOAuth");
         recalledOrigin = origin;
         recalledClient = clientID;
-        recalledSecret = clientSecret;
+        return recalledSecret = clientSecret;
       };
       if (typeof localStorage !== "undefined" && localStorage !== null ? localStorage.getItem("Laboratory | " + origin) : void 0) {
         ref = (localStorage.getItem("Laboratory | " + origin)).split(" ", 5), storedRedirect = ref[0], clientID = ref[1], clientSecret = ref[2], storedScope = ref[3], accessToken = ref[4];
@@ -1085,7 +1069,7 @@
         return;
       }
       if (storedRedirect === redirect && (scope & storedScope) === +scope && (clientID != null) && (clientSecret != null)) {
-        makeRequest();
+        return makeRequest();
       } else {
         handleClient = function(e) {
           var client;
@@ -1096,7 +1080,7 @@
           localStorage.setItem("Laboratory | " + origin, [redirect, clientID, clientSecret, +scope].join(" "));
           forget("LaboratoryClientReceived", handleClient);
           clearTimeout(timeout);
-          makeRequest();
+          return makeRequest();
         };
         listen("LaboratoryClientReceived", handleClient);
         dispatch("LaboratoryClientRequested", {
@@ -1105,32 +1089,19 @@
           redirect: redirect,
           scope: Authorization.Scope.fromValue(scope)
         });
-        timeout = setTimeout((function() {
+        return timeout = setTimeout((function() {
           forget("LaboratoryClientReceived", handleClient);
-          dispatch("LaboratoryAuthorizationFailed", new Failure("Unable to authorize client", "LaboratoryAuthorizationRequested"));
+          return dispatch("LaboratoryAuthorizationFailed", new Failure("Unable to authorize client", "LaboratoryAuthorizationRequested"));
         }), 30000);
       }
     }).handle("LaboratoryAuthorizationGranted", function(event) {
-      var accessToken, cleintSecret, clientID, clientSecret, code, datetime, onComplete, onError, origin, redirect, ref, scope, tokenType, verify;
+      var accessToken, cleintSecret, clientID, clientSecret, code, datetime, onComplete, onError, origin, redirect, ref, scope, scopeList, tokenType, verify;
       (window.open("about:blank", "LaboratoryOAuth")).close();
       if (!(origin = event.detail.origin || recalledOrigin)) {
         dispatch("LaboratoryAuthorizationFailed", new Failure("Authorization data wasn't associated with an origin", "LaboratoryAuthorizationRequested"));
         return;
       }
-      scope = event.detail.scope instanceof Authorization.Scope ? (function() {
-        var scopeList;
-        scopeList = [];
-        if (scope & Authorization.Scope.READ) {
-          scopeList.push("read");
-        }
-        if (scope & Authorization.Scope.WRITE) {
-          scopeList.push("write");
-        }
-        if (scope & Authorization.Scope.FOLLOW) {
-          scopeList.push("follow");
-        }
-        return scopeList.join(" ");
-      })() : "";
+      scope = event.detail.scope instanceof Authorization.Scope ? (scopeList = [], scope & Authorization.Scope.READ ? scopeList.push("read") : void 0, scope & Authorization.Scope.WRITE ? scopeList.push("write") : void 0, scope & Authorization.Scope.FOLLOW ? scopeList.push("follow") : void 0, scopeList.join(" ")) : "";
       datetime = 0/0;
       tokenType = "bearer";
       verify = function() {
@@ -1144,10 +1115,10 @@
             token_type: tokenType
           }, origin, response.id));
           localStorage.setItem("Laboratory | " + origin, [redirect, clientID, clientSecret, Authorization.Scope.READ * (((scopes = scope.split(/[\s\+]+/g)).indexOf("read")) !== -1) + Authorization.Scope.WRITE * ((scopes.indexOf("write")) !== -1) + Authorization.Scope.FOLLOW * ((scopes.indexOf("follow")) !== -1), accessToken].join(" "));
-          dispatch("LaboratoryProfileReceived", new Profile(response));
+          return dispatch("LaboratoryProfileReceived", new Profile(response));
         };
         verifyError = function(response, data, params) {
-          dispatch("LaboratoryAuthorizationFailed", new Failure(response.error, "LaboratoryAuthorizationRequested", params.status));
+          return dispatch("LaboratoryAuthorizationFailed", new Failure(response.error, "LaboratoryAuthorizationRequested", params.status));
         };
         return serverRequest("GET", origin + "/api/v1/accounts/verify_credentials", null, accessToken, verifyComplete, verifyError);
       };
@@ -1167,10 +1138,10 @@
           datetime = new Date(response.created_at);
           scope = response.scope;
           tokenType = response.token_type;
-          verify();
+          return verify();
         };
         onError = function(response, data, params) {
-          dispatch("LaboratoryAuthorizationFailed", new Failure(response.error, "LaboratoryAuthorizationRequested", params.status));
+          return dispatch("LaboratoryAuthorizationFailed", new Failure(response.error, "LaboratoryAuthorizationRequested", params.status));
         };
         serverRequest("POST", origin + "/oauth/token", {
           client_id: clientID,
@@ -1182,12 +1153,11 @@
       } else {
         dispatch("LaboratoryAuthorizationFailed", new Failure("No authorization code or access token was granted", "LaboratoryAuthorizationRequested"));
       }
-      recalledOrigin = recalledClient = recalledSecret = void 0;
+      return recalledOrigin = recalledClient = recalledSecret = void 0;
     }).handle("LaboratoryAuthorizationReceived", function(event) {
-      if (!(event.detail instanceof Authorization)) {
-        return;
+      if (event.detail instanceof Authorization) {
+        return Exposed.auth = Store.auth = event.detail;
       }
-      Exposed.auth = Store.auth = event.detail;
     });
   })();
 
@@ -1207,10 +1177,10 @@
     a.href = event.detail.redirect || "";
     redirect = a.href;
     onComplete = function(response, data, params) {
-      dispatch("LaboratoryClientReceived", new Client(response, data, origin));
+      return dispatch("LaboratoryClientReceived", new Client(response, data, origin));
     };
     onError = function(response, data, params) {
-      dispatch("LaboratoryClientFailed", new Failure(response.error, "LaboratoryClientRequested", params.status));
+      return dispatch("LaboratoryClientFailed", new Failure(response.error, "LaboratoryClientRequested", params.status));
     };
     return serverRequest("POST", origin + "/api/v1/apps", {
       client_name: event.detail.name,
@@ -1283,26 +1253,25 @@
       }
       store = isANotification ? Store.notifications : Store.statuses;
       if (!post.compare(store[id])) {
-        dispatch("LaboratoryPostReceived", post);
+        return dispatch("LaboratoryPostReceived", post);
       }
     };
     onError = function(response, data, params) {
-      dispatch("LaboratoryPostFailed", new Failure(response.error, "LaboratoryPostRequested", params.status));
+      return dispatch("LaboratoryPostFailed", new Failure(response.error, "LaboratoryPostRequested", params.status));
     };
-    serverRequest("GET", Store.auth.origin + (isANotification ? "/api/v1/notifications/" : "/api/v1/statuses/") + id, null, Store.auth.accessToken, onComplete, onError);
+    return serverRequest("GET", Store.auth.origin + (isANotification ? "/api/v1/notifications/" : "/api/v1/statuses/") + id, null, Store.auth.accessToken, onComplete, onError);
   }).handle("LaboratoryPostReceived", function(event) {
     var id;
-    if (!(event.detail instanceof Post && event.detail.type instanceof Post.Type && isFinite(id = Number(event.detail.id)))) {
-      return;
+    if (event.detail instanceof Post && event.detail.type instanceof Post.Type && isFinite(id = Number(event.detail.id))) {
+      return (event.detail.type & Post.Type.NOTIFICATION ? Store.notifications : Store.statuses)[id] = event.detail;
     }
-    (event.detail.type & Post.Type.NOTIFICATION ? Store.notifications : Store.statuses)[id] = event.detail;
   }).handle("LaboratoryPostCreation", function(event) {
     var attachment, attachments, inReplyTo, message, onComplete, onError;
     onComplete = function(response, data, params) {
-      dispatch("LaboratoryPostReceived", new Post(response));
+      return dispatch("LaboratoryPostReceived", new Post(response));
     };
     onError = function(response, data, params) {
-      dispatch("LaboratoryPostFailed", new Failure(response.error, "LaboratoryPostCreation", params.status));
+      return dispatch("LaboratoryPostFailed", new Failure(response.error, "LaboratoryPostCreation", params.status));
     };
     return serverRequest("POST", Store.auth.origin + "/api/v1/statuses/", {
       status: event.detail.text,
@@ -1339,7 +1308,7 @@
     }
     onComplete = function() {};
     onError = function(response, data, params) {
-      dispatch("LaboratoryPostFailed", new Failure(response.error, "LaboratoryPostDeletion", params.status));
+      return dispatch("LaboratoryPostFailed", new Failure(response.error, "LaboratoryPostDeletion", params.status));
     };
     return serverRequest("DELETE", Store.auth.origin + "/api/v1/statuses/" + id, null, Store.auth.accessToken, onComplete, onError);
   }).handle("LaboratoryPostSetReblog", function(event) {
@@ -1348,13 +1317,13 @@
       dispatch("LaboratoryPostFailed", new Failure("Cannot set reblog status for post: Either value or id is missing", "LaboratoryPostSetReblog"));
     }
     onComplete = function(response, data, params) {
-      dispatch("LaboratoryPostReceived", new Post(response));
+      return dispatch("LaboratoryPostReceived", new Post(response));
     };
     onError = function(response, data, params) {
-      dispatch("LaboratoryPostFailed", new Failure(response.error, "LaboratoryPostSetReblog", params.status));
+      return dispatch("LaboratoryPostFailed", new Failure(response.error, "LaboratoryPostSetReblog", params.status));
     };
     if (((ref = Store.statuses[id]) != null ? ref.isReblogged : void 0) !== value) {
-      serverRequest("POST", Store.auth.origin + "/api/v1/statuses/" + id + (value ? "/reblog" : "/unreblog"), null, Store.auth.accessToken, onComplete, onError);
+      return serverRequest("POST", Store.auth.origin + "/api/v1/statuses/" + id + (value ? "/reblog" : "/unreblog"), null, Store.auth.accessToken, onComplete, onError);
     }
   }).handle("LaboratoryPostSetFavourite", function(event) {
     var id, onComplete, onError, ref, value;
@@ -1362,13 +1331,13 @@
       dispatch("LaboratoryPostFailed", new Failure("Cannot set favourite status for post: Either value or id is missing", "LaboratoryPostSetFavourite"));
     }
     onComplete = function(response, data, params) {
-      dispatch("LaboratoryPostReceived", new Post(response));
+      return dispatch("LaboratoryPostReceived", new Post(response));
     };
     onError = function(response, data, params) {
-      dispatch("LaboratoryPostFailed", new Failure(response.error, "LaboratoryPostSetFavourite", params.status));
+      return dispatch("LaboratoryPostFailed", new Failure(response.error, "LaboratoryPostSetFavourite", params.status));
     };
     if (((ref = Store.statuses[id]) != null ? ref.isFavourited : void 0) !== value) {
-      serverRequest("POST", Store.auth.origin + "/api/v1/statuses/" + id + (value ? "/favourite" : "/unfavourite"), null, Store.auth.accessToken, onComplete, onError);
+      return serverRequest("POST", Store.auth.origin + "/api/v1/statuses/" + id + (value ? "/favourite" : "/unfavourite"), null, Store.auth.accessToken, onComplete, onError);
     }
   });
 
@@ -1398,7 +1367,7 @@
         dispatch("LaboratoryProfileReceived", profile);
       }
       if (event.detail.requestRelationships) {
-        serverRequest("GET", Store.auth.origin + "/api/v1/accounts/relationships", {
+        return serverRequest("GET", Store.auth.origin + "/api/v1/accounts/relationships", {
           id: id
         }, Store.auth.accessToken, onRelationshipsComplete, onError);
       }
@@ -1409,28 +1378,27 @@
       if (((ref = Store.profiles[id]) != null ? ref.relationship : void 0) === (relationship = Profile.Relationship.fromValue((Profile.Relationship.FOLLOWER * relationships.followed_by + Profile.Relationship.FOLLOWING * relationships.following + Profile.Relationship.REQUESTED * relationships.requested + Profile.Relationship.BLOCKING * relationships.blocking + Profile.Relationship.MUTING * relationships.muting + Profile.Relationship.SELF * (relationships.id === Store.auth.me)) || Profile.Relationship.UNKNOWN))) {
         return;
       }
-      dispatch("LaboratoryProfileReceived", new Profile(Store.profiles[id], relationship));
+      return dispatch("LaboratoryProfileReceived", new Profile(Store.profiles[id], relationship));
     };
     onError = function(response, data, params) {
-      dispatch("LaboratoryProfileFailed", new Failure(response.error, "LaboratoryProfileRequested", params.status));
+      return dispatch("LaboratoryProfileFailed", new Failure(response.error, "LaboratoryProfileRequested", params.status));
     };
-    serverRequest("GET", Store.auth.origin + "/api/v1/accounts/" + id, null, Store.auth.accessToken, onComplete, onError);
+    return serverRequest("GET", Store.auth.origin + "/api/v1/accounts/" + id, null, Store.auth.accessToken, onComplete, onError);
   }).handle("LaboratoryProfileReceived", function(event) {
     var id;
-    if (!(event.detail instanceof Profile && isFinite(id = Number(event.detail.id)))) {
-      return;
+    if (event.detail instanceof Profile && isFinite(id = Number(event.detail.id))) {
+      return Store.profiles[id] = event.detail;
     }
-    Store.profiles[id] = event.detail;
   }).handle("LaboratoryProfileSetRelationship", function(event) {
     var changes, id, onComplete, onError, profile, relationship;
     if (!((relationship = event.detail.relationship) instanceof Profile.Relationship && isFinite(id = Number(event.detail.id)))) {
       dispatch("LaboratoryProfileFailed", new Failure("Cannot set relationship for account: Either relationship or id is missing", "LaboratoryProfileSetRelationship"));
     }
     onComplete = function(response, data, params) {
-      dispatch("LaboratoryProfileReceived", new Profile(response));
+      return dispatch("LaboratoryProfileReceived", new Profile(response));
     };
     onError = function(response, data, params) {
-      dispatch("LaboratoryProfileFailed", new Failure(response.error, "LaboratoryProfileSetRelationship", params.status));
+      return dispatch("LaboratoryProfileFailed", new Failure(response.error, "LaboratoryProfileSetRelationship", params.status));
     };
     if ((profile = Store.profiles[id]) instanceof Profile) {
       changes = profile.relationship ^ relationship;
@@ -1443,12 +1411,12 @@
         serverRequest("POST", Store.auth.origin + "/api/v1/accounts/" + id + (relationship & Profile.BLOCKING ? "/block" : "/unblock"), null, Store.auth.accessToken, onComplete, onError);
       }
       if (changes & Profile.MUTING) {
-        serverRequest("POST", Store.auth.origin + "/api/v1/accounts/" + id + (relationship & Profile.MUTING ? "/mute" : "/unmute"), null, Store.auth.accessToken, onComplete, onError);
+        return serverRequest("POST", Store.auth.origin + "/api/v1/accounts/" + id + (relationship & Profile.MUTING ? "/mute" : "/unmute"), null, Store.auth.accessToken, onComplete, onError);
       }
     } else {
       serverRequest("POST", Store.auth.origin + "/api/v1/accounts/" + id + (relationship & Profile.FOLLOWING || relationship & Profile.REQUESTED ? "/follow" : "/unfollow"), null, Store.auth.accessToken, onComplete, onError);
       serverRequest("POST", Store.auth.origin + "/api/v1/accounts/" + id + (relationship & Profile.BLOCKING ? "/block" : "/unblock"), null, Store.auth.accessToken, onComplete, onError);
-      serverRequest("POST", Store.auth.origin + "/api/v1/accounts/" + id + (relationship & Profile.MUTING ? "/mute" : "/unmute"), null, Store.auth.accessToken, onComplete, onError);
+      return serverRequest("POST", Store.auth.origin + "/api/v1/accounts/" + id + (relationship & Profile.MUTING ? "/mute" : "/unmute"), null, Store.auth.accessToken, onComplete, onError);
     }
   });
 
@@ -1485,7 +1453,7 @@
           dispatch("LaboratoryProfileReceived", account);
         }
       }
-      dispatch("LaboratoryRolodexReceived", new Rolodex(response, {
+      return dispatch("LaboratoryRolodexReceived", new Rolodex(response, {
         type: type,
         query: query,
         before: ((params.prev.match(/.*since_id=([0-9]+)/)) || [])[1],
@@ -1493,9 +1461,9 @@
       }));
     };
     onError = function(response, data, params) {
-      dispatch("LaboratoryRolodexFailed", new Failure(response.error, "LaboratoryRolodexRequested", params.status));
+      return dispatch("LaboratoryRolodexFailed", new Failure(response.error, "LaboratoryRolodexRequested", params.status));
     };
-    serverRequest("GET", Store.auth.origin + ((function() {
+    return serverRequest("GET", Store.auth.origin + ((function() {
       switch (type) {
         case Rolodex.Type.SEARCH:
           return "/api/v1/accounts/search";
@@ -1594,7 +1562,7 @@
           dispatch("LaboratoryProfileReceived", new Profile(mention));
         }
       }
-      dispatch("LaboratoryTimelineReceived", new Timeline(response, {
+      return dispatch("LaboratoryTimelineReceived", new Timeline(response, {
         type: type,
         query: query,
         before: ((params.prev.match(/.*since_id=([0-9]+)/)) || [])[1],
@@ -1602,9 +1570,9 @@
       }));
     };
     onError = function(response, data, params) {
-      dispatch("LaboratoryTimelineFailed", new Failure(response.error, "LaboratoryTimelineRequested", params.status));
+      return dispatch("LaboratoryTimelineFailed", new Failure(response.error, "LaboratoryTimelineRequested", params.status));
     };
-    serverRequest("GET", Store.auth.origin + ((function() {
+    return serverRequest("GET", Store.auth.origin + ((function() {
       switch (type) {
         case Timeline.Type.HASHTAG:
           return "/api/v1/timelines/tag/" + query;
@@ -1664,7 +1632,7 @@
       listen(handler.type, handler);
     }
     Exposed.ready = true;
-    dispatch("LaboratoryInitializationReady");
+    return dispatch("LaboratoryInitializationReady");
   };
 
   if (document.readyState === "complete") {

@@ -91,13 +91,10 @@ We'll also dispatch a `LaboratoryProfileReceived` event with each profile contai
                     query: query
                     before: ((params.prev.match /.*since_id=([0-9]+)/) or [])[1]
                     after: ((params.next.match /.*max_id=([0-9]+)/) or [])[1]
-                return
 
 If something goes wrong, then we need to throw an error.
 
-            onError = (response, data, params) ->
-                dispatch "LaboratoryRolodexFailed", new Failure response.error, "LaboratoryRolodexRequested", params.status
-                return
+            onError = (response, data, params) -> dispatch "LaboratoryRolodexFailed", new Failure response.error, "LaboratoryRolodexRequested", params.status
 
 Finally, we can make our server request.
 Note that `serverRequest` ignores data parameters which have a value of `undefined` or `null`.
@@ -122,5 +119,3 @@ Note that `serverRequest` ignores data parameters which have a value of `undefin
                         since_id: after
                     else null
             ), Store.auth.accessToken, onComplete, onError
-
-            return

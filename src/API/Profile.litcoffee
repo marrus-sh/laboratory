@@ -99,7 +99,6 @@ We'll also request the account's relationships if necessary.
                 profile = new Profile response
                 dispatch "LaboratoryProfileReceived", profile unless profile.compare Store.profiles[id]
                 serverRequest "GET", Store.auth.origin + "/api/v1/accounts/relationships", {id}, Store.auth.accessToken, onRelationshipsComplete, onError if event.detail.requestRelationships
-                return
 
 The function call is a little different, but the same is true with our profile relationships.
 
@@ -116,28 +115,20 @@ The function call is a little different, but the same is true with our profile r
                     ) or Profile.Relationship.UNKNOWN
                 )
                 dispatch "LaboratoryProfileReceived", new Profile Store.profiles[id], relationship
-                return
 
 If something goes wrong, then we need to throw an error.
 
-            onError = (response, data, params) ->
-                dispatch "LaboratoryProfileFailed", new Failure response.error, "LaboratoryProfileRequested", params.status
-                return
+            onError = (response, data, params) -> dispatch "LaboratoryProfileFailed", new Failure response.error, "LaboratoryProfileRequested", params.status
 
 Finally, we can make our server request.
 
             serverRequest "GET", Store.auth.origin + "/api/v1/accounts/" + id, null, Store.auth.accessToken, onComplete, onError
 
-            return
-
 ####  `LaboratoryProfileReceived`.
 
 The `LaboratoryProfileReceived` event simply adds a received profile to our store.
 
-        .handle "LaboratoryProfileReceived", (event) ->
-            return unless event.detail instanceof Profile and isFinite id = Number event.detail.id
-            Store.profiles[id] = event.detail
-            return
+        .handle "LaboratoryProfileReceived", (event) -> Store.profiles[id] = event.detail if event.detail instanceof Profile and isFinite id = Number event.detail.id
 
 ####  `LaboratoryProfileSetRelationship`.
 
@@ -152,13 +143,9 @@ Obviously we need an `id` and `relationship` to do our work.
 
 Here we handle the server response for our relationship setting:
 
-            onComplete = (response, data, params) ->
-                dispatch "LaboratoryProfileReceived", new Profile response
-                return
+            onComplete = (response, data, params) -> dispatch "LaboratoryProfileReceived", new Profile response
 
-            onError = (response, data, params) ->
-                dispatch "LaboratoryProfileFailed", new Failure response.error, "LaboratoryProfileSetRelationship", params.status
-                return
+            onError = (response, data, params) -> dispatch "LaboratoryProfileFailed", new Failure response.error, "LaboratoryProfileSetRelationship", params.status
 
 If we already have a profile for the specified account loaded into our `Store`, then we can test its current relationship to avoid unnecessary requests.
 The XOR operation `profile.relationship ^ relationship` will allow us to identify which aspects of the relationship have changed.
@@ -177,5 +164,3 @@ Otherwise (if we don't have a profile on file), we have no choice but to send a 
                 serverRequest "POST", Store.auth.origin + "/api/v1/accounts/" + id + (if relationship & Profile.FOLLOWING or relationship & Profile.REQUESTED then "/follow" else "/unfollow"), null, Store.auth.accessToken, onComplete, onError
                 serverRequest "POST", Store.auth.origin + "/api/v1/accounts/" + id + (if relationship & Profile.BLOCKING then "/block" else "/unblock"), null, Store.auth.accessToken, onComplete, onError
                 serverRequest "POST", Store.auth.origin + "/api/v1/accounts/" + id + (if relationship & Profile.MUTING then "/mute" else "/unmute"), null, Store.auth.accessToken, onComplete, onError
-
-            return

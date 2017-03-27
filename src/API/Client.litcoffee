@@ -77,15 +77,11 @@ We also get our redirect URI at this point.
 
 If our request completes, then we want to respond with a `Client` object.
 
-            onComplete = (response, data, params) ->
-                dispatch "LaboratoryClientReceived", new Client response, data, origin
-                return
+            onComplete = (response, data, params) -> dispatch "LaboratoryClientReceived", new Client response, data, origin
 
 Otherwise, we need to generate a `Failure`.
 
-            onError = (response, data, params) ->
-                dispatch "LaboratoryClientFailed", new Failure response.error, "LaboratoryClientRequested", params.status
-                return
+            onError = (response, data, params) -> dispatch "LaboratoryClientFailed", new Failure response.error, "LaboratoryClientRequested", params.status
 
 Now we can send our request.
 
