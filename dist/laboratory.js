@@ -1015,8 +1015,10 @@
   });
 
   (function() {
-    var recalledOrigin;
-    recalledOrigin = null;
+    var recalledClient, recalledOrigin, recalledSecret;
+    recalledOrigin = void 0;
+    recalledClient = void 0;
+    recalledSecret = void 0;
     return LaboratoryEvent.create("LaboratoryAuthorizationRequested", {
       name: "Laboratory",
       url: "/",
@@ -1068,6 +1070,8 @@
           return results;
         })()).join("&")), "LaboratoryOAuth");
         recalledOrigin = origin;
+        recalledClient = clientID;
+        recalledSecret = clientSecret;
       };
       if (typeof localStorage !== "undefined" && localStorage !== null ? localStorage.getItem("Laboratory | " + origin) : void 0) {
         ref = (localStorage.getItem("Laboratory | " + origin)).split(" ", 5), storedRedirect = ref[0], clientID = ref[1], clientSecret = ref[2], storedScope = ref[3], accessToken = ref[4];
@@ -1107,7 +1111,7 @@
         }), 30000);
       }
     }).handle("LaboratoryAuthorizationGranted", function(event) {
-      var accessToken, clientID, clientSecret, code, datetime, onComplete, onError, origin, redirect, ref, scope, tokenType, verify;
+      var accessToken, cleintSecret, clientID, clientSecret, code, datetime, onComplete, onError, origin, redirect, ref, scope, tokenType, verify;
       (window.open("about:blank", "LaboratoryOAuth")).close();
       if (!(origin = event.detail.origin || recalledOrigin)) {
         dispatch("LaboratoryAuthorizationFailed", new Failure("Authorization data wasn't associated with an origin", "LaboratoryAuthorizationRequested"));
@@ -1129,9 +1133,6 @@
       })() : "";
       datetime = 0/0;
       tokenType = "bearer";
-      if (typeof localStorage !== "undefined" && localStorage !== null ? localStorage.getItem("Laboratory | " + origin) : void 0) {
-        ref = (localStorage.getItem("Laboratory | " + origin)).split(" ", 5), redirect = ref[0], clientID = ref[1], clientSecret = ref[2];
-      }
       verify = function() {
         var verifyComplete, verifyError;
         verifyComplete = function(response, data, params) {
@@ -1153,6 +1154,14 @@
       if (accessToken = event.detail.accessToken) {
         verify();
       } else if (code = event.detail.code) {
+        if (origin = recalledOrigin) {
+          clientID = recalledClient;
+          cleintSecret = recalledSecret;
+        } else {
+          if (typeof localStorage !== "undefined" && localStorage !== null ? localStorage.getItem("Laboratory | " + origin) : void 0) {
+            ref = (localStorage.getItem("Laboratory | " + origin)).split(" ", 5), redirect = ref[0], clientID = ref[1], clientSecret = ref[2];
+          }
+        }
         onComplete = function(response, data, params) {
           accessToken = response.access_token;
           datetime = new Date(response.created_at);
@@ -1173,7 +1182,7 @@
       } else {
         dispatch("LaboratoryAuthorizationFailed", new Failure("No authorization code or access token was granted", "LaboratoryAuthorizationRequested"));
       }
-      recalledOrigin = null;
+      recalledOrigin = recalledClient = recalledSecret = void 0;
     }).handle("LaboratoryAuthorizationReceived", function(event) {
       if (!(event.detail instanceof Authorization)) {
         return;

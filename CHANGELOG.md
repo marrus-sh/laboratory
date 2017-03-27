@@ -2,13 +2,27 @@
 
 ##  Version 0  ##
 
+###  0.4
+
+####  0.4.0
+
+#####  NEW
+
++ Added documentation for currently-open [GitHub Issues](https://github.com/marrus-sh/laboratory/issues) ([#14](https://github.com/marrus-sh/laboratory/issues/14))
+
+#####  CHANGED
+
+* Fixed [Issue #34](https://github.com/marrus-sh/laboratory/issues/3), where Laboratory used `localStorage` for things where it didn't need to
+
+ - - -
+
 ###  0.3:
 
 ####  0.3.1.
 
 #####  CHANGED
 
-* Fixed [Issue #3](https://github.com/marrus-sh/laboratory/issues/3) where Laboratory would request an access token even when it had a perfectly good one already
+* Fixed [Issue #3](https://github.com/marrus-sh/laboratory/issues/3), where Laboratory would request an access token even when it had a perfectly good one already
 * Improved documentation in a couple of areas
 
 #####  REMOVED

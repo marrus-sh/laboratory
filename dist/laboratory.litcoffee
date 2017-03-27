@@ -1,4 +1,4 @@
-<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.3.1</i> <br> <code>README.litcoffee</code></p>
+<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.4.0</i> <br> <code>README.litcoffee</code></p>
 
 #  _LABORATORY_  #
 
@@ -222,7 +222,7 @@ We can now add our event listener and send the request.
 
 - - -
 
-<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.3.1</i> <br> <code>Constructors/README.litcoffee</code></p>
+<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.4.0</i> <br> <code>Constructors/README.litcoffee</code></p>
 
 #  LABORATORY CONSTRUCTORS  #
 
@@ -261,7 +261,7 @@ See specific constructor pages for details on their implementation.
 
 - - -
 
-<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.3.1</i> <br> <code>Constructors/Enumeral.litcoffee</code></p>
+<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.4.0</i> <br> <code>Constructors/Enumeral.litcoffee</code></p>
 
 #  LABORATORY ENUMERALS  #
 
@@ -385,7 +385,7 @@ We can now freeze our enumerals and return them.
 
 - - -
 
-<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.3.1</i> <br> <code>Constructors/Application.litcoffee</code></p>
+<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.4.0</i> <br> <code>Constructors/Application.litcoffee</code></p>
 
 #  THE APPLICATION CONSTRUCTOR  #
 
@@ -429,7 +429,7 @@ The `Application` prototype just inherits from `Object`.
 
 - - -
 
-<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.3.1</i> <br> <code>Constructors/Attachment.litcoffee</code></p>
+<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.4.0</i> <br> <code>Constructors/Attachment.litcoffee</code></p>
 
 #  THE ATTACHMENT CONSTRUCTOR  #
 
@@ -502,7 +502,7 @@ Here we define our `Attachment.Type`s, as described above:
 
 - - -
 
-<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.3.1</i> <br> <code>Constructors/Authorization.litcoffee</code></p>
+<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.4.0</i> <br> <code>Constructors/Authorization.litcoffee</code></p>
 
 #  THE AUTHORIZATION CONSTRUCTOR  #
 
@@ -584,7 +584,7 @@ Here we define our `Authorization.Scope`s, as described above:
 
 - - -
 
-<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.3.1</i> <br> <code>Constructors/Client.litcoffee</code></p>
+<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.4.0</i> <br> <code>Constructors/Client.litcoffee</code></p>
 
 #  THE CLIENT CONSTRUCTOR  #
 
@@ -640,7 +640,7 @@ The `Client` prototype just inherits from `Object`.
 
 - - -
 
-<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.3.1</i> <br> <code>Constructors/Timeline.litcoffee</code></p>
+<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.4.0</i> <br> <code>Constructors/Timeline.litcoffee</code></p>
 
 #  THE FAILURE CONSTRUCTOR  #
 
@@ -687,7 +687,7 @@ The `Failure` prototype just inherits from `Object`.
 
 - - -
 
-<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.3.1</i> <br> <code>Constructors/Post.litcoffee</code></p>
+<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.4.0</i> <br> <code>Constructors/Post.litcoffee</code></p>
 
 #  THE POST CONSTRUCTOR  #
 
@@ -913,7 +913,7 @@ Here we define our enumerals as described above.
 
 - - -
 
-<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.3.1</i> <br> <code>Constructors/Profile.litcoffee</code></p>
+<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.4.0</i> <br> <code>Constructors/Profile.litcoffee</code></p>
 
 #  THE PROFILE CONSTRUCTOR  #
 
@@ -1092,7 +1092,7 @@ Here we define profile relationships, as specified above.
 
 - - -
 
-<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.3.1</i> <br> <code>Constructors/Rolodex.litcoffee</code></p>
+<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.4.0</i> <br> <code>Constructors/Rolodex.litcoffee</code></p>
 
 #  THE ROLODEX CONSTRUCTOR  #
 
@@ -1102,6 +1102,9 @@ Here we define profile relationships, as specified above.
 
 The `Rolodex()` constructor creates a unique, read-only object which represents a list of [`Profile`](Profile.litcoffee)s.
 Its properties are summarized below, alongside their Mastodon API equivalents:
+
+>   __[Issue #15](https://github.com/marrus-sh/laboratory/issues/15) :__
+>   The object returned by this constructor might be radically different in future versions of Laboratory.
 
 |  Property  |  API Response  | Description |
 | :--------: | :------------: | :---------- |
@@ -1116,6 +1119,9 @@ Note that `before` and `after` are special identifiers which may depend on the `
 ###  Rolodex types:
 
 The possible `Rolodex.Type`s are as follows:
+
+>   __[Issue #18](https://github.com/marrus-sh/laboratory/issues/18) :__
+>   There should also be a follow-request rolodex.
 
 | Enumeral | Hex Value | Description |
 | :------: | :----------: | :---------- |
@@ -1200,6 +1206,9 @@ The following loop removes any duplicates from our `data`.
 Finally, we implement our list of `profiles` as getters such that they always return the most current data.
 **Note that this will likely prevent optimization of the `profiles` array, so it is recommended that you make a static copy (using `Array.prototype.slice()` or similar) before doing intensive array operations with it.**
 
+>   __[Issue #28](https://github.com/marrus-sh/laboratory/issues/28) :__
+>   At some point in the future, `Rolodex` might instead be implemented using a linked list.
+
         @profiles = []
         Object.defineProperty @profiles, index, {get: getProfile.bind(this, value.id), enumerable: true} for value, index in data
         Object.freeze @profiles
@@ -1275,6 +1284,9 @@ Its `data` argument can be either a `Profile`, an array thereof, or a `Rolodex`.
 
 Here we define our `Rolodex.Type`s, as described above:
 
+>   __[Issue #18](https://github.com/marrus-sh/laboratory/issues/18) :__
+>   There should also be a follow-request rolodex.
+
     Rolodex.Type = Enumeral.generate
         UNDEFINED     : 0x00
         SEARCH        : 0x10
@@ -1288,7 +1300,7 @@ Here we define our `Rolodex.Type`s, as described above:
 
 - - -
 
-<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.3.1</i> <br> <code>Constructors/Timeline.litcoffee</code></p>
+<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.4.0</i> <br> <code>Constructors/Timeline.litcoffee</code></p>
 
 #  THE TIMELINE CONSTRUCTOR  #
 
@@ -1298,6 +1310,9 @@ Here we define our `Rolodex.Type`s, as described above:
 
 The `Timeline()` constructor creates a unique, read-only object which represents a Mastodon timeline.
 Its properties are summarized below, alongside their Mastodon API equivalents:
+
+>   __[Issue #15](https://github.com/marrus-sh/laboratory/issues/15) :__
+>   The object returned by this constructor might be radically different in future versions of Laboratory.
 
 | Property |  API Response  | Description |
 | :------: | :------------: | :---------- |
@@ -1310,6 +1325,9 @@ Its properties are summarized below, alongside their Mastodon API equivalents:
 ###  Timeline types:
 
 The possible `Timeline.Type`s are as follows:
+
+>   __[Issue #16](https://github.com/marrus-sh/laboratory/issues/16) :__
+>   Hashtag searches can also be global/local, so the values of these enumerals may change at some point in the future.
 
 | Enumeral | Hex Value | Description |
 | :------: | :----------: | :---------- |
@@ -1416,6 +1434,9 @@ Next we walk the array and look for any duplicates, removing them.
 Finally, we implement our list of `posts` as getters such that they always return the most current data.
 **Note that this will likely prevent optimization of the `posts` array, so it is recommended that you make a static copy (using `Array.prototype.slice()` or similar) before doing intensive array operations with it.**
 
+>   __[Issue #28](https://github.com/marrus-sh/laboratory/issues/28) :__
+>   At some point in the future, `Timeline` might instead be implemented using a linked list.
+
         @posts = []
         Object.defineProperty @posts, index, {get: getPost.bind(this, value.id, isNotification value), enumerable: true} for value, index in data
         Object.freeze @posts
@@ -1491,6 +1512,9 @@ Its `data` argument can be either a `Post`, an array thereof, or a `Timeline`.
 
 Here we define our `Timeline.Type`s, as described above:
 
+>   __[Issue #16](https://github.com/marrus-sh/laboratory/issues/16) :__
+>   Hashtag searches can also be global/local, so the values of these enumerals may change at some point in the future.
+
     Timeline.Type = Enumeral.generate
         UNDEFINED     : 0x00
         HASHTAG       : 0x10
@@ -1504,7 +1528,7 @@ Here we define our `Timeline.Type`s, as described above:
 
 - - -
 
-<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.3.1</i> <br> <code>API/README.litcoffee</code></p>
+<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.4.0</i> <br> <code>API/README.litcoffee</code></p>
 
 #  LABORATORY EVENT API  #
 
@@ -1562,10 +1586,13 @@ This code can be used to forget the previous association:
 
 Laboratory Events are broken up into three general categories: __requests__, __responses__, and __failures__.
 (There are a few miscellaneous events which don't fall into one of these categories, but they are few and far between.)
-Requests usually have names like "LaboratorySomethingRequested", responses usually have names like "LaboratorySomethingReceived", and failures usually have names like "LaboratorySomethingFailed".
+Requests usually have names like `LaboratorySomethingRequested`, responses usually have names like `LaboratorySomethingReceived`, and failures usually have names like `LaboratorySomethingFailed`.
 Typically, you will dispatch requests, and listen for their associated responses (or failures if the response doesn't go through).
 Of course, there is nothing stopping you from dispatching your own responses and failures, or from listening for others' requests.
 However, generally speaking this should not be necessary.
+
+>   __[Issue #4](https://github.com/marrus-sh/laboratory/issues/4) :__
+>   Events of the form `LaboratorySomethingFailed` will probably be consolidated into a single `LaboratoryFailure` event at some point in the future.
 
 ####  Event promises.
 
@@ -1708,7 +1735,7 @@ The `request()` function handles the listening and forgetting for us, returning 
 
 - - -
 
-<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.3.1</i> <br> <code>API/Attachment.litcoffee</code></p>
+<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.4.0</i> <br> <code>API/Attachment.litcoffee</code></p>
 
 #  ATTACHMENT EVENTS  #
 
@@ -1790,7 +1817,7 @@ The `LaboratoryAttachmentRequested` event uploads a file to the Mastodon API and
 
 - - -
 
-<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.3.1</i> <br> <code>API/Authorization.litcoffee</code></p>
+<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.4.0</i> <br> <code>API/Authorization.litcoffee</code></p>
 
 #  AUTHORIZATION EVENTS  #
 
@@ -1832,6 +1859,9 @@ Its `detail` will contain either a `code` or an `accessToken`, alongside an opti
 If you have somehow acquired an access token from somewhere else, passing this value to `LaboratoryAuthorizationGranted` alongside its origin and scope will allow Laboratory to use it as well.
 Alternatively, you can pass an `Authorization` object to `LaboratoryAuthorizationReceived`, but note that doing so requires more information.
 
+>   __[Issue #13](https://github.com/marrus-sh/laboratory/issues/13) :__
+>   The purpose and functioning of `LaboratoryAuthorizationGranted` may change radically (or the event might be removed) at some point in the future.
+
  - - -
 
 ##  Implementation  ##
@@ -1839,10 +1869,12 @@ Alternatively, you can pass an `Authorization` object to `LaboratoryAuthorizatio
 ###  Recalling the origin:
 
 Only one authorization attempt can be made at a time, since it is made in a named window.
-We recall the origin of this attempt using the local `recalledOrigin` variable.
+`recalledOrigin`, `recalledClient`, and `recalledSecret` remember these values from between when authorization is requested and when it is granted.
 
     do ->
-        recalledOrigin = null
+        recalledOrigin = undefined
+        recalledClient = undefined
+        recalledSecret = undefined
 
 ###  Creating the events:
 
@@ -1920,6 +1952,8 @@ The actual token requesting takes place after authorization has been granted by 
                         ).join "&"
                     ), "LaboratoryOAuth"
                     recalledOrigin = origin
+                    recalledClient = clientID
+                    recalledSecret = clientSecret
                     return
 
 We can only make our request once we have been registered as a client.
@@ -1976,6 +2010,9 @@ If we aren't able to acquire a client ID within 30 seconds, we timeout.
 
 ####  `LaboratoryAuthorizationGranted`.
 
+>   __[Issue #13](https://github.com/marrus-sh/laboratory/issues/13) :__
+>   This event may change radically (or be removed) in the future.
+
 The `LaboratoryAuthorizationGranted` handler does the *actual* requesting of an access token, using the authorization code in its `detail`.
 It then attempts to verify the access token through a simple request to `/api/v1/accounts/verify_credentials`.
 If this succeeds, then it will respond with the `Authorization`.
@@ -2004,11 +2041,6 @@ We'll only use these initial values if an `accessToken` was directly provided, o
                 ) else ""
                 datetime = NaN
                 tokenType = "bearer"
-
-We use our `origin` to get our redirect, client id, and secret.
-We only need these if we were provided with a `code`.
-
-                [redirect, clientID, clientSecret] = (localStorage.getItem "Laboratory | " + origin).split " ", 5 if localStorage?.getItem "Laboratory | " + origin
 
 The function `verify()` will attempt to verify our access token.
 The response should be an account object.
@@ -2039,6 +2071,16 @@ If we were given an access token then we can go ahead and verify now.
 Otherwise we first have to acquire one.
 
                 else if code = event.detail.code
+
+We grab our client id and secret from our recalled values if possible, or localStorage otherwise.
+
+                    if origin = recalledOrigin
+                        clientID = recalledClient
+                        cleintSecret = recalledSecret
+                    else [redirect, clientID, clientSecret] = (localStorage.getItem "Laboratory | " + origin).split " ", 5 if localStorage?.getItem "Laboratory | " + origin
+
+Here we make the actual request.
+
                     onComplete = (response, data, params) ->
                         accessToken = response.access_token
                         datetime = new Date response.created_at
@@ -2061,9 +2103,9 @@ If we weren't given an `accessToken` *or* a `code`, that's an error.
 
                 else dispatch "LaboratoryAuthorizationFailed", new Failure "No authorization code or access token was granted", "LaboratoryAuthorizationRequested"
 
-We can now reset our recalled origin.
+We can now reset our recalled variables.
 
-                recalledOrigin = null
+                recalledOrigin = recalledClient = recalledSecret = undefined
                 return
 
 ####  `LaboratoryAuthorizationReceived`.
@@ -2079,7 +2121,7 @@ It also exposes it to the window through `Exposed`.
 
 - - -
 
-<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.3.1</i> <br> <code>API/Client.litcoffee</code></p>
+<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.4.0</i> <br> <code>API/Client.litcoffee</code></p>
 
 #  CLIENT EVENTS  #
 
@@ -2185,7 +2227,7 @@ Now we can send our request.
 
 - - -
 
-<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.3.1</i> <br> <code>API/Initialization.litcoffee</code></p>
+<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.4.0</i> <br> <code>API/Initialization.litcoffee</code></p>
 
 #  INITIALIZATION EVENTS  #
 
@@ -2250,7 +2292,7 @@ Laboratory Initialization events do not have handlers.
 
 - - -
 
-<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.3.1</i> <br> <code>API/Post.litcoffee</code></p>
+<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.4.0</i> <br> <code>API/Post.litcoffee</code></p>
 
 #  POST EVENTS  #
 
@@ -2447,6 +2489,9 @@ The `LaboratoryPostCreation` event attempts to create a new status, and fires a 
 
 The `LaboratoryPostDeletion` event attempts to delete an existing status.
 
+>   __[Issue #21](https://github.com/marrus-sh/laboratory/issues/21) :__
+>   There needs to be better responses and error checking with regards to post deletion.
+
         .handle "LaboratoryPostDeletion", (event) ->
 
             unless isFinite id = Number event.detail.id
@@ -2519,7 +2564,7 @@ We'll only send the request if the values differ.
 
 - - -
 
-<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.3.1</i> <br> <code>API/Profile.litcoffee</code></p>
+<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.4.0</i> <br> <code>API/Profile.litcoffee</code></p>
 
 #  PROFILE EVENTS  #
 
@@ -2704,7 +2749,7 @@ Otherwise (if we don't have a profile on file), we have no choice but to send a 
 
 - - -
 
-<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.3.1</i> <br> <code>API/Request.litcoffee</code></p>
+<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.4.0</i> <br> <code>API/Request.litcoffee</code></p>
 
 #  REQUEST EVENTS  #
 
@@ -2760,7 +2805,7 @@ Laboratory Request events do not have handlers.
 
 - - -
 
-<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.3.1</i> <br> <code>API/Rolodex.litcoffee</code></p>
+<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.4.0</i> <br> <code>API/Rolodex.litcoffee</code></p>
 
 #  ROLODEX EVENTS  #
 
@@ -2769,6 +2814,9 @@ Laboratory Request events do not have handlers.
 ##  Description  ##
 
 The __Rolodex__ module of the Laboratory API is comprised of those events which are related to rolodexes of Mastodon accounts.
+
+>   __[Issue #15](https://github.com/marrus-sh/laboratory/issues/15) :__
+>   This module of the Laboratory API may change radically, or be removed, in the future.
 
 ###  Quick reference:
 
@@ -2839,6 +2887,9 @@ The `LaboratoryRolodexRequested` event requests an account from the Mastodon API
 When our list of accounts is received, we'll process it and call a `LaboratoryRolodexReceived` event with the resulting `Rolodex`.
 We'll also dispatch a `LaboratoryProfileReceived` event with each profile contained in the response.
 
+>   __[Issue #27](https://github.com/marrus-sh/laboratory/issues/27) :__
+>   This event should instead be dispatched from the `Rolodex` constructor.
+
             onComplete = (response, data, params) ->
                 ids = []
                 dispatch "LaboratoryProfileReceived", account for account in response when (ids.indexOf account.id) is -1 and ids.push account.id
@@ -2884,7 +2935,7 @@ Note that `serverRequest` ignores data parameters which have a value of `undefin
 
 - - -
 
-<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.3.1</i> <br> <code>API/Timeline.litcoffee</code></p>
+<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.4.0</i> <br> <code>API/Timeline.litcoffee</code></p>
 
 #  TIMELINE EVENTS  #
 
@@ -2893,6 +2944,9 @@ Note that `serverRequest` ignores data parameters which have a value of `undefin
 ##  Description  ##
 
 The __Timeline__ module of the Laboratory API is comprised of those events which are related to timelines of Mastodon accounts.
+
+>   __[Issue #15](https://github.com/marrus-sh/laboratory/issues/15) :__
+>   This module of the Laboratory API may change radically, or be removed, in the future.
 
 ###  Quick reference:
 
@@ -2959,6 +3013,9 @@ The `LaboratoryTimelineRequested` event requests an account from the Mastodon AP
 When our list of accounts is received, we'll process it and call a `LaboratoryTimelineReceived` event with the resulting `Timeline`.
 We'll also dispatch a `LaboratoryPostReceived` event with each post contained in the response, and a `LaboratoryProfileReceived` containing the profile data of each post author and mention.
 
+>   __[Issue #27](https://github.com/marrus-sh/laboratory/issues/27) :__
+>   These events should instead be dispatched from the `Timeline` constructor.
+
 >   __Note :__
 >   In order to prevent duplicates, `LaboratoryPostReceived` only fires for unique ids in the API response.
 >   While it is possible for a status to have the same id as a (different) notification, we don't need to worry about this since statuses and notifications are never grouped together by the Mastodon API.
@@ -3023,7 +3080,7 @@ Note that `serverRequest` ignores data parameters which have a value of `undefin
 
 - - -
 
-<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.3.1</i> <br> <code>INSTALLING.litcoffee</code></p>
+<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.4.0</i> <br> <code>INSTALLING.litcoffee</code></p>
 
 #  USING LABORATORY  #
 
