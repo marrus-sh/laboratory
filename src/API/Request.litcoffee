@@ -1,6 +1,4 @@
-_Laboratory_<br>
-Source Code and Documentation<br>
-API Version: _0.3.1_
+<p align="right">_Laboratory_ <br> Source Code and Documentation <br> API Version: _0.3.1_</p>
 
 #  REQUEST EVENTS  #
 
