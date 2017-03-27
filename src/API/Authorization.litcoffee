@@ -47,10 +47,12 @@ Alternatively, you can pass an `Authorization` object to `LaboratoryAuthorizatio
 ###  Recalling the origin:
 
 Only one authorization attempt can be made at a time, since it is made in a named window.
-We recall the origin of this attempt using the local `recalledOrigin` variable.
+`recalledOrigin`, `recalledClient`, and `recalledSecret` remember these values from between when authorization is requested and when it is granted.
 
     do ->
-        recalledOrigin = null
+        recalledOrigin = undefined
+        recalledClient = undefined
+        recalledSecret = undefined
 
 ###  Creating the events:
 
@@ -128,6 +130,8 @@ The actual token requesting takes place after authorization has been granted by 
                         ).join "&"
                     ), "LaboratoryOAuth"
                     recalledOrigin = origin
+                    recalledClient = clientID
+                    recalledSecret = clientSecret
                     return
 
 We can only make our request once we have been registered as a client.
@@ -213,11 +217,6 @@ We'll only use these initial values if an `accessToken` was directly provided, o
                 datetime = NaN
                 tokenType = "bearer"
 
-We use our `origin` to get our redirect, client id, and secret.
-We only need these if we were provided with a `code`.
-
-                [redirect, clientID, clientSecret] = (localStorage.getItem "Laboratory | " + origin).split " ", 5 if localStorage?.getItem "Laboratory | " + origin
-
 The function `verify()` will attempt to verify our access token.
 The response should be an account object.
 
@@ -247,6 +246,16 @@ If we were given an access token then we can go ahead and verify now.
 Otherwise we first have to acquire one.
 
                 else if code = event.detail.code
+
+We grab our client id and secret from our recalled values if possible, or localStorage otherwise.
+
+                    if origin = recalledOrigin
+                        clientID = recalledClient
+                        cleintSecret = recalledSecret
+                    else [redirect, clientID, clientSecret] = (localStorage.getItem "Laboratory | " + origin).split " ", 5 if localStorage?.getItem "Laboratory | " + origin
+
+Here we make the actual request.
+
                     onComplete = (response, data, params) ->
                         accessToken = response.access_token
                         datetime = new Date response.created_at
@@ -269,9 +278,9 @@ If we weren't given an `accessToken` *or* a `code`, that's an error.
 
                 else dispatch "LaboratoryAuthorizationFailed", new Failure "No authorization code or access token was granted", "LaboratoryAuthorizationRequested"
 
-We can now reset our recalled origin.
+We can now reset our recalled variables.
 
-                recalledOrigin = null
+                recalledOrigin = recalledClient = recalledSecret = undefined
                 return
 
 ####  `LaboratoryAuthorizationReceived`.
