@@ -195,6 +195,9 @@ The `LaboratoryPostCreation` event attempts to create a new status, and fires a 
 
 The `LaboratoryPostDeletion` event attempts to delete an existing status.
 
+>   __[Issue #21](https://github.com/marrus-sh/laboratory/issues/21) :__
+>   There needs to be better responses and error checking with regards to post deletion.
+
         .handle "LaboratoryPostDeletion", (event) ->
 
             unless isFinite id = Number event.detail.id

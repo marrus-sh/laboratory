@@ -9,6 +9,9 @@
 The `Rolodex()` constructor creates a unique, read-only object which represents a list of [`Profile`](Profile.litcoffee)s.
 Its properties are summarized below, alongside their Mastodon API equivalents:
 
+>   __[Issue #15](https://github.com/marrus-sh/laboratory/issues/15) :__
+>   The object returned by this constructor might be radically different in future versions of Laboratory.
+
 |  Property  |  API Response  | Description |
 | :--------: | :------------: | :---------- |
 | `profiles` | [The response] | An ordered array of profiles, in reverse-chronological order |
@@ -22,6 +25,9 @@ Note that `before` and `after` are special identifiers which may depend on the `
 ###  Rolodex types:
 
 The possible `Rolodex.Type`s are as follows:
+
+>   __[Issue #18](https://github.com/marrus-sh/laboratory/issues/18) :__
+>   There should also be a follow-request rolodex.
 
 | Enumeral | Hex Value | Description |
 | :------: | :----------: | :---------- |
@@ -106,6 +112,9 @@ The following loop removes any duplicates from our `data`.
 Finally, we implement our list of `profiles` as getters such that they always return the most current data.
 **Note that this will likely prevent optimization of the `profiles` array, so it is recommended that you make a static copy (using `Array.prototype.slice()` or similar) before doing intensive array operations with it.**
 
+>   __[Issue #28](https://github.com/marrus-sh/laboratory/issues/28) :__
+>   At some point in the future, `Rolodex` might instead be implemented using a linked list.
+
         @profiles = []
         Object.defineProperty @profiles, index, {get: getProfile.bind(this, value.id), enumerable: true} for value, index in data
         Object.freeze @profiles
@@ -180,6 +189,9 @@ Its `data` argument can be either a `Profile`, an array thereof, or a `Rolodex`.
 ###  Defining rolodex types:
 
 Here we define our `Rolodex.Type`s, as described above:
+
+>   __[Issue #18](https://github.com/marrus-sh/laboratory/issues/18) :__
+>   There should also be a follow-request rolodex.
 
     Rolodex.Type = Enumeral.generate
         UNDEFINED     : 0x00

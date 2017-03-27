@@ -8,6 +8,9 @@
 
 The __Timeline__ module of the Laboratory API is comprised of those events which are related to timelines of Mastodon accounts.
 
+>   __[Issue #15](https://github.com/marrus-sh/laboratory/issues/15) :__
+>   This module of the Laboratory API may change radically, or be removed, in the future.
+
 ###  Quick reference:
 
 | Event | Description |
@@ -72,6 +75,9 @@ The `LaboratoryTimelineRequested` event requests an account from the Mastodon AP
 
 When our list of accounts is received, we'll process it and call a `LaboratoryTimelineReceived` event with the resulting `Timeline`.
 We'll also dispatch a `LaboratoryPostReceived` event with each post contained in the response, and a `LaboratoryProfileReceived` containing the profile data of each post author and mention.
+
+>   __[Issue #27](https://github.com/marrus-sh/laboratory/issues/27) :__
+>   These events should instead be dispatched from the `Timeline` constructor.
 
 >   __Note :__
 >   In order to prevent duplicates, `LaboratoryPostReceived` only fires for unique ids in the API response.

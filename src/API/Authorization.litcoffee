@@ -40,6 +40,9 @@ Its `detail` will contain either a `code` or an `accessToken`, alongside an opti
 If you have somehow acquired an access token from somewhere else, passing this value to `LaboratoryAuthorizationGranted` alongside its origin and scope will allow Laboratory to use it as well.
 Alternatively, you can pass an `Authorization` object to `LaboratoryAuthorizationReceived`, but note that doing so requires more information.
 
+>   __[Issue #13](https://github.com/marrus-sh/laboratory/issues/13) :__
+>   The purpose and functioning of `LaboratoryAuthorizationGranted` may change radically (or the event might be removed) at some point in the future.
+
  - - -
 
 ##  Implementation  ##
@@ -187,6 +190,9 @@ If we aren't able to acquire a client ID within 30 seconds, we timeout.
                 return
 
 ####  `LaboratoryAuthorizationGranted`.
+
+>   __[Issue #13](https://github.com/marrus-sh/laboratory/issues/13) :__
+>   This event may change radically (or be removed) in the future.
 
 The `LaboratoryAuthorizationGranted` handler does the *actual* requesting of an access token, using the authorization code in its `detail`.
 It then attempts to verify the access token through a simple request to `/api/v1/accounts/verify_credentials`.

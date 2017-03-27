@@ -56,10 +56,13 @@ This code can be used to forget the previous association:
 
 Laboratory Events are broken up into three general categories: __requests__, __responses__, and __failures__.
 (There are a few miscellaneous events which don't fall into one of these categories, but they are few and far between.)
-Requests usually have names like "LaboratorySomethingRequested", responses usually have names like "LaboratorySomethingReceived", and failures usually have names like "LaboratorySomethingFailed".
+Requests usually have names like `LaboratorySomethingRequested`, responses usually have names like `LaboratorySomethingReceived`, and failures usually have names like `LaboratorySomethingFailed`.
 Typically, you will dispatch requests, and listen for their associated responses (or failures if the response doesn't go through).
 Of course, there is nothing stopping you from dispatching your own responses and failures, or from listening for others' requests.
 However, generally speaking this should not be necessary.
+
+>   __[Issue #4](https://github.com/marrus-sh/laboratory/issues/4) :__
+>   Events of the form `LaboratorySomethingFailed` will probably be consolidated into a single `LaboratoryFailure` event at some point in the future.
 
 ####  Event promises.
 

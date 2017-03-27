@@ -8,6 +8,9 @@
 
 The __Rolodex__ module of the Laboratory API is comprised of those events which are related to rolodexes of Mastodon accounts.
 
+>   __[Issue #15](https://github.com/marrus-sh/laboratory/issues/15) :__
+>   This module of the Laboratory API may change radically, or be removed, in the future.
+
 ###  Quick reference:
 
 | Event | Description |
@@ -76,6 +79,9 @@ The `LaboratoryRolodexRequested` event requests an account from the Mastodon API
 
 When our list of accounts is received, we'll process it and call a `LaboratoryRolodexReceived` event with the resulting `Rolodex`.
 We'll also dispatch a `LaboratoryProfileReceived` event with each profile contained in the response.
+
+>   __[Issue #27](https://github.com/marrus-sh/laboratory/issues/27) :__
+>   This event should instead be dispatched from the `Rolodex` constructor.
 
             onComplete = (response, data, params) ->
                 ids = []

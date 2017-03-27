@@ -9,6 +9,9 @@
 The `Timeline()` constructor creates a unique, read-only object which represents a Mastodon timeline.
 Its properties are summarized below, alongside their Mastodon API equivalents:
 
+>   __[Issue #15](https://github.com/marrus-sh/laboratory/issues/15) :__
+>   The object returned by this constructor might be radically different in future versions of Laboratory.
+
 | Property |  API Response  | Description |
 | :------: | :------------: | :---------- |
 | `posts`  | [The response] | An ordered array of posts in the timeline, in reverse-chronological order |
@@ -20,6 +23,9 @@ Its properties are summarized below, alongside their Mastodon API equivalents:
 ###  Timeline types:
 
 The possible `Timeline.Type`s are as follows:
+
+>   __[Issue #16](https://github.com/marrus-sh/laboratory/issues/16) :__
+>   Hashtag searches can also be global/local, so the values of these enumerals may change at some point in the future.
 
 | Enumeral | Hex Value | Description |
 | :------: | :----------: | :---------- |
@@ -126,6 +132,9 @@ Next we walk the array and look for any duplicates, removing them.
 Finally, we implement our list of `posts` as getters such that they always return the most current data.
 **Note that this will likely prevent optimization of the `posts` array, so it is recommended that you make a static copy (using `Array.prototype.slice()` or similar) before doing intensive array operations with it.**
 
+>   __[Issue #28](https://github.com/marrus-sh/laboratory/issues/28) :__
+>   At some point in the future, `Timeline` might instead be implemented using a linked list.
+
         @posts = []
         Object.defineProperty @posts, index, {get: getPost.bind(this, value.id, isNotification value), enumerable: true} for value, index in data
         Object.freeze @posts
@@ -200,6 +209,9 @@ Its `data` argument can be either a `Post`, an array thereof, or a `Timeline`.
 ###  Defining timeline types:
 
 Here we define our `Timeline.Type`s, as described above:
+
+>   __[Issue #16](https://github.com/marrus-sh/laboratory/issues/16) :__
+>   Hashtag searches can also be global/local, so the values of these enumerals may change at some point in the future.
 
     Timeline.Type = Enumeral.generate
         UNDEFINED     : 0x00
