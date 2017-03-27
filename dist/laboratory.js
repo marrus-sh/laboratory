@@ -14,14 +14,14 @@
              Source code available at:
       https://github.com/marrus-sh/laboratory
   
-                  Version 0.3.0
+                  Version 0.3.1
    */
   var Application, Attachment, Authorization, Client, Enumeral, Exposed, Failure, Laboratory, LaboratoryEvent, Post, Profile, Rolodex, Store, Timeline, dispatch, fn, forget, listen, prop, request, run, serverRequest,
     hasProp = {}.hasOwnProperty;
 
   Laboratory = {
     ℹ: "https://github.com/marrus-sh/laboratory",
-    Nº: 3.0
+    Nº: 3.1
   };
 
   (function() {
@@ -30,7 +30,6 @@
       return;
     }
     Mommy.dispatch("LaboratoryAuthorizationGranted", {
-      window: window,
       code: code
     });
   })();
@@ -1027,8 +1026,7 @@
       code: void 0,
       accessToken: void 0,
       origin: void 0,
-      scope: Authorization.Scope.NONE,
-      window: void 0
+      scope: Authorization.Scope.NONE
     }).handle("LaboratoryAuthorizationRequested", function(event) {
       var a, accessToken, clientID, clientSecret, handleClient, makeRequest, origin, redirect, ref, scope, storedRedirect, storedScope, timeout;
       if (!((scope = event.detail.scope) instanceof Authorization.Scope)) {
@@ -1110,9 +1108,7 @@
       }
     }).handle("LaboratoryAuthorizationGranted", function(event) {
       var accessToken, clientID, clientSecret, code, datetime, onComplete, onError, origin, redirect, ref, scope, tokenType, verify;
-      if (event.detail.window) {
-        event.detail.window.close();
-      }
+      (window.open("about:blank", "LaboratoryOAuth")).close();
       if (!(origin = event.detail.origin || recalledOrigin)) {
         dispatch("LaboratoryAuthorizationFailed", new Failure("Authorization data wasn't associated with an origin", "LaboratoryAuthorizationRequested"));
         return;

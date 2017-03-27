@@ -1,19 +1,23 @@
-> From [/src/README.litcoffee](../src/README.litcoffee) :
+<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.3.1</i> <br> <code>API/README.litcoffee</code></p>
 
-#  README  #
+#  INTRODUCTION  #
+
+ - - -
+
+##  Description  ##
 
 Welcome to the Laboratory source code!
 Laboratory is an open-source, client-side engine for Mastodon written in Literate CoffeeScript.
 Its source files are parseable as regular Markdown documents, and this file is in fact part of the Laboratory source!
 
-##  How to Read Laboratory Source Code  ##
+###  How to read Laboratory source code:
 
 Each Laboratory source code file is broadly split up into two parts: the *description*, which describes what the file does and how to use it, and the *implementation*, which actually implements the described algorithms and processes.
 The implementation will always be the last section in the document, and it is the one that it is safest to ignore—any important information should have already been covered in the description of what goes on in the file.
 However, you can turn to the implementation if you are curious on how specific Laboratory features are actually coded.
 (And, of course, if you are a computer, the compiled implementation is the only part of this file you will ever see!)
 
-###  What to read:
+####  What to read.
 
 If you're looking to use Laboratory in your project, then you should definitely familiarize yourself with the [Events API](API/), as this is the primary means of interfacing with the Laboratory engine.
 Each file of the API provides a different module, and you should probably take a look at the descriptions for each.
@@ -21,6 +25,16 @@ These will give you an overview of each API component and direct you towards fur
 
 The [Constructors](Constructors/) documentation provides details on the various data types you might encounter while interacting with Laboratory.
 You should turn to these files whenever you are unclear on what specific properties or methods an object provides.
+
+####  Notable conventions.
+
+Laboratory contains a number of constructors, functions, and objects which are made available on the `window.Laboratory` object.
+For simplicity's sake, this documentation omits the `Laboratory` part in prose; for example, `Laboratory.Authorization` will be referred to as `Authorization` and `Laboratory.dispatch()` will be represented as `dispatch()`.
+In code examples, the `Laboratory` prefix should be included.
+
+Laboratory follows the conventions set forward in the [Laboratory Style Guide](https://github.com/marrus-sh/laboratory-style).
+
+ - - -
 
 ##  Implementation  ##
 
@@ -49,7 +63,7 @@ This is the first file in our compiled source, so let's identify ourselves real 
                Source code available at:
         https://github.com/marrus-sh/laboratory
 
-                    Version 0.3.0
+                    Version 0.3.1
 
     ###
 
@@ -64,7 +78,7 @@ Laboratory thus assures that minor and patch numbers will never exceed `99` (ind
 
     Laboratory =
         ℹ: "https://github.com/marrus-sh/laboratory"
-        Nº: 3.0
+        Nº: 3.1
 
 ###  Popup handling:
 
@@ -72,7 +86,7 @@ If this is a popup (`window.opener.Laboratory` exists) and an API redirect (a `c
 
     do ->
         return unless (code = (location.search.match(/code=([^&]*)/) || [])[1]) and Mommy = window.opener.Laboratory
-        Mommy.dispatch "LaboratoryAuthorizationGranted", {window, code}
+        Mommy.dispatch "LaboratoryAuthorizationGranted", {code}
         return
 
 ###  API and exposed properties:
@@ -208,9 +222,13 @@ We can now add our event listener and send the request.
 
 - - -
 
-> From [/src/Constructors/README.litcoffee](../src/Constructors/README.litcoffee) :
+<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.3.1</i> <br> <code>Constructors/README.litcoffee</code></p>
 
 #  LABORATORY CONSTRUCTORS  #
+
+ - - -
+
+##  Description  ##
 
 The data received from Laboratory event responses is processed and converted into one of several object types before it makes its way to users.
 This process is handled by __Laboratory constructors,__ which define the basic data types used when interacting with the API.
@@ -229,17 +247,27 @@ The Laboratory constructors are as follows:
 - [__Rolodex__](Rolodex.litcoffee)
 - [__Timeline__](Timeline.litcoffee)
 
+###  API spoofing:
+
+Most Laboratory constructors expect a Mastodon API response as their first argument.
+If you find yourself needing to call them yourself (to dispatch your own `Post`s, for example), then you should feed them an object that matches what would be sent out by the Mastodon server.
+See the [Mastodon API documentation](https://github.com/tootsuite/mastodon/blob/master/docs/Using-the-API/API.md) for details on what these objects look like.
+
+ - - -
+
 ##  Implementation  ##
 
 See specific constructor pages for details on their implementation.
 
 - - -
 
-> From [/src/Constructors/Enumeral.litcoffee](../src/Constructors/Enumeral.litcoffee) :
+<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.3.1</i> <br> <code>Constructors/Enumeral.litcoffee</code></p>
 
 #  LABORATORY ENUMERALS  #
 
-##  Introduction  ##
+ - - -
+
+##  Description  ##
 
 If you have experience working with JavaScript and the DOM, you may have encountered DOM attributes whose values are described by an enumerated type.
 For example, `Node.NodeType` can have values which include `Node.ELEMENT_NODE`, with a value of `1`, and `Node.TEXT_NODE`, with a value of `3`.
@@ -260,7 +288,7 @@ They aim to accomplish these things:
 4.  **Guarantee uniqueness of value.**
     It is guaranteed that no two enumerals of a given type will share the same value.
 
-##  Enumeral Types  ##
+###  Enumeral types:
 
 Enumeral types can be created by calling `Enumeral.generate()` with an object whose properties and values give the names and values for the resultant enumerals, like so:
 
@@ -277,15 +305,17 @@ Enumeral types can be created by calling `Enumeral.generate()` with an object wh
 
 Further discussion of specific enumeral types takes place in the various files in which they are defined.
 
-###  `fromValue()`:
+####  `fromValue()`.
 
 >   ```javascript
->       Type.fromValue(n);
+>       MyType.fromValue(n);
 >   ```
 >
 >   - __`n` :__ An integer value
 
 The `fromValue()` method of an enumeral type can be used to get the enumeral associated with the given value.
+
+ - - -
 
 ##  Implementation  ##
 
@@ -355,11 +385,13 @@ We can now freeze our enumerals and return them.
 
 - - -
 
-> From [/src/Constructors/Application.litcoffee](../src/Constructors/Application.litcoffee) :
+<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.3.1</i> <br> <code>Constructors/Application.litcoffee</code></p>
 
 #  THE APPLICATION CONSTRUCTOR  #
 
-##  Introduction  ##
+ - - -
+
+##  Description  ##
 
 The `Application()` constructor creates a unique, read-only object which represents an application used to interface with the Mastodon API.
 Its properties are summarized below, alongside their Mastodon API equivalents:
@@ -368,6 +400,8 @@ Its properties are summarized below, alongside their Mastodon API equivalents:
 | :------: | :----------: | :---------- |
 |  `name`  |    `name`    | The name of the application |
 |  `href`  |  `website`   | The url of the application's homepage or website |
+
+ - - -
 
 ##  Implementation  ##
 
@@ -395,11 +429,13 @@ The `Application` prototype just inherits from `Object`.
 
 - - -
 
-> From [/src/Constructors/Attachment.litcoffee](../src/Constructors/Attachment.litcoffee) :
+<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.3.1</i> <br> <code>Constructors/Attachment.litcoffee</code></p>
 
 #  THE ATTACHMENT CONSTRUCTOR  #
 
-##  Introduction  ##
+ - - -
+
+##  Description  ##
 
 The `Attachment()` constructor creates a unique, read-only object which represents an attached piece of media sent through the Mastodon API.
 Its properties are summarized below, alongside their Mastodon API equivalents:
@@ -421,6 +457,8 @@ The possible `Attachment.Type`s are as follows:
 | `Attachment.Type.PHOTO` | `01` | The media is a photo |
 | `Attachment.Type.VIDEO` | `10` | The media is a video |
 | `Attachment.Type.GIFV` | `11` | The media is a gif-video |
+
+ - - -
 
 ##  Implementation  ##
 
@@ -464,11 +502,13 @@ Here we define our `Attachment.Type`s, as described above:
 
 - - -
 
-> From [/src/Constructors/Authorization.litcoffee](../src/Constructors/Authorization.litcoffee) :
+<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.3.1</i> <br> <code>Constructors/Authorization.litcoffee</code></p>
 
 #  THE AUTHORIZATION CONSTRUCTOR  #
 
-##  Introduction  ##
+ - - -
+
+##  Description  ##
 
 The `Authorization()` constructor creates a unique, read-only object which represents a successful authorization request.
 Its properties are summarized below, alongside their Mastodon API equivalents:
@@ -496,6 +536,8 @@ The possible `Authorization.Scope`s are as follows:
 | `Authorization.Scope.READFOLLOW` | `101` | The scope is `"read follow"` |
 | `Authorization.Scope.WRITEFOLLOW` | `110` | The scope is `"write follow"` |
 | `Authorization.Scope.READWRITEFOLLOW` | `111` | The scope is `"read write follow"` |
+
+ - - -
 
 ##  Implementation  ##
 
@@ -542,11 +584,13 @@ Here we define our `Authorization.Scope`s, as described above:
 
 - - -
 
-> From [/src/Constructors/Client.litcoffee](../src/Constructors/Client.litcoffee) :
+<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.3.1</i> <br> <code>Constructors/Client.litcoffee</code></p>
 
 #  THE CLIENT CONSTRUCTOR  #
 
-##  Introduction  ##
+ - - -
+
+##  Description  ##
 
 The `Client()` constructor creates a unique, read-only object which represents a registered Mastodon client.
 It is unlikely you will ever need to call this constructor yourself.
@@ -561,6 +605,8 @@ Its properties are summarized below, alongside their Mastodon API equivalents:
 | `clientSecret` | `client_secret` | The private (secret) id of the client |
 |    `scope`     | *Not provided*  | The [`Authorization.Scope`](Authorization.litcoffee) associated with the client |
 |   `redirect`   | `redirect_uri`  | The redirect URL associated with the client |
+
+ - - -
 
 ##  Implementation  ##
 
@@ -594,11 +640,13 @@ The `Client` prototype just inherits from `Object`.
 
 - - -
 
-> From [/src/Constructors/Failure.litcoffee](../src/Constructors/Failure.litcoffee) :
+<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.3.1</i> <br> <code>Constructors/Timeline.litcoffee</code></p>
 
 #  THE FAILURE CONSTRUCTOR  #
 
-##  Introduction  ##
+ - - -
+
+##  Description  ##
 
 The `Failure()` constructor creates a unique, read-only object which represents a failed request.
 Its properties are summarized below, alongside their Mastodon API equivalents:
@@ -608,6 +656,8 @@ Its properties are summarized below, alongside their Mastodon API equivalents:
 |  `error`  |    `error`     | The text of the error |
 |  `code`   | *Not provided* | The HTTP access code of the error, if applicable |
 | `request` | *Not provided* | The request which failed |
+
+ - - -
 
 ##  Implementation  ##
 
@@ -637,11 +687,13 @@ The `Failure` prototype just inherits from `Object`.
 
 - - -
 
-> From [/src/Constructors/Post.litcoffee](../src/Constructors/Post.litcoffee) :
+<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.3.1</i> <br> <code>Constructors/Post.litcoffee</code></p>
 
 #  THE POST CONSTRUCTOR  #
 
-##  Introduction  ##
+ - - -
+
+##  Description  ##
 
 The `Post()` constructor creates a unique, read-only object which represents an account's profile information.
 Its properties are summarized below, alongside their Mastodon API equivalents:
@@ -705,9 +757,9 @@ However, note that `Visibility.LISTED` (`0x02`) is not a valid visibility for a 
 
 The visibility of the post can be evaluating using bitwise comparisons: `visibility & Post.Visibility.LISTED` will detect whether a post is listed or unlisted, for example.
 
-##  Prototype Methods  ##
+###  Prototype methods:
 
-###  `compare()`:
+####  `compare()`.
 
 >   ```javascript
 >       Laboratory.Post.prototype.compare(post);
@@ -717,6 +769,8 @@ The visibility of the post can be evaluating using bitwise comparisons: `visibil
 
 The `compare()` prototype method compares a `Post` with another and returns `true` if they have the same properties.
 For efficiency, if two `Post`s have the same `id` then `compare()` will only test those properties which are likely to change.
+
+ - - -
 
 ##  Implementation  ##
 
@@ -859,11 +913,13 @@ Here we define our enumerals as described above.
 
 - - -
 
-> From [/src/Constructors/Profile.litcoffee](../src/Constructors/Profile.litcoffee) :
+<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.3.1</i> <br> <code>Constructors/Profile.litcoffee</code></p>
 
 #  THE PROFILE CONSTRUCTOR  #
 
-##  Introduction  ##
+ - - -
+
+##  Description  ##
 
 The `Profile()` constructor creates a unique, read-only object which represents an account's profile information.
 Its properties are summarized below, alongside their Mastodon API equivalents:
@@ -921,9 +977,9 @@ Of course, many combinations are not possible.
 | `01000000` | `Profile.Relationship.UNKNOWN` | The relationship status between the user and the account is unknown |
 | `10000000` | `Profile.Relationship.SELF` | The user is the same as the account |
 
-##  Prototype Methods  ##
+###  Prototype methods:
 
-###  `compare()`:
+####  `compare()`.
 
 >   ```javascript
 >       Laboratory.Profile.prototype.compare(profile);
@@ -932,6 +988,8 @@ Of course, many combinations are not possible.
 >   - __`profile` :__ A `Profile` to compare with
 
 The `profile()` prototype method compares a `Profile` with another and returns `true` if they have the same properties.
+
+ - - -
 
 ##  Implementation  ##
 
@@ -1034,11 +1092,13 @@ Here we define profile relationships, as specified above.
 
 - - -
 
-> From [/src/Constructors/Rolodex.litcoffee](../src/Constructors/Rolodex.litcoffee) :
+<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.3.1</i> <br> <code>Constructors/Rolodex.litcoffee</code></p>
 
 #  THE ROLODEX CONSTRUCTOR  #
 
-##  Introduction  ##
+ - - -
+
+##  Description  ##
 
 The `Rolodex()` constructor creates a unique, read-only object which represents a list of [`Profile`](Profile.litcoffee)s.
 Its properties are summarized below, alongside their Mastodon API equivalents:
@@ -1070,9 +1130,9 @@ The possible `Rolodex.Type`s are as follows:
 
 The `Rolodex()` constructor does not use or remember its `Rolodex.Type`, but these values are used when requesting new `Rolodex`es using `LaboratoryRolodexRequested`.
 
-##  Prototype Methods ##
+###  Prototype methods:
 
-###  `join()`:
+####  `join()`.
 
 >   ```javascript
 >       Laboratory.Rolodex.prototype.join(data);
@@ -1086,7 +1146,7 @@ Otherwise, the `type` of the resultant `Rolodex` will be `Rolodex.Type.UNDEFINED
 
 When joining a `Rolodex` with a different data type, the `type`, `query`, `before`, and `after` parameters remain unchanged.
 
-###  `remove()`:
+####  `remove()`.
 
 >   ```javascript
 >       Laboratory.Rolodex.prototype.remove(data);
@@ -1096,6 +1156,8 @@ When joining a `Rolodex` with a different data type, the `type`, `query`, `befor
 
 The `remove()` prototype method collects the `Profile`s of a `Rolodex` except for those of the provided `data`, and returns a new `Rolodex` of the results.
 The `type`, `query`, `before`, and `after` parameters are preserved from the original.
+
+ - - -
 
 ##  Implementation  ##
 
@@ -1226,11 +1288,13 @@ Here we define our `Rolodex.Type`s, as described above:
 
 - - -
 
-> From [/src/Constructors/Timeline.litcoffee](../src/Constructors/Timeline.litcoffee) :
+<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.3.1</i> <br> <code>Constructors/Timeline.litcoffee</code></p>
 
 #  THE TIMELINE CONSTRUCTOR  #
 
-##  Introduction  ##
+ - - -
+
+##  Description  ##
 
 The `Timeline()` constructor creates a unique, read-only object which represents a Mastodon timeline.
 Its properties are summarized below, alongside their Mastodon API equivalents:
@@ -1260,9 +1324,9 @@ The possible `Timeline.Type`s are as follows:
 
 The `Timeline()` constructor does not use or remember its `Timeline.Type`, but these values are used when requesting new `Timeline`s using `LaboratoryTimelineRequested`.
 
-##  Prototype Methods ##
+###  Prototype methods:
 
-###  `join()`:
+####  `join()`.
 
 >   ```javascript
 >       Laboratory.Timeline.prototype.join(data);
@@ -1276,7 +1340,7 @@ Otherwise, the `type` of the resultant `Timeline` will be `Timeline.Type.UNDEFIN
 
 When joining a `Timeline` with a different data type, the `type`, `query`, `before`, and `after` parameters remain unchanged.
 
-###  `remove()`:
+####  `remove()`.
 
 >   ```javascript
 >       Laboratory.Timeline.prototype.remove(data);
@@ -1286,6 +1350,8 @@ When joining a `Timeline` with a different data type, the `type`, `query`, `befo
 
 The `remove()` prototype method collects the `Post`s of a timeline except for those of the provided `data`, and returns a new `Timeline` of the results.
 The `type`, `query`, `before`, and `after` parameters are preserved from the original.
+
+ - - -
 
 ##  Implementation  ##
 
@@ -1438,15 +1504,19 @@ Here we define our `Timeline.Type`s, as described above:
 
 - - -
 
-> From [/src/API/README.litcoffee](../src/API/README.litcoffee) :
+<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.3.1</i> <br> <code>API/README.litcoffee</code></p>
 
 #  LABORATORY EVENT API  #
+
+ - - -
+
+##  Description  ##
 
 Laboratory does not give you direct access to the information it receives from a Mastodon server.
 Instead, it makes this information available using a special __Event API,__ which is documented here.
 This page will provide the basics on the API and how it works, and then direct you to further resources for specific components.
 
-##  Understanding the Event API  ##
+###  Understanding the Event API:
 
 In order to understand Laboratory's Event API, you first need to understand how Laboratory stores its data.
 All of the information that Laboratory receives and keeps track of from a Mastodon server is kept within a single central __store,__ which is a large JavaScript object with numerous different parts.
@@ -1456,12 +1526,12 @@ However, unlike with Redux, many areas of Laboratory's store are left fully muta
 This means that the store can be quickly modified in-place to add and remove data.
 However, it also means that, in order to maintain the sanctity of its data, the Laboratory store can't be exposed to the public view.
 **Laboratory's store is declared inside of a closure for which there is no external access.**
-The only functions which are allowed to act on the Laboratory store are a collection of __Laboratory Event Handlers__ (colloquially, just "handlers"), which have been bound to the store and listen for Laboratory-specific events dispatched to the `document`.
+The only functions which are allowed to modify the Laboratory store are a collection of __Laboratory Event Handlers__ (colloquially, just "handlers"), which listen for Laboratory-specific events dispatched to the `document`.
 
-Consequently, the only means outside programs have to interact with the Laboratory store is through a series of pre-defined __Laboratory Events__, which can be issued, listened for, and logged by external parties.
+The only means outside programs have to interact with the Laboratory store is then through a series of pre-defined __Laboratory Events__, which can be issued, listened for, and logged by external parties.
 The Laboratory Event API describes these events and their function.
 
-##  Creating and Issuing Laboratory Events ##
+###  Creating and issuing Laboratory Events:
 
 Laboratory Events are implemented as DOM `CustomEvents`.
 Consequently, each event has just two pieces of information that you need to account for: its `type`, which identifies the event, and its `detail`, which is an object holding the event's data.
@@ -1488,7 +1558,7 @@ This code can be used to forget the previous association:
 >       Laboratory.forget("LaboratorySomethingReceived", callback);
 >   ```
 
-###  Three types of event:
+####  Three types of event.
 
 Laboratory Events are broken up into three general categories: __requests__, __responses__, and __failures__.
 (There are a few miscellaneous events which don't fall into one of these categories, but they are few and far between.)
@@ -1497,7 +1567,7 @@ Typically, you will dispatch requests, and listen for their associated responses
 Of course, there is nothing stopping you from dispatching your own responses and failures, or from listening for others' requests.
 However, generally speaking this should not be necessary.
 
-###  Event promises:
+####  Event promises.
 
 If your environment supports `Promise`s, then the `Laboratory.request()` function will handle the request/response/failure pipeline for you; for example:
 
@@ -1505,7 +1575,7 @@ If your environment supports `Promise`s, then the `Laboratory.request()` functio
 >       Laboratory.request("LaboratorySomethingRequested", detail).then(callback).else(onError);
 >   ```
 
-###  Event details:
+####  Event details.
 
 Dispatching most events requires calling `Laboratory.dispatch()` with not only a string specifying the event, but also a `detail`, which is an object containing additional event information.
 The kind of information expected by a `detail` varies from event to event, so be sure to check the documentation to see what is required.
@@ -1514,7 +1584,7 @@ When you listen for an event using `Laboratory.listen()`, the callback function 
 For responses, `detail`s will be instances of the modules to which the events belong; for example, the detail for a `LaboratoryProfileRequested` event is an instance of `Laboratory.Profile`.
 The `detail`s for failures are all objects of type `Laboratory.Failure`.
 
-##  Laboratory Event Reference  ##
+###  Laboratory Event reference:
 
 Laboratory Events are broken up into several __modules__, each of which is documented within its source.
 These are as follows:
@@ -1528,6 +1598,8 @@ These are as follows:
 - [__Attachment__](Attachment.litcoffee)
 - [__Post__](Post.litcoffee)
 - [__Timeline__](Timeline.litcoffee)
+
+ - - -
 
 ##  Implementation  ##
 
@@ -1636,11 +1708,13 @@ The `request()` function handles the listening and forgetting for us, returning 
 
 - - -
 
-> From [/src/API/Attachment.litcoffee](../src/API/Attachment.litcoffee) :
+<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.3.1</i> <br> <code>API/Attachment.litcoffee</code></p>
 
 #  ATTACHMENT EVENTS  #
 
-##  Introduction  ##
+ - - -
+
+##  Description  ##
 
 The __Attachment__ module of the Laboratory API is comprised of those events which are related to Mastodon media attachments.
 
@@ -1652,7 +1726,7 @@ The __Attachment__ module of the Laboratory API is comprised of those events whi
 | `LaboratoryAttachmentReceived` | Fires when an `Attachment` has been processed |
 | `LaboratoryAttachmentFailed` | Fires when an `Attachment` fails to process |
 
-##  Requesting an Attachment  ##
+###  Requesting an attachment:
 
 >   - __API equivalent :__ `/api/v1/media`
 >   - __Request parameters :__
@@ -1663,6 +1737,8 @@ The __Attachment__ module of the Laboratory API is comprised of those events whi
 
 Laboratory Attachment events are used to upload files to the server and receive media `Attachment`s which can then be linked to posts.
 The only relevant parameter is `file`, which should be the `File` to upload.
+
+ - - -
 
 ##  Implementation  ##
 
@@ -1714,11 +1790,13 @@ The `LaboratoryAttachmentRequested` event uploads a file to the Mastodon API and
 
 - - -
 
-> From [/src/API/Authorization.litcoffee](../src/API/Authorization.litcoffee) :
+<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.3.1</i> <br> <code>API/Authorization.litcoffee</code></p>
 
 #  AUTHORIZATION EVENTS  #
 
-##  Introduction  ##
+ - - -
+
+##  Description  ##
 
 The __Authorization__ module of Laboratory Events is comprised of those events which are related to OAuth registration of the Laboratory client with the Mastodon server.
 
@@ -1731,7 +1809,7 @@ The __Authorization__ module of Laboratory Events is comprised of those events w
 | `LaboratoryAuthorizationFailed` | Fires when a request for an access token failed |
 | `LaboratoryAuthorizationGranted` | Fires when a popup receives an authorization code |
 
-##  Requesting Authorization  ##
+###  Requesting authorization:
 
 >   - __API equivalent :__ `/oauth/token`, `/api/v1/verify_credentials`
 >   - __Request parameters :__
@@ -1753,6 +1831,8 @@ The `LaboratoryAuthorizationGranted` event fires when a user has granted authori
 Its `detail` will contain either a `code` or an `accessToken`, alongside an optional `window`, `origin` and `scope`.
 If you have somehow acquired an access token from somewhere else, passing this value to `LaboratoryAuthorizationGranted` alongside its origin and scope will allow Laboratory to use it as well.
 Alternatively, you can pass an `Authorization` object to `LaboratoryAuthorizationReceived`, but note that doing so requires more information.
+
+ - - -
 
 ##  Implementation  ##
 
@@ -1784,7 +1864,6 @@ Here we create the events as per our specifications.
                 accessToken: undefined
                 origin: undefined
                 scope: Authorization.Scope.NONE
-                window: undefined
 
 ###  Handling the events:
 
@@ -1903,7 +1982,7 @@ If this succeeds, then it will respond with the `Authorization`.
 
             .handle "LaboratoryAuthorizationGranted", (event) ->
 
-                if event.detail.window then do event.detail.window.close
+                do (window.open "about:blank", "LaboratoryOAuth").close
 
 Our authorization must have an associated `origin`.
 If it doesn't, we can't proceed.
@@ -2000,11 +2079,13 @@ It also exposes it to the window through `Exposed`.
 
 - - -
 
-> From [/src/API/Client.litcoffee](../src/API/Client.litcoffee) :
+<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.3.1</i> <br> <code>API/Client.litcoffee</code></p>
 
 #  CLIENT EVENTS  #
 
-##  Introduction  ##
+ - - -
+
+##  Description  ##
 
 The __Client__ module of Laboratory Events is comprised of those events which are related to OAuth registration of the Laboratory client with the Mastodon server.
 
@@ -2016,7 +2097,7 @@ The __Client__ module of Laboratory Events is comprised of those events which ar
 | `LaboratoryClientReceived` | Fires when a client id and secret have been received from the OAuth server |
 | `LaboratoryClientFailed` | Fires when a request for a client id and secret from the OAuth server failed |
 
-##  Requesting Client Authorization  ##
+###  Requesting client authorization:
 
 >   - __API equivalent :__ `/api/v1/apps`
 >   - __Request parameters :__
@@ -2031,6 +2112,8 @@ The __Client__ module of Laboratory Events is comprised of those events which ar
 The `LaboratoryClientRequested` event requests a new client id for use with OAuth.
 Laboratory will fire this event automatically as necessary during the handling of `LaboratoryAuthorizationRequested`, so it isn't something you usually need to worry about.
 However, you can request this yourself if you find yourself needing new client authorization.
+
+ - - -
 
 ##  Implementation  ##
 
@@ -2102,11 +2185,13 @@ Now we can send our request.
 
 - - -
 
-> From [/src/API/Initialization.litcoffee](../src/API/Initialization.litcoffee) :
+<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.3.1</i> <br> <code>API/Initialization.litcoffee</code></p>
 
 #  INITIALIZATION EVENTS  #
 
-##  Introduction  ##
+ - - -
+
+##  Description  ##
 
 The __Initialization__ module of the Laboratory API is comprised of those events which are related to initialization of the Laboratory store and handlers.
 These make up just two events: `LaboratoryInitializationLoaded` and `LaboratoryInitializationReady`.
@@ -2126,7 +2211,7 @@ However, you should listen for these events to know when proper communication wi
 | `LaboratoryInitializationLoaded` | Fires when the Laboratory script has been loaded and run |
 | `LaboratoryInitializationReady` | Fires when the Laboratory event handlers are ready to receive events |
 
-##  Checking Initialization Status  ##
+###  Checking initialization status:
 
 >   - __API equivalent :__ _None_
 >   - __Miscellanous events :__
@@ -2146,6 +2231,8 @@ Of the two, `LaboratoryInitializationReady` is almost always the one to listen f
 
 Neither of the Laboratory Initialization events have `detail`s.
 
+ - - -
+
 ##  Implementation  ##
 
 ###  Creating the events:
@@ -2163,11 +2250,13 @@ Laboratory Initialization events do not have handlers.
 
 - - -
 
-> From [/src/API/Post.litcoffee](../src/API/Post.litcoffee) :
+<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.3.1</i> <br> <code>API/Post.litcoffee</code></p>
 
 #  POST EVENTS  #
 
-##  Introduction  ##
+ - - -
+
+##  Description  ##
 
 The __Post__ module of the Laboratory API is comprised of those events which are related to Mastodon accounts.
 
@@ -2183,7 +2272,7 @@ The __Post__ module of the Laboratory API is comprised of those events which are
 | `LaboratoryPostSetReblog` | Petitions the Mastodon server to reblog or unreblog the provided status |
 | `LaboratoryPostSetFavourite` | Petitions the Mastodon server to favourite or unfavourite the provided status |
 
-##  Requesting a Status  ##
+###  Requesting a status:
 
 >   - __API equivalent :__ `/api/v1/statuses/:id`, `/api/v1/notifications/:id`
 >   - __Request parameters :__
@@ -2200,7 +2289,7 @@ Laboratory keeps track of all of the `Post`s it receives in its internal store.
 If there is already information on the requested `Post` in the Laboratory store, it will fire `LaboratoryPostReceived` immediately, and then again once the server request completes.
 However, Laboratory will only fire as many responses as necessary; if nothing has changed from the stored value, then only one response will be given.
 
-##  Creating and Deleting Posts  ##
+###  Creating and deleting posts:
 
 >   - __API equivalent :__ `/api/v1/statuses`, `/api/v1/statuses/:id`
 >   - __Miscellaneous events :__
@@ -2220,7 +2309,7 @@ It should be fired with a `detail` containing the following properties:
 The `LaboratoryPostDeletion` event attempts to delete an existing status from the Mastodon server.
 The `id` property of its `detail` should provide the id of the status to delete.
 
-##  Favouriting and Reblogging Posts  ##
+###  Favouriting and reblogging posts:
 
 >   - __API equivalent :__ `/api/v1/statuses/:id/reblog`, `/api/v1/statuses/:id/unreblog`, `/api/v1/statuses/:id/favourite`, `/api/v1/statuses/:id/unfavourite`
 >   - __Miscellanous events :__
@@ -2229,6 +2318,8 @@ The `id` property of its `detail` should provide the id of the status to delete.
 
 The `LaboratoryPostSetReblog` and `LaboratoryPostSetFavourite` events can be used to set the reblog or favourite status of posts.
 They should be fired with a `detail` which has two properties: `id`, which gives the id of the account, and `value`, which should be `true` if the post should be favourited/reblogged, or `false` if it should be unfavourited/unreblogged.
+
+ - - -
 
 ##  Implementation  ##
 
@@ -2428,11 +2519,13 @@ We'll only send the request if the values differ.
 
 - - -
 
-> From [/src/API/Profile.litcoffee](../src/API/Profile.litcoffee) :
+<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.3.1</i> <br> <code>API/Profile.litcoffee</code></p>
 
 #  PROFILE EVENTS  #
 
-##  Introduction  ##
+ - - -
+
+##  Description  ##
 
 The __Profile__ module of the Laboratory API is comprised of those events which are related to Mastodon accounts.
 
@@ -2445,7 +2538,7 @@ The __Profile__ module of the Laboratory API is comprised of those events which 
 | `LaboratoryProfileFailed` | Fires when a `Laboratory.Profile` fails to process |
 | `LaboratoryProfileSetRelationship` | Petitions the Mastodon server to change the relationship between the user and the specified account |
 
-##  Requesting a Profile  ##
+###  Requesting a profile:
 
 >   - __API equivalent :__ `/api/v1/accounts/:id`, `/api/v1/accounts/relationships`
 >   - __Request parameters :__
@@ -2463,7 +2556,7 @@ Laboratory keeps track of all of the `Profile`s it receives in its internal stor
 This means that for each `LaboratoryProfileRequested` event, there could be as many as *three* `LaboratoryProfileReceived` responses: one containing the cached data from the store, one containing updated information from the server, and a third if the relationship information has changed as well.
 However, Laboratory will only fire as many responses as necessary; if nothing has changed from the stored value, then only one response will be given.
 
-##  Changing Relationship Status  ##
+###  Changing relationship status:
 
 >   - __API equivalent :__ `/api/v1/accounts/follow`, `/api/v1/accounts/unfollow`, `/api/v1/accounts/block`, `/api/v1/accounts/unblock`, `/api/v1/accounts/mute`, `/api/v1/accounts/unmute`
 >   - __Miscellanous events :__
@@ -2474,6 +2567,8 @@ It should be fired with a `detail` which has two properties: `id`, which gives t
 
 Note that only some relationship aspects can be changed; you can't, for example, make an account stop following you using `LaboratoryProfileSetRelationship`.
 For the purposes of this event, a follow and a follow request are treated as equivalent.
+
+ - - -
 
 ##  Implementation  ##
 
@@ -2609,9 +2704,11 @@ Otherwise (if we don't have a profile on file), we have no choice but to send a 
 
 - - -
 
-> From [/src/API/Request.litcoffee](../src/API/Request.litcoffee) :
+<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.3.1</i> <br> <code>API/Request.litcoffee</code></p>
 
 #  REQUEST EVENTS  #
+
+ - - -
 
 ##  Introduction  ##
 
@@ -2627,7 +2724,7 @@ Generally speaking you shouldn't have to interact with these events yourself, bu
 | `LaboratoryRequestComplete` | Fires when an XMLHttpRequest is done loading |
 | `LaboratoryRequestError` | Fires when an XMLHttpRequest fails |
 
-##  Listening For Requests  ##
+###  Listening for requests:
 
 >   - __API equivalent :__ _None_
 >   - __Miscellanous events :__
@@ -2641,6 +2738,8 @@ Laboratory Request events fire whenever the `readystate` of an `XMLHttpRequest` 
 Alternatively, `LaboratoryRequestError` indicates that the request completed but one or both of those conditions was not true.
 
 The `detail` of each Laboratory Request event is the associated `XMLHttpRequest`.
+
+ - - -
 
 ##  Implementation  ##
 
@@ -2661,11 +2760,13 @@ Laboratory Request events do not have handlers.
 
 - - -
 
-> From [/src/API/Rolodex.litcoffee](../src/API/Rolodex.litcoffee) :
+<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.3.1</i> <br> <code>API/Rolodex.litcoffee</code></p>
 
 #  ROLODEX EVENTS  #
 
-##  Introduction  ##
+ - - -
+
+##  Description  ##
 
 The __Rolodex__ module of the Laboratory API is comprised of those events which are related to rolodexes of Mastodon accounts.
 
@@ -2677,7 +2778,7 @@ The __Rolodex__ module of the Laboratory API is comprised of those events which 
 | `LaboratoryRolodexReceived` | Fires when a `Rolodex` has been processed |
 | `LaboratoryRolodexFailed` | Fires when a `Rolodex` fails to process |
 
-##  Requesting a Rolodex  ##
+###  Requesting a rolodex:
 
 >   - __API equivalent :__ `/api/v1/accounts/search`, `/api/v1/accounts/:id/followers`, `/api/v1/accounts/:id/following`, `/api/v1/statuses/:id/reblogged_by`, `/api/v1/statuses/:id/favourited_by`, `/api/v1/blocks`, `/api/v1/mutes`
 >   - __Request parameters :__
@@ -2695,6 +2796,8 @@ If the `type` is `Rolodex.Type.SEARCH`, then `query` should provide the string t
 In the case of `Rolodex.Type.BLOCKS` and `Rolodex.Type.MUTES`, no `query` is required.
 
 For `Rolodex.Type.SEARCH`es, the number of accounts to return can be specified using the `limit` parameter; otherwise, the `before` and `after` parameters can be used to change the range of accounts returned.
+
+ - - -
 
 ##  Implementation  ##
 
@@ -2781,11 +2884,13 @@ Note that `serverRequest` ignores data parameters which have a value of `undefin
 
 - - -
 
-> From [/src/API/Timeline.litcoffee](../src/API/Timeline.litcoffee) :
+<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.3.1</i> <br> <code>API/Timeline.litcoffee</code></p>
 
 #  TIMELINE EVENTS  #
 
-##  Introduction  ##
+ - - -
+
+##  Description  ##
 
 The __Timeline__ module of the Laboratory API is comprised of those events which are related to timelines of Mastodon accounts.
 
@@ -2797,7 +2902,7 @@ The __Timeline__ module of the Laboratory API is comprised of those events which
 | `LaboratoryTimelineReceived` | Fires when a `Laboratory.Timeline` has been processed |
 | `LaboratoryTimelineFailed` | Fires when a `Laboratory.Timeline` fails to process |
 
-##  Requesting a Rolodex  ##
+###  Requesting a timeline:
 
 >   - __API equivalent :__ `/api/v1/timelines/home`, `/api/v1/timelines/public`, `/api/v1/timelines/tag/:hashtag`, `/api/v1/notifications/`, `/api/v1/favourites`
 >   - __Request parameters :__
@@ -2813,6 +2918,8 @@ Laboratory Timeline events are used to request lists of [`Post`](../Constructors
 If the `type` is `Timeline.Type.HASHTAG`, then `query` should provide the hashtag; in the case of `Timeline.Type.ACCOUNT`, then `query` should provide the account id; otherwise, no `query` is required.
 
 The `before` and `after` parameters can be used to change the range of statuses returned.
+
+ - - -
 
 ##  Implementation  ##
 
@@ -2916,17 +3023,23 @@ Note that `serverRequest` ignores data parameters which have a value of `undefin
 
 - - -
 
-> From [/src/INSTALLING.litcoffee](../src/INSTALLING.litcoffee) :
+<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.3.1</i> <br> <code>INSTALLING.litcoffee</code></p>
 
-#  INSTALLING  #
+#  USING LABORATORY  #
+
+ - - -
+
+##  Description  ##
 
 Laboratory is written in Literate CoffeeScript, designed to compile to a single minified JavaScript file.
 This file is available in [`/dist/laboratory.min.js`](../dist/laboratory.min.js).
 If for some reason you feel the need to compile Laboratory from source yourself, the [`Cakefile`](../Cakefile) can be used to do so.
 
 All of Laboratory's components are available through the `window.Laboratory` object, which this file provides.
-Additionally, the `window.Laboratory.ready` property can be used to check if `LaboratoryInitializationReady` has already fired, and the `window.Laboratory.user` property can be used to obtain the id of the currently-logged-in user.
+Additionally, the `window.Laboratory.ready` property can be used to check if `LaboratoryInitializationReady` has already fired, and the `window.Laboratory.auth` property can be used to obtain the current [`Authorization`](Constructors/Authorization.litcoffee) object.
 Laboratory doesn't have any external dependencies, and should run in any modern (ECMAScript 5–compliant; eg IE9) browser.
+
+ - - -
 
 ##  Implementation  ##
 
@@ -2946,6 +3059,10 @@ The store is not exposed to the window.
 
 Because Laboratory is still in active development, `window["🏪"]` can be used to gain convenient access to our store.
 Obviously, you shouldn't expect this to last.
+
+>   __Note :__
+>   It's an emoji because you're not supposed to use it in production code.
+>   Don't use it in production code lol.
 
     window["🏪"] = Store
 

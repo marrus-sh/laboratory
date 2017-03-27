@@ -1,8 +1,6 @@
-<p align="right">_Laboratory_ <br> Source Code and Documentation <br> API Version: _0.3.1_</p>
+<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.3.1</i> <br> <code>Constructors/Timeline.litcoffee</code></p>
 
 #  THE FAILURE CONSTRUCTOR  #
-
->   File location: `Constructors/Failure.litcoffee`
 
  - - -
 
