@@ -26,18 +26,25 @@ Consequently, it is the last thing we load.
 Laboratory data is all stored in a single `Store`, and then acted upon through events and event listeners.
 The store is not exposed to the window.
 
-    Store =
-        auth: null
-        notifications: {}
-        profiles: {}
-        statuses: {}
+    Store = null
+    
+The `reset()` function resets our `Store` to its initial state.
+It's very important that we return nothing from this function and don't accidentially expose our `Store` lol.
+    
+    do Laboratory.reset = reset = ->
+        Store =
+            auth: null
+            notifications: {}
+            profiles: {}
+            statuses: {}
+        return
 
 Because Laboratory is still in active development, `window["🏪"]` can be used to gain convenient access to our store.
 Obviously, you shouldn't expect this to last.
 
 >   __Note :__
 >   It's an emoji because you're not supposed to use it in production code.
->   Don't use it in production code lol.
+>   Don't use it in production code lmao.
 
     window["🏪"] = Store
 

@@ -17,8 +17,7 @@ Its properties are summarized below, alongside their Mastodon API equivalents:
 | `profiles` | [The response] | An ordered array of profiles, in reverse-chronological order |
 |   `type`   | *Not provided* | A `Rolodex.Type` |
 |  `query`   | *Not provided* | The query associated with the `Rolodex` |
-|  `before`  | *Not provided* | The upper limit of the `Rolodex` |
-|  `after`   | *Not provided* | The lower limit of the `Rolodex` |
+|  `length`  | *Not provided* | The length of the `Rolodex` |
 
 Note that `before` and `after` are special identifiers which may depend on the `Rolodex.Type`.
 
@@ -39,8 +38,6 @@ The possible `Rolodex.Type`s are as follows:
 | `Rolodex.Type.REBLOGGED_BY` | `0x45` | Those who reblogged a given status |
 | `Rolodex.Type.BLOCKS` | `0x83` | Those who have been blocked |
 | `Rolodex.Type.MUTES` | `0x84` | Those who have been muted |
-
-The `Rolodex()` constructor does not use or remember its `Rolodex.Type`, but these values are used when requesting new `Rolodex`es using `LaboratoryRolodexRequested`.
 
 ###  Prototype methods:
 
@@ -88,8 +85,6 @@ This loads our `params`.
 
         @type = if params.type instanceof Rolodex.Type then params.type else Rolodex.Type.UNDEFINED
         @query = String params.query
-        @before = Number params.before if isFinite params.before
-        @after = Number params.after if isFinite params.after
 
 We'll use the `getProfile()` function in our profile getters.
 
@@ -118,6 +113,8 @@ Finally, we implement our list of `profiles` as getters such that they always re
         @profiles = []
         Object.defineProperty @profiles, index, {get: getProfile.bind(this, value.id), enumerable: true} for value, index in data
         Object.freeze @profiles
+
+        @length = data.length
 
         return Object.freeze this
 

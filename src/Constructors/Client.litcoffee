@@ -27,19 +27,19 @@ Its properties are summarized below, alongside their Mastodon API equivalents:
 ###  The constructor:
 
 The `Client()` constructor takes a `data` object from an API response and reads its attributes into an instance's properties.
-We also need to provide it with the parameters of the API request, through the `params` object, and the origin of the request, through `origin`.
+It also takes a couple of other arguments.
 
-    Laboratory.Client = Client = (data, params, origin) ->
+    Laboratory.Client = Client = (data, origin, name, scope) ->
 
         throw new Error "Laboratory Error : `Client()` must be called as a constructor" unless this and this instanceof Client
         throw new Error "Laboratory Error : `Client()` was called without any `data`" unless data?
 
         @origin = origin
-        @name = params.client_name
+        @name = name
         @id = data.id
         @clientID = data.client_id
         @clientSecret = data.client_secret
-        @scope = Authorization.Scope.fromValue Authorization.Scope.READ * (params.scopes.indexOf("read") isnt -1) + Authorization.Scope.WRITE * (params.scopes.indexOf("write") isnt -1) + Authorization.Scope.FOLLOW * (params.scopes.indexOf("follow") isnt -1)
+        @scope = scope
         @redirect = data.redirect_uri
 
         return Object.freeze this

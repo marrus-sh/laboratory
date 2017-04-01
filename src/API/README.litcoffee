@@ -100,15 +100,15 @@ These are as follows:
 
 ##  Implementation  ##
 
-There is a lot that goes on behind-the-scenes to make Laboratory events so easy to dispatch and listen for.
+###  Event processing:
+
+There is a fair amount that goes on behind-the-scenes to make Laboratory events so easy to dispatch and listen for.
 Roughly speaking, we have to:
 
 1.  Keep a record of all accepted Laboratory events.
 2.  Specify what is expected of an event's *detail*, and give default values
-3.  Associate requests with responses and failures
-4.  Associate our handlers with events and keep track of them for later
-5.  Create the `dispatch()`, `listen()`, and `forget()` functions
-6.  Create promises and the `request()` function for accessing them.
+3.  Associate our handlers with events and keep track of them for later
+4.  Create the `dispatch()` function to dispatch events
 
 For simplicity's sake, we will store our events inside a giant object called `LaboratoryEvent`, whose methods will greatly ease this process.
 `LaboratoryEvent` won't be exposed to the window, it's just for our own internal use.
@@ -118,26 +118,16 @@ For simplicity's sake, we will store our events inside a giant object called `La
         Events: {}
         Handlers: []
 
-###  Adding new events:
+####  Adding new events.
 
 The `LaboratoryEvent.create()` function registers a new event and associates it with a `detail`.
 If the provided `detail` is an object, then its own properties will determine the allowed and default properties of the event's detail; if it is a constructor, then the provided detail must be an instance (or `null`).
 
         create: (type, detail) ->
-            LaboratoryEvent.Events[type] = {detail: Object detail} unless LaboratoryEvent.Events[type]?
+            LaboratoryEvent.Events[type] = Object detail unless LaboratoryEvent.Events[type]?
             return LaboratoryEvent
 
-###  Associating requests with responses and failures:
-
-The `LaboratoryEvent.associate()` function associates a request with its response or failure.
-
-        associate: (request, response, failure) ->
-            return LaboratoryEvent unless typeof (levent = LaboratoryEvent.Events[request]) is "object"
-            levent.response = response if response?
-            levent.failure = failure if failure?
-            return LaboratoryEvent
-
-###  Setting up handlers:
+####  Setting up handlers.
 
 The `LaboratoryEvent.handle()` function just associates a `type` with a `callback`.
 It sets things up so we can easily add our handlers later.
@@ -152,52 +142,19 @@ It sets things up so we can easily add our handlers later.
             LaboratoryEvent.Handlers.push callback
             return LaboratoryEvent
 
-###  Dispatching events:
+####  Dispatching events.
 
 We can now create our `dispatch()` function.
 It just sets up our detail and dispatches the event to `document`.
 
     Laboratory.dispatch = dispatch = (event, props) ->
-        return no unless (levent = LaboratoryEvent.Events[event = String event])?
-        if typeof (initials = levent.detail) is "function"
+        return no unless (initials = LaboratoryEvent.Events[event = String event])?
+        if typeof initials is "function"
             return no unless (detail = props) instanceof initials
-        else
+        else if props?
             detail = {}
-            (detail[prop] = if props? and props[prop]? then props[prop] else initial) for prop, initial of initials
-        document.dispatchEvent new CustomEvent event, {detail: Object.freeze detail}
+            for prop, initial of initials
+                detail[prop] = if props[prop]? then props[prop] else initial
+            Object.freeze detail
+        document.dispatchEvent new CustomEvent event, {detail}
         return yes
-
-###  Listening for and forgetting events:
-
-Our `listen()` function is just a wrapper for `document.addEventListener()`.
-
-    Laboratory.listen = listen = (event, callback) ->
-        return no unless (levent = LaboratoryEvent.Events[event = String event])? and typeof callback is "function"
-        document.addEventListener event, callback
-        return yes
-
-Similarly, our `forget()` function is just a wrapper for `document.removeEventListener()`.
-
-    Laboratory.forget = forget = (event, callback) ->
-        return no unless (levent = LaboratoryEvent.Events[event = String event])? and typeof callback is "function"
-        document.removeEventListener event, callback
-        return yes
-
-###  Making promises:
-
-The `request()` function handles the listening and forgetting for us, returning a `Promise`.
-
-    Laboratory.request = request = (event, detail) -> new Promise (resolve, reject) ->
-        return unless (levent = LaboratoryEvent.Events[event])?
-        respond = (detail) ->
-            forget response, respond if response?
-            forget failure, fail if failure?
-            resolve detail
-        fail = (detail) ->
-            forget response, respond if response?
-            forget failure, fail if failure?
-            reject detail
-        listen response, respond if (response = levent.response)?
-        listen failure, fail if (failure = levent.failure)?
-        dispatch event, detail
-        return

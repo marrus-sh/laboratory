@@ -16,8 +16,9 @@
   
                   Version 0.3.1
    */
-  var Application, Attachment, Authorization, Client, Enumeral, Exposed, Failure, Laboratory, LaboratoryEvent, Post, Profile, Rolodex, Store, Timeline, dispatch, fn, forget, listen, prop, request, run, serverRequest,
-    hasProp = {}.hasOwnProperty;
+  var Application, Attachment, Authorization, Client, CustomEvent, Enumeral, Exposed, Failure, Laboratory, LaboratoryEvent, LaboratoryEventTarget, Post, Profile, Request, Rolodex, Store, Timeline, checkDecree, decree, dispatch, finishRequest, fn, getToken, makeRequest, police, prop, reset, run, startRequest, stopRequest,
+    hasProp = {}.hasOwnProperty,
+    indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
   Laboratory = {
     ℹ: "https://github.com/marrus-sh/laboratory",
@@ -26,10 +27,8 @@
 
   (function() {
     var Mommy, code;
-    if ((code = (location.search.match(/code=([^&]*)/) || [])[1]) && (Mommy = window.opener.Laboratory)) {
-      return Mommy.dispatch("LaboratoryAuthorizationGranted", {
-        code: code
-      });
+    if ((code = (location.search.match(/code=([^&]*)/) || [])[1]) && (Mommy = window.opener)) {
+      return Mommy.postMessage(code, window.location.origin);
     }
   })();
 
@@ -50,12 +49,38 @@
     fn(prop);
   }
 
+  decree = police = checkDecree = null;
+
   (function() {
-    var CustomEvent;
-    if (typeof CustomEvent === "function") {
-      return;
+    var isPrivileged;
+    isPrivileged = false;
+    decree = function(callback) {
+      var result, wasPrivileged;
+      wasPrivileged = isPrivileged;
+      isPrivileged = true;
+      result = callback();
+      isPrivileged = wasPrivileged;
+      return result;
+    };
+    police = function(callback) {
+      var initial, result;
+      initial = isPrivileged;
+      isPrivileged = false;
+      result = callback();
+      isPrivileged = wasPrivileged;
+      return result;
+    };
+    return checkDecree = function() {
+      return isPrivileged;
+    };
+  })();
+
+  CustomEvent = (function() {
+    var CE;
+    if (typeof window.CustomEvent === "function") {
+      return window.CustomEvent;
     }
-    CustomEvent = function(event, params) {
+    CE = function(event, params) {
       var e;
       params = params || {
         bubbles: false,
@@ -66,107 +91,21 @@
       e.initCustomEvent(event, params.bubbles, params.cancelable, params.detail);
       return e;
     };
-    CustomEvent.prototype = window.Event.prototype;
-    Object.freeze(CustomEvent);
-    return Object.freeze(CustomEvent.prototype);
+    CE.prototype = Object.freeze(Object.create(window.Event.prototype));
+    return Object.freeze(CE);
   })();
 
-  serverRequest = function(method, location, data, accessToken, onComplete, onError) {
-    var callback, contents, key, request, subvalue, value;
-    if (!(method === "GET" || method === "POST" || method === "DELETE")) {
-      return;
-    }
-    location = String(location);
-    data = Object(data);
-    request = new XMLHttpRequest;
-    contents = method === "POST" && (typeof FormData !== "undefined" && FormData !== null) && data instanceof FormData ? data : (((function() {
-      var results;
-      results = [];
-      for (key in data) {
-        value = data[key];
-        if (value != null) {
-          if (value instanceof Array) {
-            results.push(((function() {
-              var i, len, results1;
-              results1 = [];
-              for (i = 0, len = value.length; i < len; i++) {
-                subvalue = value[i];
-                results1.push((encodeURIComponent(key)) + "[]=" + (encodeURIComponent(subvalue)));
-              }
-              return results1;
-            })()).join("&"));
-          } else {
-            results.push((encodeURIComponent(key)) + "=" + (encodeURIComponent(value)));
-          }
-        }
-      }
-      return results;
-    })()).join("&")).replace(/%20/g, '+');
-    if (!(contents === "" || method === "POST")) {
-      location += ((location.indexOf("?")) !== -1 ? "&" : "?") + contents;
-    }
-    request.open(method, location);
-    if (method === "POST" && !((typeof FormData !== "undefined" && FormData !== null) && contents instanceof FormData)) {
-      request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-    }
-    if (accessToken) {
-      request.setRequestHeader("Authorization", "Bearer " + accessToken);
-    }
-    callback = function() {
-      var params, ref, ref1, response, status;
-      switch (request.readyState) {
-        case 0:
-          break;
-        case 1:
-          return dispatch("LaboratoryRequestOpen", request);
-        case 2:
-        case 3:
-          return dispatch("LaboratoryRequestUpdate", request);
-        case 4:
-          status = request.status;
-          response = (function() {
-            try {
-              if (request.responseText) {
-                return JSON.parse(request.responseText);
-              } else {
-                return null;
-              }
-            } catch (error) {
-              return {
-                error: "The response could not be parsed."
-              };
-            }
-          })();
-          params = {
-            status: status,
-            url: location,
-            prev: (((ref = request.getResponseHeader("Link")) != null ? ref.match(/<\s*([^,]*)\s*>\s*;[^,]*[;\s]rel="?prev(?:ious)?"?/) : void 0) || [])[1],
-            next: (((ref1 = request.getResponseHeader("Link")) != null ? ref1.match(/<\s*([^,]*)\s*>\s*;[^,]*[;\s]rel="?next"?/) : void 0) || [])[1]
-          };
-          switch (false) {
-            case !((200 <= status && status <= 205)):
-              if ((response != null ? response.error : void 0) != null) {
-                onError(response, data, params);
-                dispatch("LaboratoryRequestError", request);
-              } else {
-                onComplete(response, data, params);
-                dispatch("LaboratoryRequestComplete", request);
-              }
-              break;
-            default:
-              onError(response, data, params);
-              dispatch("LaboratoryRequestError", request);
-          }
-          return request.removeEventListener("readystatechange", callback);
-      }
+  LaboratoryEventTarget = (function() {
+    var LET, fragment, ref;
+    fragment = document.createDocumentFragment();
+    LET = function() {
+      this.addEventListener = fragment.addEventListener.bind(this);
+      this.removeEventListener = fragment.removeEventListener.bind(this);
+      return this.dispatchEvent = fragment.dispatchEvent.bind(this);
     };
-    request.addEventListener("readystatechange", callback);
-    if (method === "POST") {
-      return request.send(contents);
-    } else {
-      return request.send();
-    }
-  };
+    LET.prototype = Object.freeze(Object.create(((ref = window.EventTarget) != null ? ref.prototype : void 0) ? window.EventTarget.prototype : window.Object.prototype));
+    return Object.freeze(LET);
+  })();
 
   Laboratory.Enumeral = Enumeral = null;
 
@@ -305,7 +244,7 @@
     READWRITEFOLLOW: 0x7
   });
 
-  Laboratory.Client = Client = function(data, params, origin) {
+  Laboratory.Client = Client = function(data, origin, name, scope) {
     if (!(this && this instanceof Client)) {
       throw new Error("Laboratory Error : `Client()` must be called as a constructor");
     }
@@ -313,11 +252,11 @@
       throw new Error("Laboratory Error : `Client()` was called without any `data`");
     }
     this.origin = origin;
-    this.name = params.client_name;
+    this.name = name;
     this.id = data.id;
     this.clientID = data.client_id;
     this.clientSecret = data.client_secret;
-    this.scope = Authorization.Scope.fromValue(Authorization.Scope.READ * (params.scopes.indexOf("read") !== -1) + Authorization.Scope.WRITE * (params.scopes.indexOf("write") !== -1) + Authorization.Scope.FOLLOW * (params.scopes.indexOf("follow") !== -1));
+    this.scope = scope;
     this.redirect = data.redirect_uri;
     return Object.freeze(this);
   };
@@ -550,6 +489,184 @@
     SELF: 0x80
   });
 
+  Request = function(method, location, data, token, onComplete) {
+    var callback, contents, key, request, response, subvalue, value;
+    if (!(this && this instanceof Request)) {
+      throw new TypeError("this is not a Request");
+    }
+    response = null;
+    Object.defineProperty(this, "response", {
+      configurable: true,
+      enumerable: true,
+      get: function() {
+        return response;
+      },
+      set: function(n) {
+        if (checkDecree()) {
+          return police((function(_this) {
+            return function() {
+              response = n;
+              return _this.dispatchEvent(new CustomEvent("response", {
+                request: _this,
+                response: n
+              }));
+            };
+          })(this));
+        }
+      }
+    });
+    if (!(method === "GET" || method === "POST" || method === "DELETE")) {
+      return this;
+    }
+    location = String(location);
+    data = Object(data);
+    request = new XMLHttpRequest;
+    contents = method === "POST" && typeof FormData === "function" && data instanceof FormData ? data : (((function() {
+      var results;
+      results = [];
+      for (key in data) {
+        value = data[key];
+        if (value != null) {
+          if (value instanceof Array) {
+            results.push(((function() {
+              var i, len, results1;
+              results1 = [];
+              for (i = 0, len = value.length; i < len; i++) {
+                subvalue = value[i];
+                results1.push((encodeURIComponent(key)) + "[]=" + encodeURIComponent(subvalue));
+              }
+              return results1;
+            })()).join("&"));
+          } else {
+            results.push((encodeURIComponent(key)) + "=" + encodeURIComponent(value));
+          }
+        }
+      }
+      return results;
+    })()).join("&")).replace(/%20/g, '+');
+    if (!(contents === "" || method === "POST")) {
+      location += ((location.indexOf("?")) !== -1 ? "&" : "?") + contents;
+    }
+    callback = (function(_this) {
+      return function() {
+        var link, params, status;
+        switch (request.readyState) {
+          case 0:
+            break;
+          case 1:
+            return dispatch("LaboratoryRequestOpen", request);
+          case 2:
+          case 3:
+            return dispatch("LaboratoryRequestUpdate", request);
+          case 4:
+            status = request.status;
+            data = (function() {
+              try {
+                if (request.responseText) {
+                  return JSON.parse(request.responseText);
+                } else {
+                  return null;
+                }
+              } catch (error) {
+                return {
+                  error: "The response could not be parsed."
+                };
+              }
+            })();
+            link = request.getResponseHeader("Link");
+            params = {
+              status: status,
+              url: location,
+              prev: ((link != null ? link.match(/<\s*([^,]*)\s*>\s*;(?:[^,]*[;\s])?rel="?prev(?:ious)?"?/) : void 0) || [])[1],
+              next: ((link != null ? link.match(/<\s*([^,]*)\s*>\s*;(?:[^,]*[;\s])?rel="?next"?/) : void 0) || [])[1]
+            };
+            switch (false) {
+              case !((200 <= status && status <= 205)):
+                if ((data != null ? data.error : void 0) != null) {
+                  _this.dispatchEvent(new CustomEvent("failure", {
+                    request: _this,
+                    response: new Failure(data.error, status)
+                  }));
+                  dispatch("LaboratoryRequestError", request);
+                } else {
+                  if (typeof onComplete === "function") {
+                    onComplete(data, params);
+                  }
+                  dispatch("LaboratoryRequestComplete", request);
+                }
+                break;
+              default:
+                _this.dispatchEvent(new CustomEvent("failure", {
+                  request: _this,
+                  response: new Failure(data != null ? data.error : void 0, status)
+                }));
+                dispatch("LaboratoryRequestError", request);
+            }
+            return request.removeEventListener("readystatechange", callback);
+        }
+      };
+    })(this);
+    Object.defineProperties(this, {
+      start: {
+        configurable: true,
+        enumerable: false,
+        writable: false,
+        value: function() {
+          request.open(method, location);
+          if (method === "POST" && !((typeof FormData !== "undefined" && FormData !== null) && contents instanceof FormData)) {
+            request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+          }
+          if (token != null) {
+            request.setRequestHeader("Authorization", "Bearer " + token);
+          }
+          request.addEventListener("readystatechange", callback);
+          request.send(method === "POST" ? contents : void 0)();
+        }
+      },
+      stop: {
+        configurable: true,
+        enumerable: false,
+        writable: false,
+        value: function() {
+          request.removeEventListener("readystatechange", callback);
+          request.abort();
+        }
+      }
+    });
+    return this;
+  };
+
+  Laboratory.Request = function() {
+    throw new TypeError("Illegal constructor");
+  };
+
+  Object.defineProperty(Request, "prototype", {
+    configurable: false,
+    enumerable: false,
+    writable: false,
+    value: Object.freeze(Object.create(LaboratoryEventTarget.prototype, {
+      constructor: {
+        enumerable: false,
+        value: Laboratory.Request
+      },
+      start: {
+        enumerable: false,
+        value: function() {}
+      },
+      stop: {
+        enumerable: false,
+        value: function() {}
+      }
+    }))
+  });
+
+  Object.defineProperty(Laboratory.Request, "prototype", {
+    configurable: false,
+    enumerable: false,
+    writable: false,
+    value: Request.prototype
+  });
+
   Laboratory.Rolodex = Rolodex = function(data, params) {
     var current, currentID, getProfile, i, index, j, len, prev, ref, value;
     if (!(this && this instanceof Rolodex)) {
@@ -560,12 +677,6 @@
     }
     this.type = params.type instanceof Rolodex.Type ? params.type : Rolodex.Type.UNDEFINED;
     this.query = String(params.query);
-    if (isFinite(params.before)) {
-      this.before = Number(params.before);
-    }
-    if (isFinite(params.after)) {
-      this.after = Number(params.after);
-    }
     getProfile = function(id) {
       return Store.profiles[id];
     };
@@ -590,6 +701,7 @@
       });
     }
     Object.freeze(this.profiles);
+    this.length = data.length;
     return Object.freeze(this);
   };
 
@@ -716,12 +828,6 @@
     }
     this.type = params.type instanceof Timeline.Type ? params.type : Timeline.Type.UNDEFINED;
     this.query = String(params.query);
-    if (isFinite(params.before)) {
-      this.before = Number(params.before);
-    }
-    if (isFinite(params.after)) {
-      this.after = Number(params.after);
-    }
     isNotification = function(object) {
       return !!(((function() {
         switch (false) {
@@ -767,6 +873,7 @@
       });
     }
     Object.freeze(this.posts);
+    this.length = data.length;
     return Object.freeze(this);
   };
 
@@ -888,22 +995,7 @@
     Handlers: [],
     create: function(type, detail) {
       if (LaboratoryEvent.Events[type] == null) {
-        LaboratoryEvent.Events[type] = {
-          detail: Object(detail)
-        };
-      }
-      return LaboratoryEvent;
-    },
-    associate: function(request, response, failure) {
-      var levent;
-      if (typeof (levent = LaboratoryEvent.Events[request]) !== "object") {
-        return LaboratoryEvent;
-      }
-      if (response != null) {
-        levent.response = response;
-      }
-      if (failure != null) {
-        levent.failure = failure;
+        LaboratoryEvent.Events[type] = Object(detail);
       }
       return LaboratoryEvent;
     },
@@ -918,702 +1010,1295 @@
   };
 
   Laboratory.dispatch = dispatch = function(event, props) {
-    var detail, initial, initials, levent;
-    if ((levent = LaboratoryEvent.Events[event = String(event)]) == null) {
+    var detail, initial, initials;
+    if ((initials = LaboratoryEvent.Events[event = String(event)]) == null) {
       return false;
     }
-    if (typeof (initials = levent.detail) === "function") {
+    if (typeof initials === "function") {
       if (!((detail = props) instanceof initials)) {
         return false;
       }
-    } else {
+    } else if (props != null) {
       detail = {};
       for (prop in initials) {
         initial = initials[prop];
-        detail[prop] = (props != null) && (props[prop] != null) ? props[prop] : initial;
+        detail[prop] = props[prop] != null ? props[prop] : initial;
       }
+      Object.freeze(detail);
     }
     document.dispatchEvent(new CustomEvent(event, {
-      detail: Object.freeze(detail)
+      detail: detail
     }));
     return true;
   };
 
-  Laboratory.listen = listen = function(event, callback) {
-    var levent;
-    if (!(((levent = LaboratoryEvent.Events[event = String(event)]) != null) && typeof callback === "function")) {
-      return false;
-    }
-    document.addEventListener(event, callback);
-    return true;
-  };
-
-  Laboratory.forget = forget = function(event, callback) {
-    var levent;
-    if (!(((levent = LaboratoryEvent.Events[event = String(event)]) != null) && typeof callback === "function")) {
-      return false;
-    }
-    document.removeEventListener(event, callback);
-    return true;
-  };
-
-  Laboratory.request = request = function(event, detail) {
-    return new Promise(function(resolve, reject) {
-      var fail, failure, levent, respond, response;
-      if ((levent = LaboratoryEvent.Events[event]) == null) {
-        return;
-      }
-      respond = function(detail) {
-        if (typeof response !== "undefined" && response !== null) {
-          forget(response, respond);
+  Object.defineProperty(Attachment, "Request", {
+    configurable: false,
+    enumerable: true,
+    writable: false,
+    value: (function() {
+      var AttachmentRequest;
+      AttachmentRequest = function(data) {
+        var file, form;
+        if (!(this && this instanceof AttachmentRequest)) {
+          throw new TypeError("this is not an AttachmentRequest");
         }
-        if (typeof failure !== "undefined" && failure !== null) {
-          forget(failure, fail);
+        if (!(typeof File === "function" && (file = data.file) instanceof File)) {
+          throw new TypeError("Unable to create attachment; none provided");
         }
-        return resolve(detail);
+        if (typeof FormData !== "function") {
+          throw new TypeError("Unable to create attachment; `FormData` not supported");
+        }
+        form = new FormData;
+        form.append("file", file);
+        Request.call(this, "POST", Store.auth.origin + "/api/v1/media", form, Store.auth.accessToken, (function(_this) {
+          return function(result) {
+            return dispatch("LaboratoryAttachmentReceived", decree(function() {
+              return _this.response = police(function() {
+                return new Attachment(result);
+              });
+            }));
+          };
+        })(this));
+        return Object.freeze(this);
       };
-      fail = function(detail) {
-        if (typeof response !== "undefined" && response !== null) {
-          forget(response, respond);
-        }
-        if (typeof failure !== "undefined" && failure !== null) {
-          forget(failure, fail);
-        }
-        return reject(detail);
-      };
-      if ((response = levent.response) != null) {
-        listen(response, respond);
-      }
-      if ((failure = levent.failure) != null) {
-        listen(failure, fail);
-      }
-      dispatch(event, detail);
-    });
+      Object.defineProperty(AttachmentRequest, "prototype", {
+        configurable: false,
+        enumerable: false,
+        writable: false,
+        value: Object.freeze(Object.create(Request.prototype, {
+          constructor: {
+            enumerable: false,
+            value: AttachmentRequest
+          }
+        }))
+      });
+      return AttachmentRequest;
+    })()
+  });
+
+  LaboratoryEvent.create("LaboratoryAttachmentReceived", Attachment);
+
+  stopRequest = function() {
+    var ref;
+    if (!((this != null ? this.currentRequest : void 0) instanceof Authorization.Request)) {
+      throw new TypeError("No defined AuthorizationRequest");
+    }
+    if (typeof this.wrapup === "function") {
+      this.wrapup();
+    }
+    if (typeof ((ref = this.waitingRequest) != null ? ref.stop : void 0) === "function") {
+      this.waitingRequest.stop();
+    }
+    if (this.window instanceof Window) {
+      this.window.close();
+    }
+    this.waitingRequest = this.callback = this.window = void 0;
   };
 
-  LaboratoryEvent.create("LaboratoryAttachmentRequested", {
-    file: void 0
-  }).create("LaboratoryAttachmentReceived", Attachment).create("LaboratoryAttachmentFailed", Failure).associate("LaboratoryAttachmentRequested", "LaboratoryAttachmentReceived", "LaboratoryAttachmentFailed").handle("LaboratoryAttachmentRequested", function(event) {
-    var file, form, onComplete, onError;
-    if (!((typeof File !== "undefined" && File !== null) && (file = event.detail.file) instanceof File)) {
-      dispatch("LaboratoryAttachmentFailed", new Failure("Unable to create attachment; none provided", "LaboratoryAttachmentRequested"));
+  startRequest = function() {
+    var accessToken, handleClient, ref, scopeList, storedAccessToken, storedRedirect, storedScope, timeout;
+    if (!((this != null ? this.currentRequest : void 0) instanceof Authorization.Request)) {
+      throw new TypeError("No defined AuthorizationRequest");
+    }
+    this.currentRequest.stop();
+    ref = (typeof localStorage !== "undefined" && localStorage !== null ? localStorage.getItem("Laboratory | " + this.origin) : void 0) ? (localStorage.getItem("Laboratory | " + this.origin)).split(" ", 5) : [], storedRedirect = ref[0], this.clientID = ref[1], this.clientSecret = ref[2], storedScope = ref[3], storedAccessToken = ref[4];
+    if ((accessToken = this.accessToken) || (accessToken = storedAccessToken) && (this.scope & storedScope) === +this.scope) {
+      finishRequest.call(this, {
+        access_token: accessToken,
+        created_at: 0/0,
+        scope: (scopeList = [], this.scope & Authorization.Scope.READ ? scopeList.push("read") : void 0, this.scope & Authorization.Scope.WRITE ? scopeList.push("write") : void 0, this.scope & Authorization.Scope.FOLLOW ? scopeList.push("follow") : void 0, scopeList.join(" ")),
+        token_type: "bearer"
+      });
       return;
     }
-    if (typeof FormData === "undefined" || FormData === null) {
-      dispatch("LaboratoryAttachmentFailed", new Failure("Unable to create attachment; `FormData` is not supported on this platform"));
-    }
-    onComplete = function(response, data, params) {
-      return dispatch("LaboratoryAttachmentReceived", new Attachment(response));
-    };
-    onError = function(response, data, params) {
-      return dispatch("LaboratoryAttachmentFailed", new Failure(response.error, "LaboratoryAttachmentRequested", params.status));
-    };
-    return serverRequest("POST", Store.auth.origin + "/api/v1/media", (form = new FormData, form.append("file", file), form), Store.auth.accessToken, onComplete, onError);
-  });
-
-  (function() {
-    var recalledClient, recalledOrigin, recalledSecret;
-    recalledOrigin = void 0;
-    recalledClient = void 0;
-    recalledSecret = void 0;
-    return LaboratoryEvent.create("LaboratoryAuthorizationRequested", {
-      name: "Laboratory",
-      url: "/",
-      redirect: "",
-      scope: Authorization.Scope.READ
-    }).create("LaboratoryAuthorizationReceived", Authorization).create("LaboratoryAuthorizationFailed", Failure).associate("LaboratoryAuthorizationRequested", "LaboratoryAuthorizationReceived", "LaboratoryAuthorizationFailed").create("LaboratoryAuthorizationGranted", {
-      code: void 0,
-      accessToken: void 0,
-      origin: void 0,
-      scope: Authorization.Scope.NONE
-    }).handle("LaboratoryAuthorizationRequested", function(event) {
-      var a, accessToken, clientID, clientSecret, handleClient, makeRequest, origin, redirect, ref, scope, storedRedirect, storedScope, timeout;
-      if (!((scope = event.detail.scope) instanceof Authorization.Scope)) {
-        scope = Authorization.Scope.READ;
-      }
-      a = document.createElement("a");
-      a.href = event.detail.url;
-      origin = a.origin;
-      a.href = event.detail.redirect || "";
-      redirect = a.href;
-      makeRequest = function() {
-        var key, scopeList, value;
-        window.open(origin + "/oauth/authorize?" + (((function() {
-          var ref, results;
-          ref = {
-            client_id: clientID,
-            response_type: "code",
-            redirect_uri: redirect,
-            scope: (scopeList = [], scope & Authorization.Scope.READ ? scopeList.push("read") : void 0, scope & Authorization.Scope.WRITE ? scopeList.push("write") : void 0, scope & Authorization.Scope.FOLLOW ? scopeList.push("follow") : void 0, scopeList.join(" "))
-          };
-          results = [];
-          for (key in ref) {
-            value = ref[key];
-            results.push((encodeURIComponent(key)) + "=" + (encodeURIComponent(value)));
-          }
-          return results;
-        })()).join("&")), "LaboratoryOAuth");
-        recalledOrigin = origin;
-        recalledClient = clientID;
-        return recalledSecret = clientSecret;
-      };
-      if (typeof localStorage !== "undefined" && localStorage !== null ? localStorage.getItem("Laboratory | " + origin) : void 0) {
-        ref = (localStorage.getItem("Laboratory | " + origin)).split(" ", 5), storedRedirect = ref[0], clientID = ref[1], clientSecret = ref[2], storedScope = ref[3], accessToken = ref[4];
-      }
-      if (accessToken && (scope & storedScope) === +scope) {
-        dispatch("LaboratoryAuthorizationGranted", {
-          accessToken: accessToken,
-          origin: origin,
-          scope: scope
-        });
-        return;
-      }
-      if (storedRedirect === redirect && (scope & storedScope) === +scope && (clientID != null) && (clientSecret != null)) {
-        return makeRequest();
-      } else {
-        handleClient = function(e) {
-          var client;
-          if (!((client = e.detail) instanceof Client && client.origin === origin && (scope & client.scope) === +scope && client.redirect === redirect && (client.clientID != null) && (client.clientSecret != null))) {
+    if (storedRedirect === this.redirect && (this.scope & storedScope) === +this.scope && this.clientID && this.clientSecret) {
+      makeRequest.call(this);
+    } else {
+      handleClient = (function(_this) {
+        return function(event) {
+          var client, ref1;
+          if (!((client = event.detail.response) instanceof Client && currentRequest && client.origin === _this.origin && (_this.scope & client.scope) === +_this.scope && client.redirect === _this.redirect && client.clientID && client.clientSecret)) {
             return;
           }
-          clientID = client.clientID, clientSecret = client.clientSecret, scope = client.scope;
-          localStorage.setItem("Laboratory | " + origin, [redirect, clientID, clientSecret, +scope].join(" "));
-          forget("LaboratoryClientReceived", handleClient);
+          ref1 = [client.clientID, client.clientSecret], _this.clientID = ref1[0], _this.clientSecret = ref1[1];
+          localStorage.setItem("Laboratory | " + _this.origin, [client.redirect, client.clientID, client.clientSecret, +client.scope].join(" "));
           clearTimeout(timeout);
-          return makeRequest();
+          _this.wrapup = void 0;
+          _this.waitingRequest.removeEventListener("response", handleClient);
+          return makeRequest.call(_this);
         };
-        listen("LaboratoryClientReceived", handleClient);
-        dispatch("LaboratoryClientRequested", {
-          name: event.detail.name,
-          url: origin,
-          redirect: redirect,
-          scope: Authorization.Scope.fromValue(scope)
-        });
-        return timeout = setTimeout((function() {
-          forget("LaboratoryClientReceived", handleClient);
-          return dispatch("LaboratoryAuthorizationFailed", new Failure("Unable to authorize client", "LaboratoryAuthorizationRequested"));
-        }), 30000);
-      }
-    }).handle("LaboratoryAuthorizationGranted", function(event) {
-      var accessToken, cleintSecret, clientID, clientSecret, code, datetime, onComplete, onError, origin, redirect, ref, scope, scopeList, tokenType, verify;
-      (window.open("about:blank", "LaboratoryOAuth")).close();
-      if (!(origin = event.detail.origin || recalledOrigin)) {
-        dispatch("LaboratoryAuthorizationFailed", new Failure("Authorization data wasn't associated with an origin", "LaboratoryAuthorizationRequested"));
-        return;
-      }
-      scope = event.detail.scope instanceof Authorization.Scope ? (scopeList = [], scope & Authorization.Scope.READ ? scopeList.push("read") : void 0, scope & Authorization.Scope.WRITE ? scopeList.push("write") : void 0, scope & Authorization.Scope.FOLLOW ? scopeList.push("follow") : void 0, scopeList.join(" ")) : "";
-      datetime = 0/0;
-      tokenType = "bearer";
-      verify = function() {
-        var verifyComplete, verifyError;
-        verifyComplete = function(response, data, params) {
-          var scopes;
-          dispatch("LaboratoryAuthorizationReceived", new Authorization({
-            access_token: String(accessToken),
-            created_at: String(+datetime),
-            scope: scope,
-            token_type: tokenType
-          }, origin, response.id));
-          localStorage.setItem("Laboratory | " + origin, [redirect, clientID, clientSecret, Authorization.Scope.READ * (((scopes = scope.split(/[\s\+]+/g)).indexOf("read")) !== -1) + Authorization.Scope.WRITE * ((scopes.indexOf("write")) !== -1) + Authorization.Scope.FOLLOW * ((scopes.indexOf("follow")) !== -1), accessToken].join(" "));
-          return dispatch("LaboratoryProfileReceived", new Profile(response));
+      })(this);
+      this.waitingRequest = new Client.Request({
+        name: recalled.name,
+        url: recalled.origin,
+        redirect: recalled.redirect,
+        scope: recalled.scope
+      });
+      this.waitingRequest.addEventListener("response", handleClient);
+      this.wrapup = (function(_this) {
+        return function() {
+          return _this.waitingRequest.removeEventListener("response", handleClient);
         };
-        verifyError = function(response, data, params) {
-          return dispatch("LaboratoryAuthorizationFailed", new Failure(response.error, "LaboratoryAuthorizationRequested", params.status));
-        };
-        return serverRequest("GET", origin + "/api/v1/accounts/verify_credentials", null, accessToken, verifyComplete, verifyError);
-      };
-      if (accessToken = event.detail.accessToken) {
-        verify();
-      } else if (code = event.detail.code) {
-        if (origin = recalledOrigin) {
-          clientID = recalledClient;
-          cleintSecret = recalledSecret;
-        } else {
-          if (typeof localStorage !== "undefined" && localStorage !== null ? localStorage.getItem("Laboratory | " + origin) : void 0) {
-            ref = (localStorage.getItem("Laboratory | " + origin)).split(" ", 5), redirect = ref[0], clientID = ref[1], clientSecret = ref[2];
-          }
-        }
-        onComplete = function(response, data, params) {
-          accessToken = response.access_token;
-          datetime = new Date(response.created_at);
-          scope = response.scope;
-          tokenType = response.token_type;
-          return verify();
-        };
-        onError = function(response, data, params) {
-          return dispatch("LaboratoryAuthorizationFailed", new Failure(response.error, "LaboratoryAuthorizationRequested", params.status));
-        };
-        serverRequest("POST", origin + "/oauth/token", {
-          client_id: clientID,
-          client_secret: clientSecret,
-          redirect_uri: redirect,
-          grant_type: "authorization_code",
-          code: code
-        }, null, onComplete, onError);
-      } else {
-        dispatch("LaboratoryAuthorizationFailed", new Failure("No authorization code or access token was granted", "LaboratoryAuthorizationRequested"));
-      }
-      return recalledOrigin = recalledClient = recalledSecret = void 0;
-    }).handle("LaboratoryAuthorizationReceived", function(event) {
-      if (event.detail instanceof Authorization) {
-        return Exposed.auth = Store.auth = event.detail;
-      }
-    });
-  })();
-
-  LaboratoryEvent.create("LaboratoryClientRequested", {
-    name: "Laboratory",
-    url: "/",
-    redirect: "",
-    scope: Authorization.Scope.READ
-  }).create("LaboratoryClientReceived", Client).create("LaboratoryClientFailed", Failure).associate("LaboratoryClientRequested", "LaboratoryClientReceived", "LaboratoryClientFailed").handle("LaboratoryClientRequested", function(event) {
-    var a, onComplete, onError, origin, redirect, scope;
-    if (!((scope = event.detail.scope) instanceof Authorization.Scope)) {
-      scope = Authorization.Scope.READ;
+      })(this);
+      this.waitingRequest.start();
+      timeout = setTimeout((function() {
+        this.currentRequest.stop();
+        return this.dispatchEvent(new CustomEvent("failure", {
+          request: this,
+          response: new Failure("Unable to authorize client")
+        }));
+      }), 30000);
     }
-    a = document.createElement("a");
-    a.href = event.detail.url;
-    origin = a.origin;
-    a.href = event.detail.redirect || "";
-    redirect = a.href;
-    onComplete = function(response, data, params) {
-      return dispatch("LaboratoryClientReceived", new Client(response, data, origin));
+  };
+
+  makeRequest = function() {
+    var callback, key, scopeList, value;
+    if (!((this != null ? this.currentRequest : void 0) instanceof Authorization.Request)) {
+      throw new TypeError("No defined AuthorizationRequest");
+    }
+    this.window = window.open(this.origin + "/oauth/authorize?" + (((function() {
+      var ref, results;
+      ref = {
+        client_id: this.clientID,
+        response_type: "code",
+        redirect_uri: this.redirect,
+        scope: (scopeList = [], this.scope & Authorization.Scope.READ ? scopeList.push("read") : void 0, this.scope & Authorization.Scope.WRITE ? scopeList.push("write") : void 0, this.scope & Authorization.Scope.FOLLOW ? scopeList.push("follow") : void 0, scopeList.join(" "))
+      };
+      results = [];
+      for (key in ref) {
+        value = ref[key];
+        results.push((encodeURIComponent(key)) + "=" + (encodeURIComponent(value)));
+      }
+      return results;
+    }).call(this)).join("&")), "LaboratoryOAuth");
+    callback = (function(_this) {
+      return function(event) {
+        if (!(event.source === _this.window && event.origin === window.location.origin)) {
+          return;
+        }
+        getToken.call(_this, event.data);
+        event.source.close();
+        _this.window = null;
+        _this.wrapup = void 0;
+        window.removeEventListener("message", callback);
+        return callback = void 0;
+      };
+    })(this);
+    window.addEventListener("message", callback);
+    return this.wrapup = function() {
+      return window.removeEventListener("message", callback);
     };
-    onError = function(response, data, params) {
-      return dispatch("LaboratoryClientFailed", new Failure(response.error, "LaboratoryClientRequested", params.status));
-    };
-    return serverRequest("POST", origin + "/api/v1/apps", {
-      client_name: event.detail.name,
-      redirect_uris: event.detail.redirect,
-      scopes: (function() {
-        var scopeList;
-        scope = event.detail.scope;
-        scopeList = [];
-        if (scope & Authorization.Scope.READ) {
-          scopeList.push("read");
+  };
+
+  getToken = function(code) {
+    var ref;
+    if (!((this != null ? this.currentRequest : void 0) instanceof Authorization.Request)) {
+      throw new TypeError("No defined AuthorizationRequest");
+    }
+    if (typeof ((ref = this.waitingRequest) != null ? ref.stop : void 0) === "function") {
+      this.waitingRequest.stop();
+    }
+    return (this.waitingRequest = new Request("POST", this.origin + "/oauth/token", {
+      client_id: this.clientID,
+      client_secret: this.clientSecret,
+      redirect_uri: this.redirect,
+      grant_type: "authorization_code",
+      code: code
+    }, null, finishRequest.bind(this))).start();
+  };
+
+  finishRequest = function(result) {
+    var location, ref;
+    if (!((this != null ? this.currentRequest : void 0) instanceof Authorization.Request)) {
+      throw new TypeError("No defined AuthorizationRequest");
+    }
+    if (typeof ((ref = this.waitingRequest) != null ? ref.stop : void 0) === "function") {
+      this.waitingRequest.stop();
+    }
+    location = this.origin + "/api/v1/accounts/verify_credentials";
+    this.accessToken = String(result.access_token);
+    return (this.waitingRequest = new Request("GET", location, null, this.accessToken, (function(_this) {
+      return function(mine) {
+        var scopes;
+        decree(function() {
+          return this.currentRequest.response = police(function() {
+            return new Authorization(result, this.origin, mine.id);
+          });
+        });
+        dispatch("LaboratoryAuthorizationReceived", _this.currentRequest.response);
+        localStorage.setItem("Laboratory | " + _this.origin, [_this.redirect, _this.clientID, _this.clientSecret, Authorization.Scope.READ * (indexOf.call((scopes = result.scope.split(/[\s\+]+/g)), "read") >= 0) + Authorization.Scope.WRITE * (indexOf.call(scopes, "write") >= 0) + Authorization.Scope.FOLLOW * (indexOf.call(scopes, "follow") >= 0), _this.access_token].join(" "));
+        dispatch("LaboratoryProfileReceived", new Profile(mine));
+        return _this.currentRequest.stop();
+      };
+    })(this))).start();
+  };
+
+  Object.defineProperty(Authorization, "Request", {
+    configurable: false,
+    enumerable: true,
+    writable: false,
+    value: (function() {
+      var AuthorizationRequest;
+      AuthorizationRequest = function(data) {
+        var a, recalled;
+        if (!(this && this instanceof AuthorizationRequest)) {
+          throw new TypeError("this is not an AuthorizationRequest");
         }
-        if (scope & Authorization.Scope.WRITE) {
-          scopeList.push("write");
+        recalled = {
+          currentRequest: this,
+          waitingRequest: void 0,
+          callback: void 0,
+          scope: (data.scope instanceof Authorization.Scope ? data.scope : Authorization.Scope.READ),
+          name: (String(data.name)) || "Laboratory",
+          accessToken: (String(data.accessToken)) || null,
+          window: data.window instanceof Window ? data.window : void 0,
+          clientID: void 0,
+          clientSecret: void 0,
+          origin: (a = document.createElement("a"), a.href = data.origin || "/", a.origin),
+          redirect: (a.href = data.redirect || "", a.href)
+        };
+        Request.call(this);
+        Object.defineProperties(this, {
+          start: {
+            enumerable: false,
+            value: startRequest.bind(recalled)
+          },
+          stop: {
+            enumerable: false,
+            value: stopRequest.bind(recalled)
+          }
+        });
+        return Object.freeze(this);
+      };
+      Object.defineProperty(AuthorizationRequest, "prototype", {
+        configurable: false,
+        enumerable: false,
+        writable: false,
+        value: Object.freeze(Object.create(Request.prototype, {
+          constructor: {
+            enumerable: false,
+            value: AuthorizationRequest
+          }
+        }))
+      });
+      return AuthorizationRequest;
+    })()
+  }, LaboratoryEvent.create("LaboratoryAuthorizationReceived", Authorization).handle("LaboratoryAuthorizationReceived", function(event) {
+    if (event.detail instanceof Authorization) {
+      reset();
+      return Exposed.auth = Store.auth = event.detail;
+    }
+  }));
+
+  Object.defineProperty(Client, "Request", {
+    configurable: false,
+    enumerable: true,
+    writable: false,
+    value: (function() {
+      var ClientRequest;
+      ClientRequest = function(data) {
+        var a, name, origin, redirect, scope;
+        if (!(this && this instanceof ClientRequest)) {
+          throw new TypeError("this is not a ClientRequest");
         }
-        if (scope & Authorization.Scope.FOLLOW) {
-          scopeList.push("follow");
-        }
-        return scopeList.join(" ");
-      })()
-    }, null, onComplete, onError);
+        name = (String(data.name)) || "Laboratory";
+        scope = (data.scope(instance in Authorization.Scope) ? data.scope : Authorization.Scope.READ);
+        a = document.createElement("a");
+        a.href = data.origin || "/";
+        origin = a.origin;
+        a.href = data.redirect || "";
+        redirect = a.href;
+        Request.call(this, "POST", origin + "/api/v1/apps", {
+          client_name: name,
+          redirect_uris: redirect,
+          scopes: (function() {
+            var scopeList;
+            scope = event.detail.scope;
+            scopeList = [];
+            if (scope & Authorization.Scope.READ) {
+              scopeList.push("read");
+            }
+            if (scope & Authorization.Scope.WRITE) {
+              scopeList.push("write");
+            }
+            if (scope & Authorization.Scope.FOLLOW) {
+              scopeList.push("follow");
+            }
+            return scopeList.join(" ");
+          })()
+        }, null, (function(_this) {
+          return function(result) {
+            return dispatch("LaboratoryClientReceived", decree(function() {
+              return _this.response = police(function() {
+                return new Client(result, origin, name, scope);
+              });
+            }));
+          };
+        })(this));
+        return Object.freeze(this);
+      };
+      Object.defineProperty(ClientRequest, "prototype", {
+        configurable: false,
+        enumerable: false,
+        writable: false,
+        value: Object.freeze(Object.create(Request.prototype, {
+          constructor: {
+            enumerable: false,
+            value: ClientRequest
+          }
+        }))
+      });
+      return ClientRequest;
+    })()
   });
+
+  LaboratoryEvent.create("LaboratoryClientReceived", Client);
 
   LaboratoryEvent.create("LaboratoryInitializationLoaded").create("LaboratoryInitializationReady");
 
-  LaboratoryEvent.create("LaboratoryPostRequested", {
-    id: void 0,
-    type: Post.Type.STATUS
-  }).create("LaboratoryPostReceived", Post).create("LaboratoryPostFailed", Failure).associate("LaboratoryPostRequested", "LaboratoryPostReceived", "LaboratoryPostFailed").create("LaboratoryPostCreation", {
-    text: "",
-    visibility: Post.Visibility.PRIVATE,
-    inReplyTo: void 0,
-    attachments: void 0,
-    message: void 0,
-    makeNSFW: true
-  }).create("LaboratoryPostDeletion", {
-    id: void 0
-  }).create("LaboratoryPostSetReblog", {
-    id: void 0,
-    value: true
-  }).create("LaboratoryPostSetFavourite", {
-    id: void 0,
-    value: true
-  }).handle("LaboratoryPostRequested", function(event) {
-    var id, isANotification, onComplete, onError, type;
-    if (!isFinite(id = Number(event.detail.id))) {
-      dispatch("LaboratoryPostFailed", new Failure("Unable to fetch post; no id specified", "LaboratoryPostRequested"));
-      return;
-    }
-    if (!((type = event.detail.type) instanceof Post.Type)) {
-      dispatch("LaboratoryPostFailed", new Failure("Unable to fetch post; no type specified", "LaboratoryPostRequested"));
-      return;
-    }
-    isANotification = type & Post.Type.Notification;
-    if (!isANotification && (Store.statuses[id] != null)) {
-      dispatch("LaboratoryPostReceived", Store.statuses[id]);
-    }
-    if (isANotification && (Store.notifications[id] != null)) {
-      dispatch("LaboratoryPostReceived", Store.notifications[id]);
-    }
-    onComplete = function(response, data, params) {
-      var post, store;
-      if (response.id !== id) {
-        dispatch("LaboratoryPostFailed", new Failure("Unable to fetch post; returned post did not match requested id", "LaboratoryPostRequested"));
-        return;
-      }
-      post = new Post(response);
-      if ((post.type & Post.Type.NOTIFICATION) !== isANotification) {
-        dispatch("LaboratoryPostFailed", new Failure("Unable to fetch post; returned post was not of specified type", "LaboratoryPostRequested"));
-        return;
-      }
-      store = isANotification ? Store.notifications : Store.statuses;
-      if (!post.compare(store[id])) {
-        return dispatch("LaboratoryPostReceived", post);
-      }
-    };
-    onError = function(response, data, params) {
-      return dispatch("LaboratoryPostFailed", new Failure(response.error, "LaboratoryPostRequested", params.status));
-    };
-    return serverRequest("GET", Store.auth.origin + (isANotification ? "/api/v1/notifications/" : "/api/v1/statuses/") + id, null, Store.auth.accessToken, onComplete, onError);
-  }).handle("LaboratoryPostReceived", function(event) {
-    var id;
-    if (event.detail instanceof Post && event.detail.type instanceof Post.Type && isFinite(id = Number(event.detail.id))) {
-      return (event.detail.type & Post.Type.NOTIFICATION ? Store.notifications : Store.statuses)[id] = event.detail;
-    }
-  }).handle("LaboratoryPostCreation", function(event) {
-    var attachment, attachments, inReplyTo, message, onComplete, onError;
-    onComplete = function(response, data, params) {
-      return dispatch("LaboratoryPostReceived", new Post(response));
-    };
-    onError = function(response, data, params) {
-      return dispatch("LaboratoryPostFailed", new Failure(response.error, "LaboratoryPostCreation", params.status));
-    };
-    return serverRequest("POST", Store.auth.origin + "/api/v1/statuses/", {
-      status: event.detail.text,
-      in_reply_to_id: (inReplyTo = event.detail.inReplyTo) > 0 && isFinite(inReplyTo) ? inReplyTo : void 0,
-      media_ids: (attachments = event.detail.attachments) instanceof Array ? (function() {
-        var i, len, results;
-        results = [];
-        for (i = 0, len = attachments.length; i < len; i++) {
-          attachment = attachments[i];
-          if (attachment instanceof Attachment) {
-            results.push(attachment.id);
+  Object.defineProperties(Post, {
+    Request: {
+      configurable: false,
+      enumerable: true,
+      writable: false,
+      value: (function() {
+        var PostRequest;
+        PostRequest = function(data, isLive, useCached) {
+          var callback, isNotification, postID, ref, requestStart, requestStop, store, type;
+          if (isLive == null) {
+            isLive = true;
           }
-        }
-        return results;
-      })() : void 0,
-      sensitive: event.detail.makeNSFW ? "true" : void 0,
-      spoiler_text: (message = event.detail.message) ? String(message) : void 0,
-      visibility: (function() {
-        switch (event.detail.visibility) {
-          case Post.Visibility.PUBLIC:
-            return "public";
-          case Post.Visibility.REBLOGGABLE:
-            return "unlisted";
-          default:
-            return "private";
-        }
+          if (useCached == null) {
+            useCached = true;
+          }
+          if (!(this && this instanceof PostRequest)) {
+            throw new TypeError("this is not a PostRequest");
+          }
+          if (!((2e308 > (ref = (postID = Math.floor(data != null ? data.id : void 0))) && ref > 0))) {
+            throw new TypeError("Unable to request post; no id provided");
+          }
+          if (!((type = Post.Type.fromValue(data.type)) && type !== Post.Type.UNKNOWN)) {
+            type = Post.Type.STATUS;
+          }
+          isNotification = type & Post.Type.NOTIFICATION;
+          store = isNotification ? Store.notifications : Store.statuses;
+          callback = (function(_this) {
+            return function(event) {
+              var response;
+              response = event.detail;
+              if (response instanceof Post && response.id === postID && (response.type & Post.Type.NOTIFICATION) === isNotification) {
+                if (!response.compare(_this.response)) {
+                  decree(function() {
+                    return _this.response = response;
+                  });
+                }
+                if (!isLive) {
+                  return _this.stop();
+                }
+              }
+            };
+          })(this);
+          Request.call(this, "GET", Store.auth.origin + (isNotification ? "/api/v1/notifications/" : "/api/v1/statuses/") + postID, null, Store.auth.accessToken, (function(_this) {
+            return function(result) {
+              var post;
+              if (result.id !== postID) {
+                _this.dispatchEvent(new CustomEvent("failure", {
+                  request: _this,
+                  response: new Failure("Unable to fetch post; returned post did not match requested id")
+                }));
+                return;
+              }
+              post = new Post(result);
+              if ((post.type & Post.Type.NOTIFICATION) !== isNotification) {
+                _this.dispatchEvent(new CustomEvent("failure", {
+                  request: _this,
+                  response: new Failure("Unable to fetch post; returned post was not of specified type")
+                }));
+                return;
+              }
+              return dispatch("LaboratoryPostReceived", post);
+            };
+          })(this));
+          requestStart = this.start;
+          requestStop = this.stop;
+          Object.defineProperties(this, {
+            start: {
+              enumerable: false,
+              value: function() {
+                if (useCached && store[postID] instanceof Post) {
+                  decree((function(_this) {
+                    return function() {
+                      return _this.response = store[postID];
+                    };
+                  })(this));
+                  if (!isLive) {
+                    return;
+                  }
+                }
+                document.addEventListener("LaboratoryPostReceived", callback);
+                return requestStart();
+              }
+            },
+            stop: {
+              enumerable: false,
+              value: function() {
+                document.removeEventListener("LaboratoryPostReceived", callback);
+                return requestStop();
+              }
+            }
+          });
+          return Object.freeze(this);
+        };
+        Object.defineProperty(PostRequest, "prototype", {
+          configurable: false,
+          enumerable: false,
+          writable: false,
+          value: Object.freeze(Object.create(Request.prototype, {
+            constructor: {
+              enumerable: false,
+              value: PostRequest
+            }
+          }))
+        });
+        return PostRequest;
       })()
-    }, Store.auth.accessToken, onComplete, onError);
-  }).handle("LaboratoryPostDeletion", function(event) {
-    var id, onComplete, onError;
-    if (!isFinite(id = Number(event.detail.id))) {
-      dispatch("LaboratoryPostFailed", new Failure("Unable to delete post; no id specified", "LaboratoryPostDeletion"));
-      return;
-    }
-    onComplete = function() {};
-    onError = function(response, data, params) {
-      return dispatch("LaboratoryPostFailed", new Failure(response.error, "LaboratoryPostDeletion", params.status));
-    };
-    return serverRequest("DELETE", Store.auth.origin + "/api/v1/statuses/" + id, null, Store.auth.accessToken, onComplete, onError);
-  }).handle("LaboratoryPostSetReblog", function(event) {
-    var id, onComplete, onError, ref, value;
-    if (!(((value = !!event.detail.value) != null) && isFinite(id = Number(event.detail.id)))) {
-      dispatch("LaboratoryPostFailed", new Failure("Cannot set reblog status for post: Either value or id is missing", "LaboratoryPostSetReblog"));
-    }
-    onComplete = function(response, data, params) {
-      return dispatch("LaboratoryPostReceived", new Post(response));
-    };
-    onError = function(response, data, params) {
-      return dispatch("LaboratoryPostFailed", new Failure(response.error, "LaboratoryPostSetReblog", params.status));
-    };
-    if (((ref = Store.statuses[id]) != null ? ref.isReblogged : void 0) !== value) {
-      return serverRequest("POST", Store.auth.origin + "/api/v1/statuses/" + id + (value ? "/reblog" : "/unreblog"), null, Store.auth.accessToken, onComplete, onError);
-    }
-  }).handle("LaboratoryPostSetFavourite", function(event) {
-    var id, onComplete, onError, ref, value;
-    if (!(((value = !!event.detail.value) != null) && isFinite(id = Number(event.detail.id)))) {
-      dispatch("LaboratoryPostFailed", new Failure("Cannot set favourite status for post: Either value or id is missing", "LaboratoryPostSetFavourite"));
-    }
-    onComplete = function(response, data, params) {
-      return dispatch("LaboratoryPostReceived", new Post(response));
-    };
-    onError = function(response, data, params) {
-      return dispatch("LaboratoryPostFailed", new Failure(response.error, "LaboratoryPostSetFavourite", params.status));
-    };
-    if (((ref = Store.statuses[id]) != null ? ref.isFavourited : void 0) !== value) {
-      return serverRequest("POST", Store.auth.origin + "/api/v1/statuses/" + id + (value ? "/favourite" : "/unfavourite"), null, Store.auth.accessToken, onComplete, onError);
+    },
+    Create: {
+      configurable: false,
+      enumerable: true,
+      writable: false,
+      value: (function() {
+        var PostCreate;
+        PostCreate = function(data) {
+          var attachment, attachments, inReplyTo, makeNSFW, message, ref, text, visibility;
+          if (!(this && this instanceof PostCreate)) {
+            throw new TypeError("this is not a PostCreate");
+          }
+          if (!(data != null ? data.text : void 0)) {
+            throw new TypeError("Unable to create post; no text provided");
+          }
+          text = String(data.text);
+          if (!(visibility = Post.Visibility.fromValue(data.visibility))) {
+            visibility = Post.Visibility.PRIVATE;
+          }
+          if (!((2e308 > (ref = (inReplyTo = Math.floor(data.inReplyTo))) && ref > 0))) {
+            inReplyTo = void 0;
+          }
+          attachments = (data.attachments instanceof Array ? data.attachments : void 0);
+          message = data.message != null ? String(data.message) : void 0;
+          makeNSFW = data.makeNSFW != null ? !!data.makeNSFW : void 0;
+          Request.call(this, "POST", Store.auth.origin + "/api/v1/statuses/", {
+            status: text,
+            in_reply_to_id: inReplyTo,
+            media_ids: attachments ? (function() {
+              var i, len, results;
+              results = [];
+              for (i = 0, len = attachments.length; i < len; i++) {
+                attachment = attachments[i];
+                if (attachment instanceof Attachment) {
+                  results.push(attachment.id);
+                }
+              }
+              return results;
+            })() : void 0,
+            sensitive: makeNSFW ? "true" : void 0,
+            spoiler_text: message,
+            visibility: (function() {
+              switch (visibility) {
+                case Post.Visibility.PUBLIC:
+                  return "public";
+                case Post.Visibility.REBLOGGABLE:
+                  return "unlisted";
+                default:
+                  return "private";
+              }
+            })()
+          }, Store.auth.accessToken, (function(_this) {
+            return function(result) {
+              return dispatch("LaboratoryPostReceived", decree(function() {
+                return _this.response = police(function() {
+                  return new Post(result);
+                });
+              }));
+            };
+          })(this));
+          return Object.freeze(this);
+        };
+        Object.defineProperty(PostCreate, "prototype", {
+          configurable: false,
+          enumerable: false,
+          writable: false,
+          value: Object.freeze(Object.create(Request.prototype, {
+            constructor: {
+              enumerable: false,
+              value: PostCreate
+            }
+          }))
+        });
+        return PostCreate;
+      })()
+    },
+    Delete: {
+      configurable: false,
+      enumerable: true,
+      writable: false,
+      value: (function() {
+        var PostDelete;
+        PostDelete = function(data) {
+          var postID, ref;
+          if (!(this && this instanceof PostDelete)) {
+            throw new TypeError("this is not a PostDelete");
+          }
+          if (!((2e308 > (ref = (postID = Math.floor(data != null ? data.id : void 0))) && ref > 0))) {
+            throw new TypeError("Unable to create post; no id provided");
+          }
+          Request.call(this, "DELETE", Store.auth.origin + "/api/v1/statuses/" + postID, null, Store.auth.accessToken, (function(_this) {
+            return function(result) {
+              return dispatch("LaboratoryPostDeleted", {
+                id: postID
+              });
+            };
+          })(this));
+          return Object.freeze(this);
+        };
+        Object.defineProperty(PostDelete, "prototype", {
+          configurable: false,
+          enumerable: false,
+          writable: false,
+          value: Object.freeze(Object.create(Request.prototype, {
+            constructor: {
+              enumerable: false,
+              value: PostDelete
+            }
+          }))
+        });
+        return PostDelete;
+      })()
+    },
+    SetReblog: {
+      configurable: false,
+      enumerable: true,
+      writable: false,
+      value: (function() {
+        var PostSetReblog;
+        PostSetReblog = function(data) {
+          var postID, ref, value;
+          if (!(this && this instanceof PostSetReblog)) {
+            throw new TypeError("this is not a PostSetReblog");
+          }
+          if (!((2e308 > (ref = (postID = Math.floor(data != null ? data.id : void 0))) && ref > 0))) {
+            throw new TypeError("Unable to reblog post; no id provided");
+          }
+          value = data.value ? !!data.value : true;
+          Request.call(this, "POST", Store.auth.origin + "/api/v1/statuses/" + postID + (value ? "/reblog" : "/unreblog"), null, Store.auth.accessToken, (function(_this) {
+            return function(result) {
+              return dispatch("LaboratoryPostReceived", decree(function() {
+                return _this.response = police(function() {
+                  return new Post(result);
+                });
+              }));
+            };
+          })(this));
+          return Object.freeze(this);
+        };
+        Object.defineProperty(PostSetReblog, "prototype", {
+          configurable: false,
+          enumerable: false,
+          writable: false,
+          value: Object.freeze(Object.create(Request.prototype, {
+            constructor: {
+              enumerable: false,
+              value: PostSetReblog
+            }
+          }))
+        });
+        return PostSetReblog;
+      })()
+    },
+    SetFavourite: {
+      configurable: false,
+      enumerable: true,
+      writable: false,
+      value: (function() {
+        var PostSetFavourite;
+        PostSetFavourite = function(data) {
+          var postID, ref, value;
+          if (!(this && this instanceof PostSetFavourite)) {
+            throw new TypeError("this is not a PostSetFavourite");
+          }
+          if (!((2e308 > (ref = (postID = Math.floor(data != null ? data.id : void 0))) && ref > 0))) {
+            throw new TypeError("Unable to favourite post; no id provided");
+          }
+          value = data.value ? !!data.value : true;
+          Request.call(this, "POST", Store.auth.origin + "/api/v1/statuses/" + postID + (value ? "/favourite" : "/unfavourite"), null, Store.auth.accessToken, (function(_this) {
+            return function(result) {
+              return dispatch("LaboratoryPostReceived", decree(function() {
+                return _this.response = police(function() {
+                  return new Post(result);
+                });
+              }));
+            };
+          })(this));
+          return Object.freeze(this);
+        };
+        Object.defineProperty(PostSetFavourite, "prototype", {
+          configurable: false,
+          enumerable: false,
+          writable: false,
+          value: Object.freeze(Object.create(Request.prototype, {
+            constructor: {
+              enumerable: false,
+              value: PostSetFavourite
+            }
+          }))
+        });
+        return PostSetFavourite;
+      })()
     }
   });
 
-  LaboratoryEvent.create("LaboratoryProfileRequested", {
-    id: void 0,
-    requestRelationships: true
-  }).create("LaboratoryProfileReceived", Profile).create("LaboratoryProfileFailed", Failure).associate("LaboratoryProfileRequested", "LaboratoryProfileReceived", "LaboratoryProfileFailed").create("LaboratoryProfileSetRelationship", {
-    id: void 0,
-    relationship: void 0
-  }).handle("LaboratoryProfileRequested", function(event) {
-    var id, onComplete, onError, onRelationshipsComplete;
-    if (!isFinite(id = Number(event.detail.id))) {
-      dispatch("LaboratoryProfileFailed", new Failure("Unable to fetch profile; no id specified", "LaboratoryProfileRequested"));
-      return;
+  LaboratoryEvent.create("LaboratoryPostReceived", Post).create("LaboratoryPostDeleted", {
+    id: void 0
+  }).handle("LaboratoryPostReceived", function(event) {
+    var id, post, ref, type;
+    if ((post = event.detail) instanceof Post && (type = post.type) instanceof Post.Type && (2e308 > (ref = (id = Math.floor(post.id))) && ref > 0)) {
+      return Store[["notifications", "statuses"][+(!(type & Post.Type.NOTIFICATION))]][id] = post;
     }
-    if (Store.profiles[id] != null) {
-      dispatch("LaboratoryProfileReceived", Store.profiles[id]);
+  }).handle("LaboratoryPostDeleted", function(event) {
+    var id, ref;
+    if ((2e308 > (ref = (id = Math.floor(event.detail.id))) && ref > 0)) {
+      return delete Store.statuses[id];
     }
-    onComplete = function(response, data, params) {
-      var profile;
-      if (response.id !== id) {
-        dispatch("LaboratoryProfileFailed", new Failure("Unable to fetch profile; returned profile did not match requested id", "LaboratoryProfileRequested"));
-        return;
-      }
-      profile = new Profile(response);
-      if (!profile.compare(Store.profiles[id])) {
-        dispatch("LaboratoryProfileReceived", profile);
-      }
-      if (event.detail.requestRelationships) {
-        return serverRequest("GET", Store.auth.origin + "/api/v1/accounts/relationships", {
-          id: id
-        }, Store.auth.accessToken, onRelationshipsComplete, onError);
-      }
-    };
-    onRelationshipsComplete = function(response, data, params) {
-      var ref, relationship, relationships;
-      relationships = response[0];
-      if (((ref = Store.profiles[id]) != null ? ref.relationship : void 0) === (relationship = Profile.Relationship.fromValue((Profile.Relationship.FOLLOWER * relationships.followed_by + Profile.Relationship.FOLLOWING * relationships.following + Profile.Relationship.REQUESTED * relationships.requested + Profile.Relationship.BLOCKING * relationships.blocking + Profile.Relationship.MUTING * relationships.muting + Profile.Relationship.SELF * (relationships.id === Store.auth.me)) || Profile.Relationship.UNKNOWN))) {
-        return;
-      }
-      return dispatch("LaboratoryProfileReceived", new Profile(Store.profiles[id], relationship));
-    };
-    onError = function(response, data, params) {
-      return dispatch("LaboratoryProfileFailed", new Failure(response.error, "LaboratoryProfileRequested", params.status));
-    };
-    return serverRequest("GET", Store.auth.origin + "/api/v1/accounts/" + id, null, Store.auth.accessToken, onComplete, onError);
-  }).handle("LaboratoryProfileReceived", function(event) {
-    var id;
-    if (event.detail instanceof Profile && isFinite(id = Number(event.detail.id))) {
-      return Store.profiles[id] = event.detail;
+  });
+
+  Object.defineProperties(Profile, {
+    Request: {
+      configurable: false,
+      enumerable: true,
+      writable: false,
+      value: (function() {
+        var ProfileRequest;
+        ProfileRequest = function(data, isLive, useCached) {
+          var callback, profileID, ref, relationshipRequest, requestStart, requestStop;
+          if (isLive == null) {
+            isLive = true;
+          }
+          if (useCached == null) {
+            useCached = true;
+          }
+          if (!(this && this instanceof ProfileRequest)) {
+            throw new TypeError("this is not a ProfileRequest");
+          }
+          if (!((2e308 > (ref = (profileID = Math.floor(data != null ? data.id : void 0))) && ref > 0))) {
+            throw new TypeError("Unable to request profile; no id provided");
+          }
+          callback = (function(_this) {
+            return function(event) {
+              var response;
+              response = event.detail;
+              if (response instanceof Profile && response.id === profileID) {
+                if (!response.compare(_this.response)) {
+                  decree(function() {
+                    return _this.response = response;
+                  });
+                }
+                if (!isLive) {
+                  return _this.stop();
+                }
+              }
+            };
+          })(this);
+          Request.call(this, "GET", Store.auth.origin + "/api/v1/accounts/" + profileID, null, Store.auth.accessToken, (function(_this) {
+            return function(result) {
+              if (result.id !== profileID) {
+                _this.dispatchEvent(new CustomEvent("failure", {
+                  id: _this.id,
+                  request: _this,
+                  response: new Failure("Unable to fetch profile; returned profile did not match requested id")
+                }));
+                return;
+              }
+              dispatch("LaboratoryProfileReceived", new Profile(result));
+              return relationshipRequest.start();
+            };
+          })(this));
+          relationshipRequest = new Request("GET", Store.auth.origin + "/api/v1/accounts/relationships", {
+            id: postID
+          }, Store.auth.accessToken, (function(_this) {
+            return function(result) {
+              var ref1, relID, relationship, relationships;
+              relationships = response[0];
+              relID = relationships.id;
+              relationship = Profile.Relationship.fromValue((Profile.Relationship.FOLLOWER * relationships.followed_by + Profile.Relationship.FOLLOWING * relationships.following + Profile.Relationship.REQUESTED * relationships.requested + Profile.Relationship.BLOCKING * relationships.blocking + Profile.Relationship.MUTING * relationships.muting + Profile.Relationship.SELF * (relID === Store.auth.me)) || Profile.Relationship.UNKNOWN);
+              if (((ref1 = Store.profiles[relID]) != null ? ref1.relationship : void 0) !== relaltionship) {
+                return dispatch("LaboratoryProfileReceived", new Profile(Store.profiles[relID] || {
+                  id: relID
+                }, relationship));
+              }
+            };
+          })(this));
+          requestStart = this.start;
+          requestStop = this.stop;
+          Object.defineProperties(this, {
+            start: {
+              enumerable: false,
+              value: function() {
+                if (useCached && Store.profiles[profileID] instanceof Profile) {
+                  decree((function(_this) {
+                    return function() {
+                      return _this.response = Store.profiles[profileID];
+                    };
+                  })(this));
+                  if (!isLive) {
+                    return;
+                  }
+                }
+                document.addEventListener("LaboratoryProfileReceived", callback);
+                return requestStart();
+              }
+            },
+            stop: {
+              enumerable: false,
+              value: function() {
+                document.removeEventListener("LaboratoryProfileReceived", callback);
+                requestStop();
+                return relationshipRequest.stop();
+              }
+            }
+          });
+          return Object.freeze(this);
+        };
+        Object.defineProperty(ProfileRequest, "prototype", {
+          configurable: false,
+          enumerable: false,
+          writable: false,
+          value: Object.freeze(Object.create(Request.prototype, {
+            constructor: {
+              enumerable: false,
+              value: ProfileRequest
+            }
+          }))
+        });
+        return ProfileRequest;
+      })()
+    },
+    SetFollow: {
+      configurable: false,
+      enumerable: true,
+      writable: false,
+      value: (function() {
+        var ProfileSetFollow;
+        ProfileSetFollow = function(data) {
+          var profileID, ref, value;
+          if (!(this && this instanceof ProfileSetFollow)) {
+            throw new TypeError("this is not a ProfileSetFollow");
+          }
+          if (!((2e308 > (ref = (profileID = Math.floor(data != null ? data.id : void 0))) && ref > 0))) {
+            throw new TypeError("Unable to follow account; no id provided");
+          }
+          value = data.value ? !!data.value : true;
+          Request.call(this, "POST", Store.auth.origin + "/api/v1/accounts/" + profileID + (value ? "/follow" : "/unfollow"), null, Store.auth.accessToken, (function(_this) {
+            return function(result) {
+              return dispatch("LaboratoryProfileReceived", decree(function() {
+                return _this.response = police(function() {
+                  return new Profile(result);
+                });
+              }));
+            };
+          })(this));
+          return Object.freeze(this);
+        };
+        Object.defineProperty(ProfileSetFollow, "prototype", {
+          configurable: false,
+          enumerable: false,
+          writable: false,
+          value: Object.freeze(Object.create(Request.prototype, {
+            constructor: {
+              enumerable: false,
+              value: ProfileSetFollow
+            }
+          }))
+        });
+        return ProfileSetFollow;
+      })()
+    },
+    SetBlock: {
+      configurable: false,
+      enumerable: true,
+      writable: false,
+      value: (function() {
+        var ProfileSetBlock;
+        ProfileSetBlock = function(data) {
+          var profileID, ref, value;
+          if (!(this && this instanceof ProfileSetBlock)) {
+            throw new TypeError("this is not a ProfileSetBlock");
+          }
+          if (!((2e308 > (ref = (profileID = Math.floor(data != null ? data.id : void 0))) && ref > 0))) {
+            throw new TypeError("Unable to block account; no id provided");
+          }
+          value = data.value ? !!data.value : true;
+          Request.call(this, "POST", Store.auth.origin + "/api/v1/accounts/" + profileID + (value ? "/block" : "/unblock"), null, Store.auth.accessToken, (function(_this) {
+            return function(result) {
+              return dispatch("LaboratoryProfileReceived", decree(function() {
+                return _this.response = police(function() {
+                  return new Profile(result);
+                });
+              }));
+            };
+          })(this));
+          return Object.freeze(this);
+        };
+        Object.defineProperty(ProfileSetBlock, "prototype", {
+          configurable: false,
+          enumerable: false,
+          writable: false,
+          value: Object.freeze(Object.create(Request.prototype, {
+            constructor: {
+              enumerable: false,
+              value: ProfileSetBlock
+            }
+          }))
+        });
+        return ProfileSetBlock;
+      })()
+    },
+    SetMute: {
+      configurable: false,
+      enumerable: true,
+      writable: false,
+      value: (function() {
+        var ProfileSetMute;
+        ProfileSetMute = function(data) {
+          var profileID, ref, value;
+          if (!(this && this instanceof ProfileSetMute)) {
+            throw new TypeError("this is not a ProfileSetMute");
+          }
+          if (!((2e308 > (ref = (profileID = Math.floor(data != null ? data.id : void 0))) && ref > 0))) {
+            throw new TypeError("Unable to mute account; no id provided");
+          }
+          value = data.value ? !!data.value : true;
+          Request.call(this, "POST", Store.auth.origin + "/api/v1/accounts/" + profileID + (value ? "/mute" : "/unmute"), null, Store.auth.accessToken, (function(_this) {
+            return function(result) {
+              return dispatch("LaboratoryProfileReceived", decree(function() {
+                return _this.response = police(function() {
+                  return new Profile(result);
+                });
+              }));
+            };
+          })(this));
+          return Object.freeze(this);
+        };
+        Object.defineProperty(ProfileSetMute, "prototype", {
+          configurable: false,
+          enumerable: false,
+          writable: false,
+          value: Object.freeze(Object.create(Request.prototype, {
+            constructor: {
+              enumerable: false,
+              value: ProfileSetMute
+            }
+          }))
+        });
+        return ProfileSetMute;
+      })()
     }
-  }).handle("LaboratoryProfileSetRelationship", function(event) {
-    var changes, id, onComplete, onError, profile, relationship;
-    if (!((relationship = event.detail.relationship) instanceof Profile.Relationship && isFinite(id = Number(event.detail.id)))) {
-      dispatch("LaboratoryProfileFailed", new Failure("Cannot set relationship for account: Either relationship or id is missing", "LaboratoryProfileSetRelationship"));
-    }
-    onComplete = function(response, data, params) {
-      return dispatch("LaboratoryProfileReceived", new Profile(response));
-    };
-    onError = function(response, data, params) {
-      return dispatch("LaboratoryProfileFailed", new Failure(response.error, "LaboratoryProfileSetRelationship", params.status));
-    };
-    if ((profile = Store.profiles[id]) instanceof Profile) {
-      changes = profile.relationship ^ relationship;
-      if (changes & Profile.FOLLOWING) {
-        serverRequest("POST", Store.auth.origin + "/api/v1/accounts/" + id + (relationship & Profile.FOLLOWING ? "/follow" : "/unfollow"), null, Store.auth.accessToken, onComplete, onError);
-      } else if (changes & Profile.REQUESTED) {
-        serverRequest("POST", Store.auth.origin + "/api/v1/accounts/" + id + (relationship & Profile.REQUESTED ? "/follow" : "/unfollow"), null, Store.auth.accessToken, onComplete, onError);
-      }
-      if (changes & Profile.BLOCKING) {
-        serverRequest("POST", Store.auth.origin + "/api/v1/accounts/" + id + (relationship & Profile.BLOCKING ? "/block" : "/unblock"), null, Store.auth.accessToken, onComplete, onError);
-      }
-      if (changes & Profile.MUTING) {
-        return serverRequest("POST", Store.auth.origin + "/api/v1/accounts/" + id + (relationship & Profile.MUTING ? "/mute" : "/unmute"), null, Store.auth.accessToken, onComplete, onError);
-      }
-    } else {
-      serverRequest("POST", Store.auth.origin + "/api/v1/accounts/" + id + (relationship & Profile.FOLLOWING || relationship & Profile.REQUESTED ? "/follow" : "/unfollow"), null, Store.auth.accessToken, onComplete, onError);
-      serverRequest("POST", Store.auth.origin + "/api/v1/accounts/" + id + (relationship & Profile.BLOCKING ? "/block" : "/unblock"), null, Store.auth.accessToken, onComplete, onError);
-      return serverRequest("POST", Store.auth.origin + "/api/v1/accounts/" + id + (relationship & Profile.MUTING ? "/mute" : "/unmute"), null, Store.auth.accessToken, onComplete, onError);
+  });
+
+  LaboratoryEvent.create("LaboratoryProfileReceived", Profile).handle("LaboratoryProfileReceived", function(event) {
+    var id, profile, ref;
+    if ((profile = event.detail) instanceof Profile && (2e308 > (ref = (id = Math.floor(profile.id))) && ref > 0)) {
+      return Store.profiles[id] = profile;
     }
   });
 
   LaboratoryEvent.create("LaboratoryRequestOpen", XMLHttpRequest).create("LaboratoryRequestUpdate", XMLHttpRequest).create("LaboratoryRequestComplete", XMLHttpRequest).create("LaboratoryRequestError", XMLHttpRequest);
 
-  LaboratoryEvent.create("LaboratoryRolodexRequested", {
-    type: Rolodex.Type.SEARCH,
-    query: "",
-    before: void 0,
-    after: void 0,
-    limit: void 0
-  }).create("LaboratoryRolodexReceived", Rolodex).create("LaboratoryRolodexFailed", Failure).associate("LaboratoryRolodexRequested", "LaboratoryRolodexReceived", "LaboratoryRolodexFailed").handle("LaboratoryRolodexRequested", function(event) {
-    var after, before, limit, onComplete, onError, query, type;
-    query = String(event.detail.query);
-    if (!isFinite(limit = Number(event.detail.limit))) {
-      limit = null;
-    }
-    if (!isFinite(before = Number(event.detail.before))) {
-      before = null;
-    }
-    if (!isFinite(after = Number(event.detail.after))) {
-      after = null;
-    }
-    if (!((type = event.detail.type) instanceof Rolodex.Type && type !== Rolodex.Type.UNDEFINED)) {
-      dispatch("LaboratoryRolodexFailed", new Failure("Unable to fetch rolodex; no type specified", "LaboratoryRolodexRequested"));
-      return;
-    }
-    onComplete = function(response, data, params) {
-      var account, i, ids, len;
-      ids = [];
-      for (i = 0, len = response.length; i < len; i++) {
-        account = response[i];
-        if ((ids.indexOf(account.id)) === -1 && ids.push(account.id)) {
-          dispatch("LaboratoryProfileReceived", account);
+  Object.defineProperties(Rolodex, "Request", {
+    configurable: false,
+    enumerable: true,
+    writable: false,
+    value: (function() {
+      var RolodexRequest;
+      RolodexRequest = function(data, before, after) {
+        var limit, query, ref, type;
+        if (!(this && this instanceof RolodexRequest)) {
+          throw new TypeError("this is not a RolodexRequest");
         }
-      }
-      return dispatch("LaboratoryRolodexReceived", new Rolodex(response, {
-        type: type,
-        query: query,
-        before: ((params.prev.match(/.*since_id=([0-9]+)/)) || [])[1],
-        after: ((params.next.match(/.*max_id=([0-9]+)/)) || [])[1]
-      }));
-    };
-    onError = function(response, data, params) {
-      return dispatch("LaboratoryRolodexFailed", new Failure(response.error, "LaboratoryRolodexRequested", params.status));
-    };
-    return serverRequest("GET", Store.auth.origin + ((function() {
-      switch (type) {
-        case Rolodex.Type.SEARCH:
-          return "/api/v1/accounts/search";
-        case Rolodex.Type.FOLLOWERS:
-          return "/api/v1/accounts/" + query + "/followers";
-        case Rolodex.Type.FOLLOWING:
-          return "/api/v1/accounts/" + query + "/following";
-        case Rolodex.Type.FAVOURITED_BY:
-          return "/api/v1/statuses/" + query + "/favourited_by";
-        case Rolodex.Type.REBLOGGED_BY:
-          return "/api/v1/statuses/" + query + "/reblogged_by";
-        case Rolodex.Type.BLOCKS:
-          return "/api/v1/blocks";
-        case Rolodex.Type.MUTES:
-          return "/api/v1/mutes";
-        default:
-          return "/api/v1";
-      }
-    })()), ((function() {
-      switch (type) {
-        case Rolodex.Type.SEARCH:
-          return {
-            q: query,
-            limit: limit
-          };
-        case Rolodex.Type.FOLLOWERS:
-        case Rolodex.Type.FOLLOWING:
-        case Rolodex.Type.FAVOURITED_BY:
-        case Rolodex.Type.REBLOGGED_BY:
-        case Rolodex.Type.BLOCKS:
-        case Rolodes.Type.MUTES:
-          return {
-            max_id: before,
-            since_id: after
-          };
-        default:
-          return null;
-      }
-    })()), Store.auth.accessToken, onComplete, onError);
-  });
-
-  LaboratoryEvent.create("LaboratoryTimelineRequested", {
-    type: Timeline.Type.HOME,
-    query: "",
-    before: void 0,
-    after: void 0
-  }).create("LaboratoryTimelineReceived", Timeline).create("LaboratoryTimelineFailed", Failure).associate("LaboratoryTimelineRequested", "LaboratoryTimelineReceived", "LaboratoryTimelineFailed").handle("LaboratoryTimelineRequested", function(event) {
-    var after, before, onComplete, onError, query, type;
-    query = String(event.detail.query);
-    if (!isFinite(before = Number(event.detail.before))) {
-      before = null;
-    }
-    if (!isFinite(after = Number(event.detail.after))) {
-      after = null;
-    }
-    if (!((type = event.detail.type) instanceof Timeline.Type && type !== Timeline.Type.UNDEFINED)) {
-      dispatch("LaboratoryTimelineFailed", new Failure("Unable to fetch timeline; no type specified", "LaboratoryTimelineRequested"));
-      return;
-    }
-    onComplete = function(response, data, params) {
-      var account, acctIDs, i, ids, j, k, len, len1, len2, mention, mentionIDs, mentions, ref, ref1, ref2, status;
-      acctIDs = [];
-      mentions = [];
-      mentionIDs = [];
-      ids = [];
-      for (i = 0, len = response.length; i < len; i++) {
-        status = response[i];
-        if (!((ids.indexOf(status.id)) === -1 && ids.push(status.id))) {
-          continue;
+        if (!((type = Rolodex.Type.fromValue(data.type)) && type !== Rolodex.Type.UNDEFINED)) {
+          throw new TypeError("Unable to request rolodex; no type provided");
         }
-        if ((acctIDs.indexOf(status.account.id)) === -1 && acctIDs.push(status.account.id)) {
-          dispatch("LaboratoryProfileReceived", new Profile(status.account));
-        }
-        if ((((ref = status.status) != null ? ref.account : void 0) != null) && (acctIDs.indexOf(status.status.account.id)) === -1 && acctIDs.push(status.status.account.id)) {
-          dispatch("LaboratoryProfileReceived", new Profile(status.status.account));
-        }
-        if ((((ref1 = status.reblog) != null ? ref1.account : void 0) != null) && (acctIDs.indexOf(status.reblog.account.id)) === -1 && acctIDs.push(status.reblog.account.id)) {
-          dispatch("LaboratoryProfileReceived", new Profile(status.reblog.account));
-        }
-        if (status.mentions instanceof Array) {
-          ref2 = status.mentions;
-          for (j = 0, len1 = ref2.length; j < len1; j++) {
-            account = ref2[j];
-            if (!((mentionIDs.indexOf(account.id)) === -1)) {
-              continue;
-            }
-            mentionIDs.push(account.id);
-            mentions.push(account);
+        query = data.query != null ? String(data.query) : void 0;
+        limit = (2e308 > (ref = data.limit) && ref > 0) ? Math.floor(data.limit) : void 0;
+        before = void 0;
+        after = void 0;
+        Request.call(this, "GET", Store.auth.origin + ((function() {
+          switch (type) {
+            case Rolodex.Type.SEARCH:
+              return "/api/v1/accounts/search";
+            case Rolodex.Type.FOLLOWERS:
+              return "/api/v1/accounts/" + query + "/followers";
+            case Rolodex.Type.FOLLOWING:
+              return "/api/v1/accounts/" + query + "/following";
+            case Rolodex.Type.FAVOURITED_BY:
+              return "/api/v1/statuses/" + query + "/favourited_by";
+            case Rolodex.Type.REBLOGGED_BY:
+              return "/api/v1/statuses/" + query + "/reblogged_by";
+            case Rolodex.Type.BLOCKS:
+              return "/api/v1/blocks";
+            case Rolodex.Type.MUTES:
+              return "/api/v1/mutes";
           }
-        }
-        dispatch("LaboratoryPostReceived", new Post(status));
-      }
-      for (k = 0, len2 = mentions.length; k < len2; k++) {
-        mention = mentions[k];
-        if ((acctIDs.indexOf(mention.id)) === -1 && (Store.profiles[mention.id] == null)) {
-          dispatch("LaboratoryProfileReceived", new Profile(mention));
-        }
-      }
-      return dispatch("LaboratoryTimelineReceived", new Timeline(response, {
-        type: type,
-        query: query,
-        before: ((params.prev.match(/.*since_id=([0-9]+)/)) || [])[1],
-        after: ((params.next.match(/.*max_id=([0-9]+)/)) || [])[1]
-      }));
-    };
-    onError = function(response, data, params) {
-      return dispatch("LaboratoryTimelineFailed", new Failure(response.error, "LaboratoryTimelineRequested", params.status));
-    };
-    return serverRequest("GET", Store.auth.origin + ((function() {
-      switch (type) {
-        case Timeline.Type.HASHTAG:
-          return "/api/v1/timelines/tag/" + query;
-        case Timeline.Type.LOCAL:
-          return "/api/v1/timelines/public";
-        case Timeline.Type.GLOBAL:
-          return "/api/v1/timelines/public";
-        case Timeline.Type.HOME:
-          return "/api/v1/timelines/home";
-        case Timeline.Type.NOTIFICATIONS:
-          return "/api/v1/notifications";
-        case Timeline.Type.FAVOURITES:
-          return "/api/v1/favourites";
-        case Timeline.Type.ACCOUNT:
-          return "/api/v1/accounts/" + query + "/statuses";
-        default:
-          return "/api/v1";
-      }
-    })()), ((function() {
-      switch (type) {
-        case Timeline.Type.LOCAL:
-          return {
-            local: true,
-            max_id: before,
-            since_id: after
+        })()), ((function() {
+          switch (type) {
+            case Rolodex.Type.SEARCH:
+              return {
+                q: query,
+                limit: limit
+              };
+            default:
+              return {
+                max_id: before,
+                since_id: after
+              };
+          }
+        })()), Store.auth.accessToken, (function(_this) {
+          return function(result, params) {
+            var account, i, ids, len, ref1, ref2, ref3;
+            ids = [];
+            before = (((ref1 = params.prev) != null ? ref1.match(/.*since_id=([0-9]+)/) : void 0) || [])[1];
+            after = (((ref2 = params.next) != null ? ref2.match(/.*max_id=([0-9]+)/) : void 0) || [])[1];
+            for (i = 0, len = result.length; i < len; i++) {
+              account = result[i];
+              if (!(ref3 = account.id, indexOf.call(ids, ref3) < 0)) {
+                continue;
+              }
+              ids.push(account.id);
+              dispatch("LaboratoryProfileReceived", new Profile(account));
+            }
+            return decree(function() {
+              return _this.response = police(function() {
+                return new Rolodex(result, data);
+              });
+            });
           };
-        default:
-          return {
-            max_id: before,
-            since_id: after
-          };
-      }
-    })()), Store.auth.accessToken, onComplete, onError);
+        })(this));
+        Object.defineProperties(this, {
+          before: {
+            enumerable: true,
+            get: function() {
+              return before;
+            }
+          },
+          after: {
+            enumerable: true,
+            get: function() {
+              return after;
+            }
+          },
+          prev: {
+            enumerable: false,
+            value: function() {
+              return new RolodexRequest(data, void 0, before);
+            }
+          },
+          next: {
+            enumerable: false,
+            value: function() {
+              return new RolodexRequest(data, after);
+            }
+          },
+          loadMore: {
+            enumerable: false,
+            value: (function(_this) {
+              return function() {
+                var callback, next;
+                callback = function(event) {
+                  after = next.after;
+                  decree(function() {
+                    return _this.response = police(function() {
+                      return this.response.join(new Rolodex(next.response));
+                    });
+                  });
+                  return next.removeEventListener("response", callback);
+                };
+                (next = _this.next()).addEventListener("response", callback);
+                return next.start();
+              };
+            })(this)
+          },
+          update: {
+            enumerable: false,
+            value: (function(_this) {
+              return function(keepGoing) {
+                var callback, next;
+                callback = function(event) {
+                  var next, result;
+                  before = prev.before;
+                  result = new Rolodex(prev.response);
+                  decree(function() {
+                    return _this.response = police(function() {
+                      return this.response.join(result);
+                    });
+                  });
+                  prev.removeEventListener("response", callback);
+                  if (keepGoing && result.length) {
+                    (next = _this.next()).addEventListener("response", callback);
+                    return next.start();
+                  }
+                };
+                (next = _this.next()).addEventListener("response", callback);
+                return next.start();
+              };
+            })(this)
+          }
+        });
+        return Object.freeze(this);
+      };
+      Object.defineProperty(RolodexRequest, "prototype", {
+        configurable: false,
+        enumerable: false,
+        writable: false,
+        value: Object.freeze(Object.create(Request.prototype, {
+          constructor: {
+            enumerable: false,
+            value: RolodexRequest
+          },
+          prev: {
+            enumerable: false,
+            value: function() {}
+          },
+          next: {
+            enumerable: false,
+            value: function() {}
+          },
+          loadMore: {
+            enumerable: false,
+            value: function() {}
+          },
+          update: {
+            enumerable: false,
+            value: function() {}
+          }
+        }))
+      });
+      return RolodexRequest;
+    })()
   });
 
-  Store = {
-    auth: null,
-    notifications: {},
-    profiles: {},
-    statuses: {}
-  };
+  Object.defineProperty(Timeline, "Request", {
+    configurable: false,
+    enumerable: true,
+    writable: false,
+    value: (function() {
+      var TimelineRequest;
+      TimelineRequest = function(data, before, after) {
+        var limit, query, ref, type;
+        if (!(this && this instanceof TimelineRequest)) {
+          throw new TypeError("this is not a TimelineRequest");
+        }
+        if (!((type = Timeline.Type.fromValue(data.type)) && type !== Timeline.Type.UNDEFINED)) {
+          throw new TypeError("Unable to request rolodex; no type provided");
+        }
+        query = data.query != null ? String(data.query) : void 0;
+        limit = (2e308 > (ref = data.limit) && ref > 0) ? Math.floor(data.limit) : void 0;
+        before = void 0;
+        after = void 0;
+        Request.call(this, "GET", Store.auth.origin + ((function() {
+          switch (type) {
+            case Timeline.Type.HASHTAG:
+              return "/api/v1/timelines/tag/" + query;
+            case Timeline.Type.LOCAL:
+              return "/api/v1/timelines/public";
+            case Timeline.Type.GLOBAL:
+              return "/api/v1/timelines/public";
+            case Timeline.Type.HOME:
+              return "/api/v1/timelines/home";
+            case Timeline.Type.NOTIFICATIONS:
+              return "/api/v1/notifications";
+            case Timeline.Type.FAVOURITES:
+              return "/api/v1/favourites";
+            case Timeline.Type.ACCOUNT:
+              return "/api/v1/accounts/" + query + "/statuses";
+            default:
+              return "/api/v1";
+          }
+        })()), ((function() {
+          switch (type) {
+            case Timeline.Type.LOCAL:
+              return {
+                local: true,
+                max_id: before,
+                since_id: after
+              };
+            default:
+              return {
+                max_id: before,
+                since_id: after
+              };
+          }
+        })()), Store.auth.accessToken, (function(_this) {
+          return function(result, params) {
+            var account, acctIDs, i, ids, j, k, l, len, len1, len2, len3, mention, mentionIDs, mentions, ref1, ref10, ref2, ref3, ref4, ref5, ref6, ref7, ref8, ref9, status;
+            acctIDs = [];
+            mentions = [];
+            mentionIDs = [];
+            ids = [];
+            before = (((ref1 = params.prev) != null ? ref1.match(/.*since_id=([0-9]+)/) : void 0) || [])[1];
+            after = (((ref2 = params.next) != null ? ref2.match(/.*max_id=([0-9]+)/) : void 0) || [])[1];
+            for (i = 0, len = result.length; i < len; i++) {
+              status = result[i];
+              if (!(ref3 = status.id, indexOf.call(ids, ref3) < 0)) {
+                continue;
+              }
+              ids.push(status.id);
+              ref6 = [status.account, (ref4 = status.status) != null ? ref4.account : void 0, (ref5 = status.reblog) != null ? ref5.account : void 0];
+              for (j = 0, len1 = ref6.length; j < len1; j++) {
+                account = ref6[j];
+                if (!(account)) {
+                  continue;
+                }
+                acctIDs.push(account.id);
+                dispatch("LaboratoryProfileReceived", new Profile(account));
+              }
+              if ((mentions = status.mentions || ((ref7 = status.status) != null ? ref7.mentions : void 0) || ((ref8 = status.reblog) != null ? ref8.mentions : void 0)) instanceof Array) {
+                for (k = 0, len2 = mentions.length; k < len2; k++) {
+                  account = mentions[k];
+                  if (!(ref9 = account.id, indexOf.call(mentionIDs, ref9) < 0)) {
+                    continue;
+                  }
+                  mentionIDs.push(account.id);
+                  mentions.push(account);
+                }
+              }
+              dispatch("LaboratoryPostReceived", new Post(status));
+            }
+            for (l = 0, len3 = mentions.length; l < len3; l++) {
+              mention = mentions[l];
+              if ((ref10 = mention.id, indexOf.call(acctIDs, ref10) < 0) && (Store.profiles[mention.id] == null)) {
+                dispatch("LaboratoryProfileReceived", new Profile(mention));
+              }
+            }
+            return decree(function() {
+              return _this.response = police(function() {
+                return new Timeline(result, data);
+              });
+            });
+          };
+        })(this));
+        Object.defineProperties(this, {
+          before: {
+            enumerable: true,
+            get: function() {
+              return before;
+            }
+          },
+          after: {
+            enumerable: true,
+            get: function() {
+              return after;
+            }
+          },
+          prev: {
+            enumerable: false,
+            value: function() {
+              return new TimelineRequest(data, void 0, before);
+            }
+          },
+          next: {
+            enumerable: false,
+            value: function() {
+              return new TimelineRequest(data, after);
+            }
+          },
+          loadMore: {
+            enumerable: false,
+            value: (function(_this) {
+              return function() {
+                var callback, next;
+                callback = function(event) {
+                  after = next.after;
+                  decree(function() {
+                    return _this.response = police(function() {
+                      return this.response.join(new Timeline(next.response));
+                    });
+                  });
+                  return next.removeEventListener("response", callback);
+                };
+                (next = _this.next()).addEventListener("response", callback);
+                return next.start();
+              };
+            })(this)
+          },
+          update: {
+            enumerable: false,
+            value: (function(_this) {
+              return function(keepGoing) {
+                var callback, next;
+                callback = function(event) {
+                  var next, result;
+                  before = prev.before;
+                  result = new Timeline(prev.response);
+                  decree(function() {
+                    return _this.response = police(function() {
+                      return this.response.join(result);
+                    });
+                  });
+                  prev.removeEventListener("response", callback);
+                  if (keepGoing && result.length) {
+                    (next = _this.next()).addEventListener("response", callback);
+                    return next.start();
+                  }
+                };
+                (next = _this.next()).addEventListener("response", callback);
+                return next.start();
+              };
+            })(this)
+          }
+        });
+        return Object.freeze(this);
+      };
+      Object.defineProperty(TimelineRequest, "prototype", {
+        configurable: false,
+        enumerable: false,
+        writable: false,
+        value: Object.freeze(Object.create(Request.prototype, {
+          constructor: {
+            enumerable: false,
+            value: TimelineRequest
+          },
+          prev: {
+            enumerable: false,
+            value: function() {}
+          },
+          next: {
+            enumerable: false,
+            value: function() {}
+          },
+          loadMore: {
+            enumerable: false,
+            value: function() {}
+          },
+          update: {
+            enumerable: false,
+            value: function() {}
+          }
+        }))
+      });
+      return TimelineRequest;
+    })()
+  });
+
+  Store = null;
+
+  (Laboratory.reset = reset = function() {
+    Store = {
+      auth: null,
+      notifications: {},
+      profiles: {},
+      statuses: {}
+    };
+  })();
 
   window["🏪"] = Store;
 

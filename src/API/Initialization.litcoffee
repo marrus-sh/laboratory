@@ -1,12 +1,12 @@
 <p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.4.0</i> <br> <code>API/Initialization.litcoffee</code></p>
 
-#  INITIALIZATION EVENTS  #
+#  INITIALIZATION  #
 
  - - -
 
 ##  Description  ##
 
-The __Initialization__ module of the Laboratory API is comprised of those events which are related to initialization of the Laboratory store and handlers.
+The __Initialization__ module of the Laboratory API is comprised of a few events related to initialization of the Laboratory store and handlers.
 These make up just two events: `LaboratoryInitializationLoaded` and `LaboratoryInitializationReady`.
 
 You can check `window.Laboratory.ready` as a means of verifying if these events have fired after-the-fact:
@@ -18,6 +18,8 @@ They will be ignored by Laboratory proper, but may confuse other components whic
 However, you should listen for these events to know when proper communication with the Laboratory framework should begin.
 
 ###  Quick reference:
+
+####  Events.
 
 | Event | Description |
 | :---- | :---------- |
@@ -43,6 +45,17 @@ Laboratory waits for the entire document to be loaded before assigning its handl
 Of the two, `LaboratoryInitializationReady` is almost always the one to listen for.
 
 Neither of the Laboratory Initialization events have `detail`s.
+
+ - - -
+
+##  Examples  ##
+
+###  Initializing an application:
+
+>   ```javascript
+>       if (Laboratory.ready) init();
+>       else document.addEventListener("LaboratoryInitializationReady", init);
+>   ```
 
  - - -
 

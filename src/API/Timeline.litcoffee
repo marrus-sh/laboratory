@@ -1,136 +1,270 @@
 <p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.4.0</i> <br> <code>API/Timeline.litcoffee</code></p>
 
-#  TIMELINE EVENTS  #
+#  TIMELINE REQUESTS  #
 
  - - -
 
 ##  Description  ##
 
-The __Timeline__ module of the Laboratory API is comprised of those events which are related to timelines of Mastodon accounts.
-
->   __[Issue #15](https://github.com/marrus-sh/laboratory/issues/15) :__
->   This module of the Laboratory API may change radically, or be removed, in the future.
+The __Timeline__ module of the Laboratory API is comprised of those requests which are related to rolodexes of Mastodon accounts.
 
 ###  Quick reference:
 
-| Event | Description |
-| :---- | :---------- |
-| `LaboratoryTimelineRequested` | Requests a `Laboratory.Timeline` for a specified query |
-| `LaboratoryTimelineReceived` | Fires when a `Laboratory.Timeline` has been processed |
-| `LaboratoryTimelineFailed` | Fires when a `Laboratory.Timeline` fails to process |
+| Request | Description |
+| :------ | :---------- |
+| `Timeline.Request()` | Requests a `Timeline` from the Mastodon server |
 
-###  Requesting a timeline:
+###  Requesting a rolodex:
 
+>   ```javascript
+>       request = new Laboratory.Timeline.Request(data);
+>       rangedRequest = new Laboratory.Timeline.Request(data, before, after);
+>   ```
+>
 >   - __API equivalent :__ `/api/v1/timelines/home`, `/api/v1/timelines/public`, `/api/v1/timelines/tag/:hashtag`, `/api/v1/notifications/`, `/api/v1/favourites`
 >   - __Request parameters :__
->       - __`type` :__ The [`Laboratory.Timeline.Type`](../Constructors/Timeline.litcoffee) of the `Timeline`
+>       - __`type` :__ The [`Timeline.Type`](../Constructors/Timeline.litcoffee) of the `Timeline`
 >       - __`query` :__ The associated query
->       - __`before` :__ The id at which to end the timeline
->       - __`after` :__ The id at which to begin the timeline
->   - __Request :__ `LaboratoryTimelineRequested`
->   - __Response :__ `LaboratoryTimelineReceived`
->   - __Failure :__ `LaboratoryTimelineFailed`
+>       - __`limit` :__ The number of accounts to show (for searches only)
+>   - __Response :__ A [`Timeline`](../Constructors/Timeline.litcoffee)
 
-Laboratory Timeline events are used to request lists of [`Post`](../Constructors/Post.litcoffee)s according to the specified `type` and `query`.
+Laboratory Rolodex events are used to request [`Timeline`](../Constructors/Timeline.litcoffee)s of accounts according to the specified `type` and `query`.
 If the `type` is `Timeline.Type.HASHTAG`, then `query` should provide the hashtag; in the case of `Timeline.Type.ACCOUNT`, then `query` should provide the account id; otherwise, no `query` is required.
 
-The `before` and `after` parameters can be used to change the range of statuses returned.
+The `before` and `after` arguments can be used to modify the range of the `Timeline`, but generally speaking you shouldn't need to specify these directly—instead use the built-in update and pagination functions to do this for you.
+
+####  Getting more entries.
+
+The `update()` and `loadMore()` methods of a `Timeline.Request` can be used to update a `Timeline` with new entries, or older ones, respectively.
+
+The `update()` method takes one argument: `keepGoing`, which tells Laboratory whether to keep loading new information until the `Timeline` is caught up to the present.
+The default value for this argument is `true`.
+
+####  Pagination.
+
+If you want to get more entries, but don't want them all collapsed into a single `Timeline`, the `prev()` and `next()` methods can be used instead.
+These return new `Timeline.Request`s which will respond with the previous and next page of entries, respectively.
+
+ - - -
+
+##  Examples  ##
+
+###  Requesting an account's statuses:
+
+>   ```javascript
+>       function requestCallback(event) {
+>           //  Do something with the timeline
+>       }
+>
+>       var request = new Laboratory.Timeline.Request({
+>           type: Laboratory.Timeline.Type.ACCOUNT
+>           query: someProfile.id
+>       });
+>       request.addEventListener("response", requestCallback);
+>       request.start();
+>   ```
+
+###  Getting posts for a hashtag:
+
+>   ```javascript
+>       function requestCallback(event) {
+>           //  Do something with the rolodex
+>       }
+>
+>       var request = new Laboratory.Timeline.Request({
+>           type: Laboratory.Timeline.Type.HASHTAG
+>           query: "hashtag"
+>       });
+>       request.addEventListener("response", requestCallback);
+>       request.start();
+>   ```
+
+###  Getting the home timeline:
+
+>   ```javascript
+>       function requestCallback(event) {
+>           //  Do something with the rolodex
+>       }
+>
+>       var request = new Laboratory.Timeline.Request({
+>           type: Laboratory.Timeline.Type.HOME
+>       });
+>       request.addEventListener("response", requestCallback);
+>       request.start();
+>   ```
+
+###  Updating a request:
+
+>   ```javascript
+>       request.update();  //  Will fire a "response" event for each update
+>   ```
+
+###  Paginating a request:
+
+>   ```javascript
+>       function requestCallback(event) {
+>           //  Do something with the rolodex
+>       }
+>
+>       function loadNextPage (request) {
+>           var newRequest = request.next();
+>           newRequest.addEventListener("response", requestCallback);
+>           newRequest.start();
+>           return newRequest;
+>       }
+>
+>       function loadPrevPage (request) {
+>           var newRequest = request.prev();
+>           newRequest.addEventListener("response", requestCallback);
+>           newRequest.start();
+>           return newRequest;
+>       }
+>   ```
 
  - - -
 
 ##  Implementation  ##
 
-###  Creating the events:
+###  Making the request:
 
-Here we create the events as per our specifications.
+    Object.defineProperty Timeline, "Request", 
+    
+        configurable: no
+        enumerable: yes
+        writable: no
+        value: do ->
 
-    LaboratoryEvent
-        .create "LaboratoryTimelineRequested",
-            type: Timeline.Type.HOME
-            query: ""
-            before: undefined
-            after: undefined
-        .create "LaboratoryTimelineReceived", Timeline
-        .create "LaboratoryTimelineFailed", Failure
-        .associate "LaboratoryTimelineRequested", "LaboratoryTimelineReceived", "LaboratoryTimelineFailed"
+            TimelineRequest = (data, before, after) ->
+        
+                unless this and this instanceof TimelineRequest
+                    throw new TypeError "this is not a TimelineRequest"
+                    
+First, we handle our `data`.
 
-###  Handling the events:
+                unless (type = Timeline.Type.fromValue data.type) and
+                    type isnt Timeline.Type.UNDEFINED
+                        throw new TypeError "Unable to request rolodex; no type provided"
+                query = if data.query? then String data.query else undefined
+                limit =
+                    if Infinity > data.limit > 0 then Math.floor data.limit else undefined
 
-Laboratory provides handlers for the following Authorization events:
+`before` and `after` will store the next and previous pages for our `Timeline.Request`.
 
-- `LaboratoryTimelineRequested`
+                before = undefined
+                after = undefined
 
-####  `LaboratoryTimelineRequested`.
+Next, we set up our `Request`.
+Note that `Request()` ignores data parameters which have a value of `undefined` or `null`.
 
-The `LaboratoryTimelineRequested` event requests an account from the Mastodon API, processes it, and fires a `LaboratoryTimelineReceived` event with the resultant `Timeline`.
+                Request.call this, "GET", Store.auth.origin + (
+                        switch type
+                            when Timeline.Type.HASHTAG then "/api/v1/timelines/tag/" + query
+                            when Timeline.Type.LOCAL then "/api/v1/timelines/public"
+                            when Timeline.Type.GLOBAL then "/api/v1/timelines/public"
+                            when Timeline.Type.HOME then "/api/v1/timelines/home"
+                            when Timeline.Type.NOTIFICATIONS then "/api/v1/notifications"
+                            when Timeline.Type.FAVOURITES then "/api/v1/favourites"
+                            when Timeline.Type.ACCOUNT then "/api/v1/accounts/" + query +
+                                "/statuses"
+                            else "/api/v1"
+                    ), (
+                        switch type
+                            when Timeline.Type.LOCAL
+                                local: yes
+                                max_id: before
+                                since_id: after
+                            else
+                                max_id: before
+                                since_id: after
+                    ), Store.auth.accessToken, (result, params) => 
+                        acctIDs = []
+                        mentions = []
+                        mentionIDs = []
+                        ids = []
+                        before = ((params.prev?.match /.*since_id=([0-9]+)/) or [])[1]
+                        after = ((params.next?.match /.*max_id=([0-9]+)/) or [])[1]
+                        for status in result when status.id not in ids
+                            ids.push status.id
+                            for account in [
+                                status.account
+                                status.status?.account
+                                status.reblog?.account
+                            ] when account
+                                acctIDs.push account.id
+                                dispatch "LaboratoryProfileReceived", new Profile account
+                            if (
+                                mentions = status.mentions or status.status?.mentions or
+                                    status.reblog?.mentions
+                            ) instanceof Array
+                                for account in mentions when account.id not in mentionIDs
+                                    mentionIDs.push account.id
+                                    mentions.push account
+                            dispatch "LaboratoryPostReceived", new Post status
+                        for mention in mentions when mention.id not in acctIDs and
+                            not Store.profiles[mention.id]?
+                                dispatch "LaboratoryProfileReceived", new Profile mention
+                        decree => @response = police -> new Timeline result, data
 
-        .handle "LaboratoryTimelineRequested", (event) ->
+                Object.defineProperties this,
+                    before:
+                        enumerable: yes
+                        get: -> before
+                    after:
+                        enumerable: yes
+                        get: -> after
+                    prev:
+                        enumerable: no
+                        value: -> return new TimelineRequest data, undefined, before
+                    next:
+                        enumerable: no
+                        value: -> return new TimelineRequest data, after
+                    loadMore:
+                        enumerable: no
+                        value: =>
+                            callback = (event) =>
+                                after = next.after
+                                decree => @response = police ->
+                                    @response.join new Timeline next.response
+                                next.removeEventListener "response", callback
+                            (next = do @next).addEventListener "response", callback
+                            do next.start
+                    update:
+                        enumerable: no
+                        value: (keepGoing) =>
+                            callback = (event) =>
+                                before = prev.before
+                                result = new Timeline prev.response
+                                decree => @response = police -> @response.join result
+                                prev.removeEventListener "response", callback
+                                if keepGoing and result.length
+                                    (next = do @next).addEventListener "response", callback
+                                    do next.start
+                            (next = do @next).addEventListener "response", callback
+                            do next.start
+                            
+                Object.freeze this
 
-            query = String event.detail.query
-            before = null unless isFinite before = Number event.detail.before
-            after = null unless isFinite after = Number event.detail.after
-            unless (type = event.detail.type) instanceof Timeline.Type and type isnt Timeline.Type.UNDEFINED
-                dispatch "LaboratoryTimelineFailed", new Failure "Unable to fetch timeline; no type specified", "LaboratoryTimelineRequested"
-                return
+Our `Rolodex.Request.prototype` inherits from `Request`, with additional dummy methods for the ones we define in our constructor.
 
-When our list of accounts is received, we'll process it and call a `LaboratoryTimelineReceived` event with the resulting `Timeline`.
-We'll also dispatch a `LaboratoryPostReceived` event with each post contained in the response, and a `LaboratoryProfileReceived` containing the profile data of each post author and mention.
+            Object.defineProperty TimelineRequest, "prototype",
+                configurable: no
+                enumerable: no
+                writable: no
+                value: Object.freeze Object.create Request.prototype,
+                    constructor:
+                        enumerable: no
+                        value: TimelineRequest
+                    prev:
+                        enumerable: no
+                        value: ->
+                    next:
+                        enumerable: no
+                        value: ->
+                    loadMore:
+                        enumerable: no
+                        value: ->
+                    update:
+                        enumerable: no
+                        value: ->
 
->   __[Issue #27](https://github.com/marrus-sh/laboratory/issues/27) :__
->   These events should instead be dispatched from the `Timeline` constructor.
-
->   __Note :__
->   In order to prevent duplicates, `LaboratoryPostReceived` only fires for unique ids in the API response.
->   While it is possible for a status to have the same id as a (different) notification, we don't need to worry about this since statuses and notifications are never grouped together by the Mastodon API.
-
->   __Note :__
->   Note that the account data provided by mentions is not as complete as that which would be in a normal API response.
-
-            onComplete = (response, data, params) ->
-                acctIDs = []
-                mentions = []
-                mentionIDs = []
-                ids = []
-                for status in response when (ids.indexOf status.id) is -1 and ids.push status.id
-                    dispatch "LaboratoryProfileReceived", new Profile status.account if (acctIDs.indexOf status.account.id) is -1 and acctIDs.push status.account.id
-                    dispatch "LaboratoryProfileReceived", new Profile status.status.account if status.status?.account? and (acctIDs.indexOf status.status.account.id) is -1 and acctIDs.push status.status.account.id
-                    dispatch "LaboratoryProfileReceived", new Profile status.reblog.account if status.reblog?.account? and (acctIDs.indexOf status.reblog.account.id) is -1 and acctIDs.push status.reblog.account.id
-                    if status.mentions instanceof Array
-                        for account in status.mentions when (mentionIDs.indexOf account.id) is -1
-                            mentionIDs.push account.id
-                            mentions.push account
-                    dispatch "LaboratoryPostReceived", new Post status
-                dispatch "LaboratoryProfileReceived", new Profile mention for mention in mentions when (acctIDs.indexOf mention.id) is -1 and not Store.profiles[mention.id]?
-                dispatch "LaboratoryTimelineReceived", new Timeline response,
-                    type: type
-                    query: query
-                    before: ((params.prev.match /.*since_id=([0-9]+)/) or [])[1]
-                    after: ((params.next.match /.*max_id=([0-9]+)/) or [])[1]
-
-If something goes wrong, then we need to throw an error.
-
-            onError = (response, data, params) -> dispatch "LaboratoryTimelineFailed", new Failure response.error, "LaboratoryTimelineRequested", params.status
-
-Finally, we can make our server request.
-Note that `serverRequest` ignores data parameters which have a value of `undefined` or `null`.
-
-            serverRequest "GET", Store.auth.origin + (
-                switch type
-                    when Timeline.Type.HASHTAG then "/api/v1/timelines/tag/" + query
-                    when Timeline.Type.LOCAL then "/api/v1/timelines/public"
-                    when Timeline.Type.GLOBAL then "/api/v1/timelines/public"
-                    when Timeline.Type.HOME then "/api/v1/timelines/home"
-                    when Timeline.Type.NOTIFICATIONS then "/api/v1/notifications"
-                    when Timeline.Type.FAVOURITES then "/api/v1/favourites"
-                    when Timeline.Type.ACCOUNT then "/api/v1/accounts/" + query + "/statuses"
-                    else "/api/v1"
-            ), (
-                switch type
-                    when Timeline.Type.LOCAL
-                        local: yes
-                        max_id: before
-                        since_id: after
-                    else
-                        max_id: before
-                        since_id: after
-            ), Store.auth.accessToken, onComplete, onError
+            return TimelineRequest

@@ -84,7 +84,7 @@ Laboratory thus assures that minor and patch numbers will never exceed `99` (ind
 
 If this is a popup (`window.opener.Laboratory` exists) and an API redirect (a `code` parameter exists in our query), then we hand our opener our code.
 
-    do -> Mommy.dispatch "LaboratoryAuthorizationGranted", {code} if (code = (location.search.match(/code=([^&]*)/) || [])[1]) and Mommy = window.opener.Laboratory
+    do -> Mommy.postMessage code, window.location.origin if (code = (location.search.match(/code=([^&]*)/) || [])[1]) and Mommy = window.opener
 
 ###  API and exposed properties:
 
@@ -104,111 +104,54 @@ For now, we'll keep these properties in the `Exposed` object, and define getters
 
     (do (prop) -> Object.defineProperty Laboratory, prop, {get: (-> Exposed[prop]), enumerable: yes}) for prop of Exposed
 
+###  Privileged and unprivileged code:
+
+There are certain features that we will want available from within the API that should not be accessible to outsiders.
+The `decree()` function immediately invokes its argument with privilege, while the `checkDecree()` function checks whether privilege is currently had.
+The `police()` function can be used to remove privilege from within a `decree`.
+For obvious reasons, none of these functions are exposed to the window.
+
+    decree = police = checkDecree = null
+    do ->
+        isPrivileged = no
+        decree = (callback) ->
+            wasPrivileged = isPrivileged
+            isPrivileged = yes
+            result = do callback
+            isPrivileged = wasPrivileged
+            return result
+        police = (callback) ->
+            initial = isPrivileged
+            isPrivileged = no
+            result = do callback
+            isPrivileged = wasPrivileged
+            return result
+        checkDecree = -> isPrivileged
+
 ###  `CustomEvent()`:
 
 `CustomEvent()` is required for our event handling.
 This is a CoffeeScript re-implementation of the polyfill available on [the MDN](https://developer.mozilla.org/en-US/docs/Web/API/CustomEvent/CustomEvent).
 
-    do ->
-        return if typeof CustomEvent is "function"
-        CustomEvent = (event, params) ->
+    CustomEvent = do ->
+        return window.CustomEvent if typeof window.CustomEvent is "function"
+        CE = (event, params) ->
             params = params or {bubbles: no, cancelable: no, detail: undefined}
             e = document.createEvent "CustomEvent"
             e.initCustomEvent event, params.bubbles, params.cancelable, params.detail
             return e
-        CustomEvent.prototype = window.Event.prototype
-        Object.freeze CustomEvent
-        Object.freeze CustomEvent.prototype
+        CE.prototype = Object.freeze Object.create window.Event.prototype
+        Object.freeze CE
 
-###  `serverRequest()`:
+###  `LaboratoryEventTarget()`:
 
-`serverRequest()` is a convenience function for dealing with XMLHttpRequest.
-We will use it in our handlers to actually send our requests to the API.
-It isn't exposed to the window.
+`LaboratoryEventTarget()` is a simple implementation of the [`EventTarget` interface](https://developer.mozilla.org/en-US/docs/Web/API/EventTarget), used to create an `XMLHttpRequest`-esque object for requesting Mastodon data.
 
-    serverRequest = (method, location, data, accessToken, onComplete, onError) ->
-
-####  Creating the request.
-
-This is fairly simple; we just create an XMLHttpRequest.
-You can see we set the `Authorization` header using our access token, if one was provided.
-
-        return unless method is "GET" or method is "POST" or method is "DELETE"
-        location = String location
-        data = Object data
-        request = new XMLHttpRequest
-
-####  Setting the contents.
-
-Note that `FormData` isn't supported in IE 9.
-
-        contents = if method is "POST" and FormData? and data instanceof FormData then data else (
-            (
-                for key, value of data when value?
-                    if value instanceof Array then (
-                        (encodeURIComponent key) + "[]=" + (encodeURIComponent subvalue) for subvalue in value
-                    ).join "&"
-                    else (encodeURIComponent key) + "=" + (encodeURIComponent value)
-            ).join "&"
-        ).replace /%20/g, '+'
-
-####  Opening the request.
-
-If our `method` isn't `"POST"` then we need to append our `contents` to our `location`.
-
-        location += (if (location.indexOf "?") isnt -1 then "&" else "?") + contents unless contents is "" or method is "POST"
-        request.open method, location
-        request.setRequestHeader "Content-type", "application/x-www-form-urlencoded" if method is "POST" and not (FormData? and contents instanceof FormData)
-        request.setRequestHeader "Authorization", "Bearer " + accessToken if accessToken
-
-####  The callback.
-
-This is the function that is called once the request finishes loading.
-We will consider a status code in the range `200` to `205` (inclusive) to be a success, and anything else to be an error.
-Laboratory doesn't support HTTP status codes like `206 PARTIAL CONTENT`.
-
->   __Note :__
->   We use numbers instead of the easier-to-read state names because state names are different in IE.
->   However, the standard names are as follows:
->
->   - `XMLHttpRequest.UNSENT` (`0`)
->   - `XMLHttpRequest.OPENED` (`1`)
->   - `XMLHttpRequest.HEADERS_RECEIVED` (`2`)
->   - `XMLHttpRequest.LOADING` (`3`)
->   - `XMLHttpRequest.DONE` (`4`)
-
-        callback = ->
-            switch request.readyState
-                when 0 then  #  Do nothing
-                when 1 then dispatch "LaboratoryRequestOpen", request
-                when 2, 3 then dispatch "LaboratoryRequestUpdate", request
-                when 4
-                    status = request.status
-                    response =
-                        try if request.responseText then JSON.parse request.responseText else null
-                        catch
-                            error: "The response could not be parsed."
-                    params =
-                        status: status
-                        url: location
-                        prev: (((request.getResponseHeader "Link")?.match /<\s*([^,]*)\s*>\s*;[^,]*[;\s]rel="?prev(?:ious)?"?/) or [])[1]
-                        next: (((request.getResponseHeader "Link")?.match /<\s*([^,]*)\s*>\s*;[^,]*[;\s]rel="?next"?/) or [])[1]
-                    switch
-                        when 200 <= status <= 205
-                            if response?.error?
-                                onError response, data, params
-                                dispatch "LaboratoryRequestError", request
-                            else
-                                onComplete response, data, params
-                                dispatch "LaboratoryRequestComplete", request
-                        else
-                            onError response, data, params
-                            dispatch "LaboratoryRequestError", request
-                    request.removeEventListener "readystatechange", callback
-
-####  Sending the request.
-
-We can now add our event listener and send the request.
-
-        request.addEventListener "readystatechange", callback
-        if method is "POST" then request.send contents else do request.send
+    LaboratoryEventTarget = do ->
+        fragment = do document.createDocumentFragment
+        LET = ->
+            @addEventListener = fragment.addEventListener.bind this
+            @removeEventListener = fragment.removeEventListener.bind this
+            @dispatchEvent = fragment.dispatchEvent.bind this
+        LET.prototype = Object.freeze Object.create if window.EventTarget?.prototype then window.EventTarget.prototype else window.Object.prototype
+        Object.freeze LET

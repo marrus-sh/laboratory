@@ -1,240 +1,486 @@
 <p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.4.0</i> <br> <code>API/Post.litcoffee</code></p>
 
-#  POST EVENTS  #
+#  POST REQUESTS  #
 
  - - -
 
 ##  Description  ##
 
-The __Post__ module of the Laboratory API is comprised of those events which are related to Mastodon accounts.
+The __Post__ module of the Laboratory API is comprised of those requests which are related to Mastodon accounts.
 
 ###  Quick reference:
 
+####  Requests.
+
+| Request | Description |
+| :------ | :---------- |
+| `Post.Request()` | Requests a `Post` from the Mastodon server |
+| `Post.Create()` | Petitions the Mastodon server to create a new status |
+| `Post.Delete()` | Petitions the Mastodon server to delete an existing status |
+| `Post.SetReblog()` | Petitions the Mastodon server to reblog or unreblog the provided status |
+| `Post.SetFavourite()` | Petitions the Mastodon server to favourite or unfavourite the provided status |
+
+####  Events.
+
 | Event | Description |
 | :---- | :---------- |
-| `LaboratoryPostRequested` | Requests a `Laboratory.Post` for a specified status or notification |
-| `LaboratoryPostReceived` | Fires when a `Laboratory.Post` has been processed |
-| `LaboratoryPostFailed` | Fires when a `Laboratory.Post` fails to process |
-| `LaboratoryPostCreation` | Petitions the Mastodon server to create a new status |
-| `LaboratoryPostDeletion` | Petitions the Mastodon server to delete the provided status |
-| `LaboratoryPostSetReblog` | Petitions the Mastodon server to reblog or unreblog the provided status |
-| `LaboratoryPostSetFavourite` | Petitions the Mastodon server to favourite or unfavourite the provided status |
+| `LaboratoryPostReceived` | Fires when a `Post` has been processed |
+| `LaboratoryPostDeleted` | Fires when a `Post` has been deleted |
 
-###  Requesting a status:
+###  Requesting a post:
 
+>   ```javascript
+>       request = new Laboratory.Post.Request(data, isLive, useCached);
+>   ```
+>
 >   - __API equivalent :__ `/api/v1/statuses/:id`, `/api/v1/notifications/:id`
->   - __Request parameters :__
+>   - __Data parameters :__
 >       - __`id` :__ The id of the status or notification to request
 >       - __`type` :__ A `Post.Type` (default: `Post.Type.STATUS`)
->   - __Request :__ `LaboratoryPostRequested`
->   - __Response :__ `LaboratoryPostReceived`
->   - __Failure :__ `LaboratoryPostFailed`
+>   - __Response :__ A [`Post`](../Constructors/Post.litcoffee)
 
-Laboratory Post events are used to request [`Post`](../Constructors/Post.litcoffee)s containing data on a specified status or notification.
-The request, `LaboratoryPostRequested`, takes an object whose `id` parameter specifies the account to fetch and whose `type` specifies whether the post is a status or notification.
+Laboratory `Post.Request`s are used to request [`Post`](../Constructors/Post.litcoffee)s containing data on a specified status or notification.
+The request takes an object whose `id` parameter specifies the account to fetch and whose `type` specifies whether the post is a status or notification.
+
+Post requests may be either __static__ or __live__.
+Static post requests don't update their responses when new information is received from the server, whereas live post requests do.
+This behaviour is controlled by the `isLive` argument, which defaults to `true`.
+
+>   __Note : __
+>   You can call `request.stop()` to stop a live `Post.Request`, and `request.start()` to start it up again.
+>   Always call `request.stop()` when you are finished using a live request to allow it to be freed from memory.
 
 Laboratory keeps track of all of the `Post`s it receives in its internal store.
-If there is already information on the requested `Post` in the Laboratory store, it will fire `LaboratoryPostReceived` immediately, and then again once the server request completes.
-However, Laboratory will only fire as many responses as necessary; if nothing has changed from the stored value, then only one response will be given.
+If the `useCached` argument is `true` (the default), then it will immediately load the stored value into its response if available.
+It will still request the server for updated information unless `isLive` is `false`.
 
-###  Creating and deleting posts:
+###  Creating new statuses:
 
->   - __API equivalent :__ `/api/v1/statuses`, `/api/v1/statuses/:id`
->   - __Miscellaneous events :__
->       - `LaboratoryPostCreation`
->       - `LaboratoryPostDeletion`
+>   ```javascript
+>       request = new Laboratory.Post.Create(data);
+>   ```
+>
+>   - __API equivalent :__ `/api/v1/statuses`
+>   - __Data parameters :__
+>       - __`text` :__ The text of the post
+>       - __`visibility` :__ A `Post.Visibility` (default: `Post.Visibility.PRIVATE`)
+>       - __`inReplyTo` :__ A status id if the post is a reply
+>       - __`attachments` :__ An array of `Attachment`s
+>       - __`message` :__ A content/spoiler warning
+>       - __`makeNSFW` :__ Whether or not the attached media contains NSFW content (default: `true`)
+>   - __Response :__ A [`Post`](../Constructors/Post.litcoffee)
 
-The `LaboratoryPostCreation` event attempts to create a new status on the Mastodon server.
-It should be fired with a `detail` containing the following properties:
+`Post.Create()` attempts to create a new status on the Mastodon server.
 
-- __`text` :__ The text of the post
-- __`visibility` :__ A `Post.Visibility` (default: `Post.Visibility.PRIVATE`)
-- __`inReplyTo` :__ A status id if the post is a reply
-- __`attachments` :__ An array of `Attachment`s
-- __`message` :__ A content/spoiler warning
-- __`makeNSFW` :__ Whether or not the attached media contains NSFW content (default: `true`)
+###  Deleting statuses:
 
-The `LaboratoryPostDeletion` event attempts to delete an existing status from the Mastodon server.
-The `id` property of its `detail` should provide the id of the status to delete.
+>   ```javascript
+>       request = new Laboratory.Post.Delete(data);
+>   ```
+>
+>   - __API equivalent :__ `/api/v1/statuses`
+>   - __Data parameters :__
+>       - __`id` :__ The id of the post to delete
+>   - __Response :__ `null`
 
-###  Favouriting and reblogging posts:
+`Post.Delete()` event attempts to delete an existing status from the Mastodon server.
+The `id` parameter provides the id of the status to delete.
 
->   - __API equivalent :__ `/api/v1/statuses/:id/reblog`, `/api/v1/statuses/:id/unreblog`, `/api/v1/statuses/:id/favourite`, `/api/v1/statuses/:id/unfavourite`
->   - __Miscellanous events :__
->       - `LaboratoryPostSetReblog`
->       - `LaboratoryPostSetFavourite`
+###  Reblogging and favouriting posts:
 
-The `LaboratoryPostSetReblog` and `LaboratoryPostSetFavourite` events can be used to set the reblog or favourite status of posts.
-They should be fired with a `detail` which has two properties: `id`, which gives the id of the account, and `value`, which should be `true` if the post should be favourited/reblogged, or `false` if it should be unfavourited/unreblogged.
+>   ```javascript
+>       request = new Laboratory.Post.SetReblog(data);
+>       request = new Laboratory.Post.SetFavourite(data);
+>   ```
+>
+>   - __API equivalent :__ `/api/v1/statuses/:id/reblog`, `/api/v1/statuses/:id/unreblog`
+>   - __Data parameters :__
+>       - __`id` :__ The id of the status to reblog
+>       - __`value` :__ `true` if the post should be reblogged/favourited, `false` if the post should be unreblogged/unfavourited
+>   - __Response :__ A [`Post`](../Constructors/Post.litcoffee)
+
+`Post.SetReblog()` and `Post.SetFavourite()` can be used to set the reblog/favourited status of posts.
+They will respond with the updated post if they succeed.
+
+ - - -
+
+##  Examples  ##
+
+###  Requesting a post's data:
+
+>   ```javascript
+>       function requestCallback(event) {
+>           //  Do something with the post
+>       }
+>
+>       var request = new Laboratory.Post.Request({
+>           id: postID,
+>           type: Laboratory.Post.Type.STATUS
+>       });
+>       request.addEventListener("response", requestCallback);
+>       request.start();
+>   ```
+
+###  Creating a new post:
+
+>   ```javascript
+>       var request = new Laboratory.Post.Create({
+>           text: contents,
+>           visibility: Laboratory.Post.Visibility.PUBLIC
+>       });
+>       request.start();
+>   ```
+
+###  Deleting a post:
+
+>   ```javascript
+>       var request = new Laboratory.Post.Delete({id: deleteThisID});
+>       request.start();
+>   ```
+
+###  Reblogging a post:
+
+>   ```javascript
+>       function requestCallback(event) {
+>           if (event.detail.response.isReblogged) success();
+>       }
+>
+>       var request = new Laboratory.Post.SetReblog({
+>           id: somePost.id,
+>           value: true
+>       });
+>       request.addEventListener("response", requestCallback);
+>       request.start();
+>   ```
+
+###  Unfavouriting a post:
+
+>   ```javascript
+>       function requestCallback(event) {
+>           if (!event.detail.response.isFavourited) success();
+>       }
+>
+>       var request = new Laboratory.Post.SetFavourite({
+>           id: somePost.id,
+>           value: false
+>       });
+>       request.addEventListener("response", requestCallback);
+>       request.start();
+>   ```
 
  - - -
 
 ##  Implementation  ##
+
+###  Making the requests:
+
+    Object.defineProperties Post,
+    
+####  `Post.Request`s.
+    
+        Request:
+            configurable: no
+            enumerable: yes
+            writable: no
+            value: do ->
+
+                PostRequest = (data, isLive = yes, useCached = yes) ->
+            
+                    unless this and this instanceof PostRequest
+                        throw new TypeError "this is not a PostRequest"
+
+First we need to handle our variables.
+
+                    unless Infinity > (postID = Math.floor data?.id) > 0
+                        throw new TypeError "Unable to request post; no id provided"
+                    type = Post.Type.STATUS unless (type = Post.Type.fromValue data.type) and
+                        type isnt Post.Type.UNKNOWN
+                    isNotification = type & Post.Type.NOTIFICATION
+                    store = if isNotification then Store.notifications else Store.statuses
+
+This `callback()` updates our `Post.Request` if Laboratory receives another `Post` with the same `id` and `type`.
+
+                    callback = (event) =>
+                        response = event.detail
+                        if response instanceof Post and response.id is postID and
+                            (response.type & Post.Type.NOTIFICATION) is isNotification
+                                unless response.compare @response
+                                    decree => @response = response
+                                do @stop unless isLive
+
+We can now create our request.
+We dispatch a failure unless the received post matches the requested `postID` and `type`, and `stop()` unless our request `isLive`.
+
+                    Request.call this, "GET", Store.auth.origin + (
+                        if isNotification then "/api/v1/notifications/"
+                        else "/api/v1/statuses/"
+                    ) + postID, null, Store.auth.accessToken, (result) =>
+                        unless result.id is postID
+                            @dispatchEvent new CustomEvent "failure",
+                                request: this
+                                response: new Failure "Unable to fetch post; returned post did
+                                    not match requested id"
+                            return
+                        post = new Post result
+                        unless (post.type & Post.Type.NOTIFICATION) is isNotification
+                            @dispatchEvent new CustomEvent "failure",
+                                request: this
+                                response: new Failure "Unable to fetch post; returned post was
+                                    not of specified type"
+                            return
+                        dispatch "LaboratoryPostReceived", post
+                        
+We store the default `Request` `start()` and `stop()` values and then overwrite them with our own.
+This allows us to handle our `useCached` and `isLive` arguments.
+                        
+                    requestStart = @start
+                    requestStop = @stop
+                    
+                    Object.defineProperties this,
+                        start:
+                            enumerable: no
+                            value: ->
+                                if useCached and store[postID] instanceof Post
+                                    decree => @response = store[postID]
+                                    return unless isLive
+                                document.addEventListener "LaboratoryPostReceived", callback
+                                do requestStart
+                        stop:
+                            enumerable: no
+                            value: ->
+                                document.removeEventListener "LaboratoryPostReceived", callback
+                                do requestStop
+
+                    Object.freeze this
+
+Our `Post.Request.prototype` just inherits from `Request`.
+
+                Object.defineProperty PostRequest, "prototype",
+                    configurable: no
+                    enumerable: no
+                    writable: no
+                    value: Object.freeze Object.create Request.prototype,
+                        constructor:
+                            enumerable: no
+                            value: PostRequest
+
+                return PostRequest
+    
+####  `Post.Create`s.
+    
+        Create:
+            configurable: no
+            enumerable: yes
+            writable: no
+            value: do ->
+
+                PostCreate = (data) ->
+                
+                    unless this and this instanceof PostCreate
+                        throw new TypeError "this is not a PostCreate"
+
+First we need to handle our variables.
+
+                    unless data?.text
+                        throw new TypeError "Unable to create post; no text provided"
+                    text = String data.text
+                    unless visibility = Post.Visibility.fromValue data.visibility
+                        visibility = Post.Visibility.PRIVATE
+                    unless Infinity > (inReplyTo = Math.floor data.inReplyTo) > 0
+                        inReplyTo = undefined
+                    attachments = (
+                        if data.attachments instanceof Array then data.attachments
+                        else undefined
+                    )
+                    message = if data.message? then String data.message else undefined
+                    makeNSFW = if data.makeNSFW? then !!data.makeNSFW else undefined
+
+We can now create our request.
+This is just a simple `POST` request to the mastodon server.
+
+                    Request.call this, "POST", Store.auth.origin + "/api/v1/statuses/", {
+                        status: text
+                        in_reply_to_id: inReplyTo
+                        media_ids: if attachments then (
+                            for attachment in attachments when attachment instanceof Attachment
+                                attachment.id
+                        ) else undefined
+                        sensitive: if makeNSFW then "true" else undefined
+                        spoiler_text: message
+                        visibility: switch visibility
+                            when Post.Visibility.PUBLIC then "public"
+                            when Post.Visibility.REBLOGGABLE then "unlisted"
+                            else "private"
+                    }, Store.auth.accessToken, (result) =>
+                        dispatch "LaboratoryPostReceived", decree =>
+                            @response = police -> new Post result
+
+                    Object.freeze this
+
+Our `Post.Create.prototype` just inherits from `Request`.
+
+                Object.defineProperty PostCreate, "prototype",
+                    configurable: no
+                    enumerable: no
+                    writable: no
+                    value: Object.freeze Object.create Request.prototype,
+                        constructor:
+                            enumerable: no
+                            value: PostCreate
+
+                return PostCreate
+    
+####  `Post.Delete`s.
+
+>   __[Issue #21](https://github.com/marrus-sh/laboratory/issues/21) :__
+>   There needs to be better responses and error checking with regards to post deletion.
+    
+        Delete:
+            configurable: no
+            enumerable: yes
+            writable: no
+            value: do ->
+
+                PostDelete = (data) ->
+            
+                    unless this and this instanceof PostDelete
+                        throw new TypeError "this is not a PostDelete"
+                    unless Infinity > (postID = Math.floor data?.id) > 0
+                        throw new TypeError "Unable to create post; no id provided"
+
+`Post.Delete()` just sends a `DELETE` to the appropriate point in the Mastodon API.
+
+                    Request.call this, "DELETE",
+                        Store.auth.origin + "/api/v1/statuses/" + postID, null,
+                        Store.auth.accessToken, (result) =>
+                            dispatch "LaboratoryPostDeleted", {id: postID}
+
+                    Object.freeze this
+
+Our `Post.Delete.prototype` just inherits from `Request`.
+
+                Object.defineProperty PostDelete, "prototype",
+                    configurable: no
+                    enumerable: no
+                    writable: no
+                    value: Object.freeze Object.create Request.prototype,
+                        constructor:
+                            enumerable: no
+                            value: PostDelete
+
+                return PostDelete
+    
+####  `Post.SetReblog`s.
+    
+        SetReblog:
+            configurable: no
+            enumerable: yes
+            writable: no
+            value: do ->
+
+                PostSetReblog = (data) ->
+            
+                    unless this and this instanceof PostSetReblog
+                        throw new TypeError "this is not a PostSetReblog"
+                    unless Infinity > (postID = Math.floor data?.id) > 0
+                        throw new TypeError "Unable to reblog post; no id provided"
+                    value = if data.value then !!data.value else on
+
+`Post.SetReblog()` is mostly just an API request.
+
+                    Request.call this, "POST",
+                        Store.auth.origin + "/api/v1/statuses/" + postID + (
+                            if value then "/reblog" else "/unreblog"
+                        ), null, Store.auth.accessToken, (result) =>
+                            dispatch "LaboratoryPostReceived", decree =>
+                                @response = police -> new Post result
+
+                    Object.freeze this
+
+Our `Post.SetReblog.prototype` just inherits from `Request`.
+
+                Object.defineProperty PostSetReblog, "prototype",
+                    configurable: no
+                    enumerable: no
+                    writable: no
+                    value: Object.freeze Object.create Request.prototype,
+                        constructor:
+                            enumerable: no
+                            value: PostSetReblog
+
+                return PostSetReblog
+    
+####  `Post.SetFavourite`s.
+    
+        SetFavourite:
+            configurable: no
+            enumerable: yes
+            writable: no
+            value: do ->
+
+                PostSetFavourite = (data) ->
+            
+                    unless this and this instanceof PostSetFavourite
+                        throw new TypeError "this is not a PostSetFavourite"
+                    unless Infinity > (postID = Math.floor data?.id) > 0
+                        throw new TypeError "Unable to favourite post; no id provided"
+                    value = if data.value then !!data.value else on
+
+`Post.SetFavourite()` is mostly just an API request.
+
+                    Request.call this, "POST",
+                        Store.auth.origin + "/api/v1/statuses/" + postID + (
+                            if value then "/favourite" else "/unfavourite"
+                        ), null, Store.auth.accessToken, (result) =>
+                            dispatch "LaboratoryPostReceived", decree =>
+                                @response = police -> new Post result
+
+                    Object.freeze this
+
+Our `Post.SetFavourite.prototype` just inherits from `Request`.
+
+                Object.defineProperty PostSetFavourite, "prototype",
+                    configurable: no
+                    enumerable: no
+                    writable: no
+                    value: Object.freeze Object.create Request.prototype,
+                        constructor:
+                            enumerable: no
+                            value: PostSetFavourite
+
+                return PostSetFavourite
 
 ###  Creating the events:
 
 Here we create the events as per our specifications.
 
     LaboratoryEvent
-        .create "LaboratoryPostRequested",
-            id: undefined
-            type: Post.Type.STATUS
         .create "LaboratoryPostReceived", Post
-        .create "LaboratoryPostFailed", Failure
-        .associate "LaboratoryPostRequested", "LaboratoryPostReceived", "LaboratoryPostFailed"
-
-        .create "LaboratoryPostCreation",
-            text: ""
-            visibility: Post.Visibility.PRIVATE
-            inReplyTo: undefined
-            attachments: undefined
-            message: undefined
-            makeNSFW: yes
-        .create "LaboratoryPostDeletion",
+        .create "LaboratoryPostDeleted",
             id: undefined
-
-        .create "LaboratoryPostSetReblog",
-            id: undefined
-            value: on
-        .create "LaboratoryPostSetFavourite",
-            id: undefined
-            value: on
 
 ###  Handling the events:
 
 Laboratory provides handlers for the following Authorization events:
 
-- `LaboratoryPostRequested`
 - `LaboratoryPostReceived`
-- `LaboratoryPostCreation`
-- `LaboratoryPostDeletion`
-- `LaboratoryPostSetReblog`
-- `LaboratoryPostSetFavourite`
-
-####  `LaboratoryPostRequested`.
-
-The `LaboratoryPostRequested` event requests a status or notification from the Mastodon API, processes it, and fires a `LaboratoryPostReceived` event with the resultant `Post`.
-
-        .handle "LaboratoryPostRequested", (event) ->
-
-            unless isFinite id = Number event.detail.id
-                dispatch "LaboratoryPostFailed", new Failure "Unable to fetch post; no id specified", "LaboratoryPostRequested"
-                return
-            unless (type = event.detail.type) instanceof Post.Type
-                dispatch "LaboratoryPostFailed", new Failure "Unable to fetch post; no type specified", "LaboratoryPostRequested"
-                return
-            isANotification = type & Post.Type.Notification
-
-If we already have information for the specified post loaded into our `Store`, we can go ahead and fire a `LaboratoryPostReceived` event with that information now.
-
-            dispatch "LaboratoryPostReceived", Store.statuses[id] if not isANotification and Store.statuses[id]?
-            dispatch "LaboratoryPostReceived", Store.notifications[id] if isANotification and Store.notifications[id]?
-
-When our new post data is received, we'll process it and do the same—*if* something has changed.
-
-            onComplete = (response, data, params) ->
-                unless response.id is id
-                    dispatch "LaboratoryPostFailed", new Failure "Unable to fetch post; returned post did not match requested id", "LaboratoryPostRequested"
-                    return
-                post = new Post response
-                unless (post.type & Post.Type.NOTIFICATION) is isANotification
-                    dispatch "LaboratoryPostFailed", new Failure "Unable to fetch post; returned post was not of specified type", "LaboratoryPostRequested"
-                    return
-                store = if isANotification then Store.notifications else Store.statuses
-                dispatch "LaboratoryPostReceived", post unless post.compare store[id]
-
-If something goes wrong, then we need to throw an error.
-
-            onError = (response, data, params) -> dispatch "LaboratoryPostFailed", new Failure response.error, "LaboratoryPostRequested", params.status
-
-Finally, we can make our server request.
-
-            serverRequest "GET", Store.auth.origin + (if isANotification then "/api/v1/notifications/" else "/api/v1/statuses/") + id, null, Store.auth.accessToken, onComplete, onError
+- `LaboratoryPostDeleted`
 
 ####  `LaboratoryPostReceived`.
 
 The `LaboratoryPostReceived` event simply adds a received post to our store.
 
-        .handle "LaboratoryPostReceived", (event) -> (if event.detail.type & Post.Type.NOTIFICATION then Store.notifications else Store.statuses)[id] = event.detail if event.detail instanceof Post and event.detail.type instanceof Post.Type and isFinite id = Number event.detail.id
-
-####  `LaboratoryPostCreation`.
-
-The `LaboratoryPostCreation` event attempts to create a new status, and fires a `LaboratoryPostReceived` event with the new `Post` if it succeeds.
-
-        .handle "LaboratoryPostCreation", (event) ->
-
-            onComplete = (response, data, params) -> dispatch "LaboratoryPostReceived", new Post response
-
-            onError = (response, data, params) -> dispatch "LaboratoryPostFailed", new Failure response.error, "LaboratoryPostCreation", params.status
-
-            serverRequest "POST", Store.auth.origin + "/api/v1/statuses/", (
-                status: event.detail.text
-                in_reply_to_id: if (inReplyTo = event.detail.inReplyTo) > 0 and isFinite inReplyTo then inReplyTo else undefined
-                media_ids: if (attachments = event.detail.attachments) instanceof Array then (attachment.id for attachment in attachments when attachment instanceof Attachment) else undefined
-                sensitive: if event.detail.makeNSFW then "true" else undefined
-                spoiler_text: if (message = event.detail.message) then String message else undefined
-                visibility: switch event.detail.visibility
-                    when Post.Visibility.PUBLIC then "public"
-                    when Post.Visibility.REBLOGGABLE then "unlisted"
-                    else "private"
-            ), Store.auth.accessToken, onComplete, onError
+        .handle "LaboratoryPostReceived", (event) ->
+            if (post = event.detail) instanceof Post and
+                (type = post.type) instanceof Post.Type and
+                Infinity > (id = Math.floor post.id) > 0
+                    Store[["notifications", "statuses"][+!(
+                        type & Post.Type.NOTIFICATION
+                    )]][id] = post
 
 ####  `LaboratoryPostDeletion`.
 
-The `LaboratoryPostDeletion` event attempts to delete an existing status.
+The `LaboratoryPostDeleted` event removes the given post from our store.
 
->   __[Issue #21](https://github.com/marrus-sh/laboratory/issues/21) :__
->   There needs to be better responses and error checking with regards to post deletion.
-
-        .handle "LaboratoryPostDeletion", (event) ->
-
-            unless isFinite id = Number event.detail.id
-                dispatch "LaboratoryPostFailed", new Failure "Unable to delete post; no id specified", "LaboratoryPostDeletion"
-                return
-
-            onComplete = ->
-            onError = (response, data, params) -> dispatch "LaboratoryPostFailed", new Failure response.error, "LaboratoryPostDeletion", params.status
-
-            serverRequest "DELETE", Store.auth.origin + "/api/v1/statuses/" + id, null, Store.auth.accessToken, onComplete, onError
-
-####  `LaboratoryPostSetReblog`.
-
-The `LaboratoryPostSetReblog` event attempts to set the reblog status of a post according to the specified `value`.
-It will fire a new `LaboratoryPostReceived` event updating the post's information if it succeeds.
-
-        .handle "LaboratoryPostSetReblog", (event) ->
-
-Obviously we need an `id` and `value` to do our work.
-
-            dispatch "LaboratoryPostFailed", new Failure "Cannot set reblog status for post: Either value or id is missing", "LaboratoryPostSetReblog" unless (value = !!event.detail.value)? and isFinite id = Number event.detail.id
-
-Here we handle the server response for our reblog setting:
-
-            onComplete = (response, data, params) -> dispatch "LaboratoryPostReceived", new Post response
-            onError = (response, data, params) -> dispatch "LaboratoryPostFailed", new Failure response.error, "LaboratoryPostSetReblog", params.status
-
-If we already have a post for the specified id loaded into our `Store`, then we can test its current reblog value to avoid unnecessary requests.
-We'll only send the request if the values differ.
-
-            serverRequest "POST", Store.auth.origin + "/api/v1/statuses/" + id + (if value then "/reblog" else "/unreblog"), null, Store.auth.accessToken, onComplete, onError unless Store.statuses[id]?.isReblogged is value
-
-####  `LaboratoryPostSetFavourite`.
-
-The `LaboratoryPostSetFavourite` event attempts to set the favourite status of a post according to the specified `value`.
-It will fire a new `LaboratoryPostReceived` event updating the post's information if it succeeds.
-
-        .handle "LaboratoryPostSetFavourite", (event) ->
-
-Obviously we need an `id` and `value` to do our work.
-
-            dispatch "LaboratoryPostFailed", new Failure "Cannot set favourite status for post: Either value or id is missing", "LaboratoryPostSetFavourite" unless (value = !!event.detail.value)? and isFinite id = Number event.detail.id
-
-Here we handle the server response for our favourite setting:
-
-            onComplete = (response, data, params) -> dispatch "LaboratoryPostReceived", new Post response
-            onError = (response, data, params) -> dispatch "LaboratoryPostFailed", new Failure response.error, "LaboratoryPostSetFavourite", params.status
-
-If we already have a post for the specified id loaded into our `Store`, then we can test its current favourite value to avoid unnecessary requests.
-We'll only send the request if the values differ.
-
-            serverRequest "POST", Store.auth.origin + "/api/v1/statuses/" + id + (if value then "/favourite" else "/unfavourite"), null, Store.auth.accessToken, onComplete, onError unless Store.statuses[id]?.isFavourited is value
+        .handle "LaboratoryPostDeleted", (event) ->
+            delete Store.statuses[id] if Infinity > (id = Math.floor event.detail.id) > 0

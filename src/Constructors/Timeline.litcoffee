@@ -17,8 +17,7 @@ Its properties are summarized below, alongside their Mastodon API equivalents:
 | `posts`  | [The response] | An ordered array of posts in the timeline, in reverse-chronological order |
 |  `type`  | *Not provided* | A `Timeline.Type` |
 | `query`  | *Not provided* | The minimum id of posts in the timeline |
-| `before` | *Not provided* | The upper limit of the timeline |
-| `after`  | *Not provided* | The lower limit of the timeline |
+| `length` | *Not provided* | The length of the timeline |
 
 ###  Timeline types:
 
@@ -37,8 +36,6 @@ The possible `Timeline.Type`s are as follows:
 | `Timeline.Type.NOTIFICATIONS` | `0x23` | A user's notifications |
 | `Timeline.Type.FAVOURITES` | `0x24` | A list of a user's favourites |
 | `Timeline.Type.ACCOUNT` | `0x40` | A timeline of an account's posts |
-
-The `Timeline()` constructor does not use or remember its `Timeline.Type`, but these values are used when requesting new `Timeline`s using `LaboratoryTimelineRequested`.
 
 ###  Prototype methods:
 
@@ -86,8 +83,6 @@ This loads our `params`.
 
         @type = if params.type instanceof Timeline.Type then params.type else Timeline.Type.UNDEFINED
         @query = String params.query
-        @before = Number params.before if isFinite params.before
-        @after = Number params.after if isFinite params.after
 
 Mastodon keeps track of ids for notifications separately from ids for posts, as best as I can tell, so we have to verify that our posts are of matching type before proceeding.
 Really all we care about is whether the posts are notifications, so that's all we test.
@@ -138,6 +133,8 @@ Finally, we implement our list of `posts` as getters such that they always retur
         @posts = []
         Object.defineProperty @posts, index, {get: getPost.bind(this, value.id, isNotification value), enumerable: true} for value, index in data
         Object.freeze @posts
+
+        @length = data.length
 
         return Object.freeze this
 
