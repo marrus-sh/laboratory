@@ -23,7 +23,7 @@ The __Rolodex__ module of the Laboratory API is comprised of those requests whic
 >   rangedRequest = new Laboratory.Rolodex.Request(data, before, after);
 >   ```
 >
->   - __API equivalent :__ `/api/v1/accounts/search`, `/api/v1/accounts/:id/followers`, `/api/v1/accounts/:id/following`, `/api/v1/statuses/:id/reblogged_by`, `/api/v1/statuses/:id/favourited_by`, `/api/v1/blocks`, `/api/v1/mutes`
+>   - __API equivalent :__ `/api/v1/accounts/search`, `/api/v1/accounts/:id/followers`, `/api/v1/accounts/:id/following`, `/api/v1/statuses/:id/reblogged_by`, `/api/v1/statuses/:id/favourited_by`, `/api/v1/blocks`, `/api/v1/mutes`, `/api/v1/follow_requests`
 >   - __Request parameters :__
 >       - __`type` :__ The [`Rolodex.Type`](../Constructors/Rolodex.litcoffee) of the `Rolodex`
 >       - __`query` :__ The associated query
@@ -32,7 +32,7 @@ The __Rolodex__ module of the Laboratory API is comprised of those requests whic
 
 Laboratory Rolodex events are used to request [`Rolodex`](../Constructors/Rolodex.litcoffee)es of accounts according to the specified `type` and `query`.
 If the `type` is `Rolodex.Type.SEARCH`, then `query` should provide the string to search for; otherwise, `query` should be the id of the relevant account or status.
-In the case of `Rolodex.Type.BLOCKS` and `Rolodex.Type.MUTES`, no `query` is required.
+In the case of `Rolodex.Type.BLOCKS`, `Rolodex.Type.MUTES`, and `Rolodex.Type.FOLLOW_REQUESTS`, no `query` is required.
 
 The `before` and `after` arguments can be used to modify the range of the `Rolodex`, but generally speaking you shouldn't need to specify these directly—instead use the built-in update and pagination functions to do this for you.
 
@@ -175,6 +175,7 @@ Note that `Request()` ignores data parameters which have a value of `undefined` 
                                 "/api/v1/statuses/" + query + "/reblogged_by"
                             when Rolodex.Type.BLOCKS then "/api/v1/blocks"
                             when Rolodex.Type.MUTES then "/api/v1/mutes"
+                            when Rolodex.Type.FOLLOW_REQUESTS then "/api/v1/follow_requests"
                     ), (
                         switch type
                             when Rolodex.Type.SEARCH

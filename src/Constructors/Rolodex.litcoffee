@@ -33,11 +33,12 @@ The possible `Rolodex.Type`s are as follows:
 | `Rolodex.Type.UNDEFINED` | `0x00` | No type is defined |
 | `Rolodex.Type.SEARCH` | `0x10` | A search of profiles |
 | `Rolodex.Type.FOLLOWERS` | `0x21` | The followers of an account |
-| `Rolodex.Type.FOLLOWING` | `0x22` | Those following an account |
+| `Rolodex.Type.FOLLOWING` | `0x22` | Those an account is following |
 | `Rolodex.Type.FAVOURITED_BY` | `0x41` | Those who favourited a given status |
 | `Rolodex.Type.REBLOGGED_BY` | `0x45` | Those who reblogged a given status |
 | `Rolodex.Type.BLOCKS` | `0x83` | Those who have been blocked |
 | `Rolodex.Type.MUTES` | `0x84` | Those who have been muted |
+| `Rolodex.Type.FOLLOW_REQUESTS` | `0x86` | Those who have requested to follow the user |
 
 ###  Prototype methods:
 
@@ -199,11 +200,12 @@ Here we define our `Rolodex.Type`s, as described above:
 >   There should also be a follow-request rolodex.
 
     Rolodex.Type = Enumeral.generate
-        UNDEFINED     : 0x00
-        SEARCH        : 0x10
-        FOLLOWERS     : 0x21
-        FOLLOWING     : 0x22
-        FAVOURITED_BY : 0x41
-        REBLOGGED_BY  : 0x45
-        BLOCKS        : 0x83
-        MUTES         : 0x84
+        UNDEFINED       : 0x00
+        SEARCH          : 0x10
+        FOLLOWERS       : 0x21
+        FOLLOWING       : 0x22
+        FAVOURITED_BY   : 0x41
+        REBLOGGED_BY    : 0x45
+        BLOCKS          : 0x83
+        MUTES           : 0x84
+        FOLLOW_REQUESTS : 0x86

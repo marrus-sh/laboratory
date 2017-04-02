@@ -834,7 +834,8 @@
     FAVOURITED_BY: 0x41,
     REBLOGGED_BY: 0x45,
     BLOCKS: 0x83,
-    MUTES: 0x84
+    MUTES: 0x84,
+    FOLLOW_REQUESTS: 0x86
   });
 
   Laboratory.Timeline = Timeline = function(data, params) {
@@ -1959,6 +1960,8 @@
               return "/api/v1/blocks";
             case Rolodex.Type.MUTES:
               return "/api/v1/mutes";
+            case Rolodex.Type.FOLLOW_REQUESTS:
+              return "/api/v1/follow_requests";
           }
         })()), ((function() {
           switch (type) {

@@ -1387,11 +1387,12 @@ The possible `Rolodex.Type`s are as follows:
 | `Rolodex.Type.UNDEFINED` | `0x00` | No type is defined |
 | `Rolodex.Type.SEARCH` | `0x10` | A search of profiles |
 | `Rolodex.Type.FOLLOWERS` | `0x21` | The followers of an account |
-| `Rolodex.Type.FOLLOWING` | `0x22` | Those following an account |
+| `Rolodex.Type.FOLLOWING` | `0x22` | Those an account is following |
 | `Rolodex.Type.FAVOURITED_BY` | `0x41` | Those who favourited a given status |
 | `Rolodex.Type.REBLOGGED_BY` | `0x45` | Those who reblogged a given status |
 | `Rolodex.Type.BLOCKS` | `0x83` | Those who have been blocked |
 | `Rolodex.Type.MUTES` | `0x84` | Those who have been muted |
+| `Rolodex.Type.FOLLOW_REQUESTS` | `0x86` | Those who have requested to follow the user |
 
 ###  Prototype methods:
 
@@ -1553,14 +1554,15 @@ Here we define our `Rolodex.Type`s, as described above:
 >   There should also be a follow-request rolodex.
 
     Rolodex.Type = Enumeral.generate
-        UNDEFINED     : 0x00
-        SEARCH        : 0x10
-        FOLLOWERS     : 0x21
-        FOLLOWING     : 0x22
-        FAVOURITED_BY : 0x41
-        REBLOGGED_BY  : 0x45
-        BLOCKS        : 0x83
-        MUTES         : 0x84
+        UNDEFINED       : 0x00
+        SEARCH          : 0x10
+        FOLLOWERS       : 0x21
+        FOLLOWING       : 0x22
+        FAVOURITED_BY   : 0x41
+        REBLOGGED_BY    : 0x45
+        BLOCKS          : 0x83
+        MUTES           : 0x84
+        FOLLOW_REQUESTS : 0x86
 
 
 - - -
@@ -3685,7 +3687,7 @@ The __Rolodex__ module of the Laboratory API is comprised of those requests whic
 >   rangedRequest = new Laboratory.Rolodex.Request(data, before, after);
 >   ```
 >
->   - __API equivalent :__ `/api/v1/accounts/search`, `/api/v1/accounts/:id/followers`, `/api/v1/accounts/:id/following`, `/api/v1/statuses/:id/reblogged_by`, `/api/v1/statuses/:id/favourited_by`, `/api/v1/blocks`, `/api/v1/mutes`
+>   - __API equivalent :__ `/api/v1/accounts/search`, `/api/v1/accounts/:id/followers`, `/api/v1/accounts/:id/following`, `/api/v1/statuses/:id/reblogged_by`, `/api/v1/statuses/:id/favourited_by`, `/api/v1/blocks`, `/api/v1/mutes`, `/api/v1/follow_requests`
 >   - __Request parameters :__
 >       - __`type` :__ The [`Rolodex.Type`](../Constructors/Rolodex.litcoffee) of the `Rolodex`
 >       - __`query` :__ The associated query
@@ -3694,7 +3696,7 @@ The __Rolodex__ module of the Laboratory API is comprised of those requests whic
 
 Laboratory Rolodex events are used to request [`Rolodex`](../Constructors/Rolodex.litcoffee)es of accounts according to the specified `type` and `query`.
 If the `type` is `Rolodex.Type.SEARCH`, then `query` should provide the string to search for; otherwise, `query` should be the id of the relevant account or status.
-In the case of `Rolodex.Type.BLOCKS` and `Rolodex.Type.MUTES`, no `query` is required.
+In the case of `Rolodex.Type.BLOCKS`, `Rolodex.Type.MUTES`, and `Rolodex.Type.FOLLOW_REQUESTS`, no `query` is required.
 
 The `before` and `after` arguments can be used to modify the range of the `Rolodex`, but generally speaking you shouldn't need to specify these directly—instead use the built-in update and pagination functions to do this for you.
 
@@ -3837,6 +3839,7 @@ Note that `Request()` ignores data parameters which have a value of `undefined` 
                                 "/api/v1/statuses/" + query + "/reblogged_by"
                             when Rolodex.Type.BLOCKS then "/api/v1/blocks"
                             when Rolodex.Type.MUTES then "/api/v1/mutes"
+                            when Rolodex.Type.FOLLOW_REQUESTS then "/api/v1/follow_requests"
                     ), (
                         switch type
                             when Rolodex.Type.SEARCH
