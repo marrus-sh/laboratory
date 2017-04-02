@@ -10,15 +10,15 @@ This allows specific versioned releases to be well-documented.
 
 Laboratory employs a number of issue labels, which are summarized below:
 
-- <b color="#b01c1c">bug :</b> Laboratory differs from its specification or what might be reasonably expected
-- <b color="#d15919">depreciation :</b> An aspect of Laboratory should be removed
-- <b color="#fae13e">documentation :</b> This issue relates to the Laboratory specification/documentation in addition to or instead of its implementation
-- <b color="#1aaceb">duplicate :</b> This issue has already been reported before
-- <b color="#50d952">enhancement :</b> A new feature should be added to Laboratory
-- <b color="#eb9100">low-priority :</b> This issue might not be fixed for a while
-- <b color="#1f1a14">polish :</b> This issue improves an existing aspect of how Laboratory operates without necessarily changing which features are offered
-- <b color="#f56e97">question :</b> It is unclear whether this issue needs to be acted upon
-- <b color="#4b2df7">wontfix :</b> This issue won't be acted upon
+- __bug :__ Laboratory differs from its specification or what might be reasonably expected
+- __depreciation :__ An aspect of Laboratory should be removed
+- __documentation :__ This issue relates to the Laboratory specification/documentation in addition to or instead of its implementation
+- __duplicate :__ This issue has already been reported before
+- __enhancement :__ A new feature should be added to Laboratory
+- __low-priority :__ This issue might not be fixed for a while
+- __polish :__ This issue improves an existing aspect of how Laboratory operates without necessarily changing which features are offered
+- __question :__ It is unclear whether this issue needs to be acted upon
+- __wontfix :__ This issue won't be acted upon
 
 When creating new issues, try to thoroughly describe the problem or, in the case of feature-requests, provide scenarios where the proposed fix would be beneficial.
 Providing an extensive technical solution isn't necessary in the case of most issues, but an effort should be made to help readers understand the problem at hand.

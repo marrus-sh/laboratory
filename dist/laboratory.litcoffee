@@ -2126,6 +2126,10 @@ The __Authorization__ module of the Laboratory API is comprised of those request
 This will likely be the first request you make when interacting with Laboratory.
 This data will be made available through the `Laboratory` object, so you probably don't need to keep track of its response yourself.
 
+The OAuth request for authorization needs to take place in a separate window; you can specify this by passing it as an argument to `request.start()`.
+If unspecified, Laboratory will try to open a window on its own (named `LaboratoryOAuth`); note that popup blockers will likely block this though.
+You don't need to specify a `window` if you're passing through an `accessToken`.
+
  - - -
 
 ##  Examples  ##
@@ -2144,7 +2148,7 @@ This data will be made available through the `Laboratory` object, so you probabl
 >       scope: Laboratory.Authorization.Scope.READWRITEFOLLOW
 >   });
 >   request.addEventListener("response", requestCallback);
->   request.start();
+>   request.start(authWindow);
 >   ```
 
 ###  Using a predetermined access token:
@@ -2193,11 +2197,12 @@ We explicitly return nothing because `stopRequest` is actually made transparent 
 The `startRequest()` function starts a new request.
 Its `this` value is an object which contains the request parameters and will get passed along the entire request.
 
-    startRequest = ->
+    startRequest = (window) ->
 
         unless this?.currentRequest instanceof Authorization.Request
             throw new TypeError "No defined AuthorizationRequest"
         do @currentRequest.stop
+        @window = window if window? and not window.closed
 
 We can only make our request once we have been registered as a client.
 Laboratory stores its client and authorization data in `localStorage`.
@@ -2292,7 +2297,7 @@ The actual token requesting takes place after authorization has been granted by 
 >   __Note :__
 >   This window **will be blocked** by popup blockers unless it has already been opened previously in response to a click or keyboard event.
 
-        @window = window.open @origin + "/oauth/authorize?" + (
+        location = @origin + "/oauth/authorize?" + (
             (
                 (encodeURIComponent key) + "=" + (encodeURIComponent value) for key, value of {
                     client_id: @clientID
@@ -2307,7 +2312,9 @@ The actual token requesting takes place after authorization has been granted by 
                     )
                 }
             ).join "&"
-        ), "LaboratoryOAuth"
+        )
+        if @window then @window.location = location
+        else @window = window.open location, "LaboratoryOAuth"
 
 Now we wait for a message from the popup window containing its key.
 
@@ -2401,7 +2408,7 @@ We store all our provided properties in an object called `recalled`, which we wi
                         else Authorization.Scope.READ
                     name: (String data.name) or "Laboratory"
                     accessToken: (String data.accessToken) or null
-                    window: if data.window instanceof Window then data.window else undefined
+                    window: undefined
                     clientID: undefined
                     clientSecret: undefined
 

@@ -1095,12 +1095,15 @@
     this.waitingRequest = this.callback = this.window = void 0;
   };
 
-  startRequest = function() {
+  startRequest = function(window) {
     var accessToken, handleClient, ref, scopeList, storedAccessToken, storedRedirect, storedScope, timeout;
     if (!((this != null ? this.currentRequest : void 0) instanceof Authorization.Request)) {
       throw new TypeError("No defined AuthorizationRequest");
     }
     this.currentRequest.stop();
+    if ((window != null) && !window.closed) {
+      this.window = window;
+    }
     ref = (typeof localStorage !== "undefined" && localStorage !== null ? localStorage.getItem("Laboratory | " + this.origin) : void 0) ? (localStorage.getItem("Laboratory | " + this.origin)).split(" ", 5) : [], storedRedirect = ref[0], this.clientID = ref[1], this.clientSecret = ref[2], storedScope = ref[3], storedAccessToken = ref[4];
     if ((accessToken = this.accessToken) || (accessToken = storedAccessToken) && (this.scope & storedScope) === +this.scope) {
       finishRequest.call(this, {
@@ -1152,11 +1155,11 @@
   };
 
   makeRequest = function() {
-    var callback, key, scopeList, value;
+    var callback, key, location, scopeList, value;
     if (!((this != null ? this.currentRequest : void 0) instanceof Authorization.Request)) {
       throw new TypeError("No defined AuthorizationRequest");
     }
-    this.window = window.open(this.origin + "/oauth/authorize?" + (((function() {
+    location = this.origin + "/oauth/authorize?" + (((function() {
       var ref, results;
       ref = {
         client_id: this.clientID,
@@ -1170,7 +1173,12 @@
         results.push((encodeURIComponent(key)) + "=" + (encodeURIComponent(value)));
       }
       return results;
-    }).call(this)).join("&")), "LaboratoryOAuth");
+    }).call(this)).join("&"));
+    if (this.window) {
+      this.window.location = location;
+    } else {
+      this.window = window.open(location, "LaboratoryOAuth");
+    }
     callback = (function(_this) {
       return function(event) {
         if (!(event.source === _this.window && event.origin === window.location.origin)) {
@@ -1251,7 +1259,7 @@
           scope: data.scope instanceof Authorization.Scope ? data.scope : Authorization.Scope.READ,
           name: (String(data.name)) || "Laboratory",
           accessToken: (String(data.accessToken)) || null,
-          window: data.window instanceof Window ? data.window : void 0,
+          window: void 0,
           clientID: void 0,
           clientSecret: void 0,
           origin: (a = document.createElement("a"), a.href = data.origin || "/", a.origin),
