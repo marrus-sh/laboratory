@@ -208,7 +208,7 @@ External scripts don't actually get to access the `Request` constructor.
 Instead, we feed them a dummy function with the same prototype—so `instanceof` will still match.
 (The prototype is set in the next section.)
 
-    Laboratory.Request = -> throw new TypeError "Illegal constructor"
+    Laboratory.Request = (data) -> throw new TypeError "Illegal constructor"
 
 ###  The prototype:
 

@@ -16,6 +16,42 @@ Laboratory doesn't have any external dependencies, and should run in any modern 
 
  - - -
 
+##  Examples  ##
+
+###  Basic Laboratory Template:
+
+>   ```html
+>   <!DOCTYPE html>
+>   <title>My Laboratory Project</title>
+>   <meta charset="utf-8">
+>
+>   <script type="text/javascript" src="laboratory.min.js"></script>
+>
+>   <script type="text/javascript">
+>
+>       function init () {
+>           var request = Laboratory.Authorization.Request({
+>               origin: "https://myinstance.social"
+>               name: "My Laboratory Client"
+>               redirect: "/"
+>               scope: Laboratory.Authorization.READWRITEFOLLOW
+>           });
+>           request.addEventListener("response", run);
+>           request.start();
+>       }
+>
+>       function run () {
+>           //  Project code.
+>       }
+>
+>       if (typeof Laboratory !== "undefined" && Laboratory.ready) init();
+>       else document.addEventListener("LaboratoryInitializationReady", init);
+>
+>   </script>
+>   ```
+
+ - - -
+
 ##  Implementation  ##
 
 This script loads and runs the Laboratory engine.
@@ -27,10 +63,10 @@ Laboratory data is all stored in a single `Store`, and then acted upon through e
 The store is not exposed to the window.
 
     Store = null
-    
+
 The `reset()` function resets our `Store` to its initial state.
 It's very important that we return nothing from this function and don't accidentially expose our `Store` lol.
-    
+
     do Laboratory.reset = reset = ->
         Store =
             auth: null
@@ -56,7 +92,7 @@ We now make our `Laboratory` object available to the window.
         value: Object.freeze Laboratory
         enumerable: yes
 
-Now that the `Laboratory` object is available to the `window`, we can fire our `LaboratoryInitializationLoaded` event.
+Now that the `Laboratory` object is available, we can fire our `LaboratoryInitializationLoaded` event.
 
     dispatch "LaboratoryInitializationLoaded"
 
@@ -83,7 +119,7 @@ We also set `Exposed.ready` to `true` so that scripts can tell Laboratory is run
 
 ####  Running asynchronously.
 
-We don't want the store loading before `document.body` or any of our other scripts, so we'll attach a `window.onload` event handler if our window isn't currently loaded.
+We don't want the store loading before `document.body` or any of our other scripts, so we'll attach a `window.onload` event handler if our document isn't currently loaded.
 (If it is, then we'll just call `run` right now.)
 
-    if document.readyState is "complete" then run() else window.addEventListener "load", run
+    if document.readyState is "complete" then do run else window.addEventListener "load", run

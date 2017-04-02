@@ -28,7 +28,7 @@ The __Profile__ module of the Laboratory API is comprised of those events which 
 ###  Requesting a profile:
 
 >   ```javascript
->       request = new Laboratory.Profile.Request(data, isLive, useCached);
+>   request = new Laboratory.Profile.Request(data, isLive, useCached);
 >   ```
 >
 >   - __API equivalent :__ `/api/v1/accounts/:id`, `/api/v1/accounts/relationships`
@@ -43,7 +43,7 @@ Profile requests may be either __static__ or __live__.
 Static profile requests don't update their responses when new information is received from the server, whereas live profile requests do.
 This behaviour is controlled by the `isLive` argument, which defaults to `true`.
 
->   __Note : __
+>   __Note :__
 >   You can call `request.stop()` to stop a live `Profile.Request`, and `request.start()` to start it up again.
 >   Always call `request.stop()` when you are finished using a live request to allow it to be freed from memory.
 
@@ -79,7 +79,7 @@ A summary of these options is provided by the table below:
 >   - __Response :__ A [`Profile`](../Constructors/Profile.litcoffee)
 
 `Profile.SetFollow()`, `Profile.SetBlock()`, and `Profile.SetMute()` can be used to modify the relationship status for an account.
-It should be fired with two parameters: `id`, which gives the id of the account, and `value`, which should indicate whether to follow/block/mute an account, or do the opposite.
+They should be fired with two parameters: `id`, which gives the id of the account, and `value`, which should indicate whether to follow/block/mute an account, or do the opposite.
 
  - - -
 
@@ -88,43 +88,43 @@ It should be fired with two parameters: `id`, which gives the id of the account,
 ###  Requesting a profile's data:
 
 >   ```javascript
->       function requestCallback(event) {
->           //  Do something with the profile
->       }
+>   function requestCallback(event) {
+>       //  Do something with the profile
+>   }
 >
->       var request = new Laboratory.Profile.Request({id: profileID});
->       request.addEventListener("response", requestCallback);
->       request.start();
+>   var request = new Laboratory.Profile.Request({id: profileID});
+>   request.addEventListener("response", requestCallback);
+>   request.start();
 >   ```
 
 ###  Following a profile:
 
 >   ```javascript
->       function requestCallback(event) {
->           if (event.detail.response.relationship & Laboratory.Profile.Relationship.FOLLOWING) success();
->       }
+>   function requestCallback(event) {
+>       if (event.detail.response.relationship & Laboratory.Profile.Relationship.FOLLOWING) success();
+>   }
 >
->       var request = new Laboratory.Profile.SetRelationship({
->           id: someProfile.id,
->           value: someProfile.relationship & Laboratory.Profile.Relationship.FOLLOWING
->       });
->       request.addEventListener("response", requestCallback);
->       request.start();
+>   var request = new Laboratory.Profile.SetRelationship({
+>       id: someProfile.id,
+>       value: someProfile.relationship & Laboratory.Profile.Relationship.FOLLOWING
+>   });
+>   request.addEventListener("response", requestCallback);
+>   request.start();
 >   ```
 
 ###  Unmuting a profile:
 
 >   ```javascript
->       function requestCallback(event) {
->           if (event.detail.response.relationship & ~Laboratory.Profile.Relationship.MUTING) success();
->       }
+>   function requestCallback(event) {
+>       if (event.detail.response.relationship & ~Laboratory.Profile.Relationship.MUTING) success();
+>   }
 >
->       var request = new Laboratory.Profile.SetRelationship({
->           id: someProfile.id,
->           value: someProfile.relationship & ~Laboratory.Profile.Relationship.MUTING
->       });
->       request.addEventListener("response", requestCallback);
->       request.start();
+>   var request = new Laboratory.Profile.SetRelationship({
+>       id: someProfile.id,
+>       value: someProfile.relationship & ~Laboratory.Profile.Relationship.MUTING
+>   });
+>   request.addEventListener("response", requestCallback);
+>   request.start();
 >   ```
 
  - - -
@@ -134,9 +134,9 @@ It should be fired with two parameters: `id`, which gives the id of the account,
 ###  Making the requests:
 
     Object.defineProperties Profile,
-    
+
 ####  `Profile.Request`s.
-    
+
         Request:
             configurable: no
             enumerable: yes
@@ -144,11 +144,11 @@ It should be fired with two parameters: `id`, which gives the id of the account,
             value: do ->
 
                 ProfileRequest = (data, isLive = yes, useCached = yes) ->
-            
+
                     unless this and this instanceof ProfileRequest
                         throw new TypeError "this is not a ProfileRequest"
                     unless Infinity > (profileID = Math.floor data?.id) > 0
-                        throw new TypeError "Unable to request profile; no id provided" 
+                        throw new TypeError "Unable to request profile; no id provided"
 
 This `callback()` updates our `Profile.Request` if Laboratory receives another `Profile` with the same `id`.
 
@@ -173,7 +173,7 @@ We dispatch a failure unless the received profile matches the requested `profile
                                 return
                             dispatch "LaboratoryProfileReceived", new Profile result
                             do relationshipRequest.start
-                        
+
 If this `isLive`, then we also need to create a `Request` for our relationships.
 
                     relationshipRequest = new Request "GET",
@@ -194,13 +194,13 @@ If this `isLive`, then we also need to create a `Request` for our relationships.
                                     new Profile (
                                         Store.profiles[relID] or {id: relID}
                                     ), relationship
-                        
+
 We store the default `Request` `start()` and `stop()` values and then overwrite them with our own.
 This allows us to handle our `useCached` and `isLive` arguments.
-                        
+
                     requestStart = @start
                     requestStop = @stop
-                    
+
                     Object.defineProperties this,
                         start:
                             enumerable: no
@@ -232,9 +232,9 @@ Our `Profile.Request.prototype` just inherits from `Request`.
                             value: ProfileRequest
 
                 return ProfileRequest
-    
+
 ####  `Post.SetFollow`s.
-    
+
         SetFollow:
             configurable: no
             enumerable: yes
@@ -242,11 +242,11 @@ Our `Profile.Request.prototype` just inherits from `Request`.
             value: do ->
 
                 ProfileSetFollow = (data) ->
-            
+
                     unless this and this instanceof ProfileSetFollow
                         throw new TypeError "this is not a ProfileSetFollow"
                     unless Infinity > (profileID = Math.floor data?.id) > 0
-                        throw new TypeError "Unable to follow account; no id provided" 
+                        throw new TypeError "Unable to follow account; no id provided"
                     value = if data.value then !!data.value else on
 
 `Profile.SetFollow()` is mostly just an API request.
@@ -272,9 +272,9 @@ Our `Profile.SetFollow.prototype` just inherits from `Request`.
                             value: ProfileSetFollow
 
                 return ProfileSetFollow
-    
+
 ####  `Post.SetBlock`s.
-    
+
         SetBlock:
             configurable: no
             enumerable: yes
@@ -282,11 +282,11 @@ Our `Profile.SetFollow.prototype` just inherits from `Request`.
             value: do ->
 
                 ProfileSetBlock = (data) ->
-                
+
                     unless this and this instanceof ProfileSetBlock
                         throw new TypeError "this is not a ProfileSetBlock"
                     unless Infinity > (profileID = Math.floor data?.id) > 0
-                        throw new TypeError "Unable to block account; no id provided" 
+                        throw new TypeError "Unable to block account; no id provided"
                     value = if data.value then !!data.value else on
 
 `Profile.SetBlock()` is mostly just an API request.
@@ -312,9 +312,9 @@ Our `Profile.SetBlock.prototype` just inherits from `Request`.
                             value: ProfileSetBlock
 
                 return ProfileSetBlock
-    
+
 ####  `Post.SetFollow`s.
-    
+
         SetMute:
             configurable: no
             enumerable: yes
@@ -322,11 +322,11 @@ Our `Profile.SetBlock.prototype` just inherits from `Request`.
             value: do ->
 
                 ProfileSetMute = (data) ->
-            
+
                     unless this and this instanceof ProfileSetMute
                         throw new TypeError "this is not a ProfileSetMute"
                     unless Infinity > (profileID = Math.floor data?.id) > 0
-                        throw new TypeError "Unable to mute account; no id provided" 
+                        throw new TypeError "Unable to mute account; no id provided"
                     value = if data.value then !!data.value else on
 
 `Profile.SetMute()` is mostly just an API request.
@@ -373,4 +373,4 @@ The `LaboratoryProfileReceived` event simply adds a received profile to our stor
         .handle "LaboratoryProfileReceived", (event) ->
             if (profile = event.detail) instanceof Profile and
                 Infinity > (id = Math.floor profile.id) > 0
-                    Store.profiles[id] = profile 
+                    Store.profiles[id] = profile

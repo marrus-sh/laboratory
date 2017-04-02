@@ -9,10 +9,16 @@
 #####  NEW
 
 + Added documentation for currently-open [GitHub Issues](https://github.com/marrus-sh/laboratory/issues) ([#14](https://github.com/marrus-sh/laboratory/issues/14))
++ Added a new Request API to make interacting with Laboratory substantially easier and less alien to those not used to event-based operations ([#15](https://github.com/marrus-sh/laboratory/issues/15))
 
 #####  CHANGED
 
 * Fixed [Issue #34](https://github.com/marrus-sh/laboratory/issues/3), where Laboratory used `localStorage` for things where it didn't need to
+
+#####  REMOVED
+
+- Request events and Failure events have been removed, as these features are now provided by the Request API
+- `LaboratoryTimelineReceived` and `LaboratoryRolodexReceived` events have been removed, and the Event API now only concerns those data types which directly impact the store
 
  - - -
 

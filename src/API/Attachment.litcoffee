@@ -16,16 +16,10 @@ The __Attachment__ module of the Laboratory API is comprised of those requests w
 | :------ | :---------- |
 | `Attachment.Request()` | Requests a media attachment from the Mastodon server. |
 
-####  Events.
-
-| Event | Description |
-| :---- | :---------- |
-| `LaboratoryAttachmentReceived` | Fires when an `Attachment` has been processed |
-
 ###  Requesting an attachment:
 
 >   ```javascript
->       request = new Laboratory.Attachment.Request(data);
+>   request = new Laboratory.Attachment.Request(data);
 >   ```
 >
 >   - __API equivalent :__ `/api/v1/media`
@@ -43,20 +37,20 @@ The only relevant parameter is `file`, which should be the `File` to upload.
 ###  Uploading an attachment to the Mastodon server:
 
 >   ```javascript
->       //  Suppose `myAttachment` is a `File`.
->       var request = new Laboratory.Attachment.Request({
->           file: myAttachment
->       });
->       request.addEventListener("response", requestCallback);
->       request.start();
+>   //  Suppose `myAttachment` is a `File`.
+>   var request = new Laboratory.Attachment.Request({
+>       file: myAttachment
+>   });
+>   request.addEventListener("response", requestCallback);
+>   request.start();
 >   ```
 
 ###  Using the result of an Attachment request:
 
 >   ```javascript
->       function requestCallback(event) {
->           useAttachment(event.response);
->       }
+>   function requestCallback(event) {
+>       useAttachment(event.response);
+>   }
 >   ```
 
  - - -
@@ -72,7 +66,10 @@ The only relevant parameter is `file`, which should be the `File` to upload.
         value: do ->
 
             AttachmentRequest = (data) ->
-        
+
+Our first order of business is checking that we were provided a `File` and that `FormData` is supported on our platform.
+If not, that's a `TypeError`.
+
                 unless this and this instanceof AttachmentRequest
                     throw new TypeError "this is not an AttachmentRequest"
                 unless typeof File is "function" and (file = data.file) instanceof File
@@ -80,8 +77,13 @@ The only relevant parameter is `file`, which should be the `File` to upload.
                 unless typeof FormData is "function"
                     throw new TypeError "Unable to create attachment; `FormData` not supported"
 
+We create a new `form` and add the `file` to it.
+This will be directly uploaded to the server during the request.
+
                 form = new FormData
                 form.append "file", file
+
+Here we create the request.
 
                 Request.call this, "POST", Store.auth.origin + "/api/v1/media", form,
                     Store.auth.accessToken, (result) =>
@@ -89,6 +91,8 @@ The only relevant parameter is `file`, which should be the `File` to upload.
                             @response = police -> new Attachment result
 
                 Object.freeze this
+
+Our `Attachment.Request.prototype` just inherits from `Request`.
 
             Object.defineProperty AttachmentRequest, "prototype",
                 configurable: no
@@ -100,14 +104,3 @@ The only relevant parameter is `file`, which should be the `File` to upload.
                         value: AttachmentRequest
 
             return AttachmentRequest
-
-###  Creating the events:
-
-Here we create the events as per our specifications.
-
-    LaboratoryEvent
-        .create "LaboratoryAttachmentReceived", Attachment
-
-###  Handling the events:
-
-Laboratory Attachment events do not have handlers.

@@ -10,6 +10,8 @@ The __Rolodex__ module of the Laboratory API is comprised of those requests whic
 
 ###  Quick reference:
 
+####  Requests.
+
 | Request | Description |
 | :------ | :---------- |
 | `Rolodex.Request()` | Requests a `Rolodex` from the Mastodon server |
@@ -17,8 +19,8 @@ The __Rolodex__ module of the Laboratory API is comprised of those requests whic
 ###  Requesting a rolodex:
 
 >   ```javascript
->       request = new Laboratory.Rolodex.Request(data);
->       rangedRequest = new Laboratory.Rolodex.Request(data, before, after);
+>   request = new Laboratory.Rolodex.Request(data);
+>   rangedRequest = new Laboratory.Rolodex.Request(data, before, after);
 >   ```
 >
 >   - __API equivalent :__ `/api/v1/accounts/search`, `/api/v1/accounts/:id/followers`, `/api/v1/accounts/:id/following`, `/api/v1/statuses/:id/reblogged_by`, `/api/v1/statuses/:id/favourited_by`, `/api/v1/blocks`, `/api/v1/mutes`
@@ -55,74 +57,74 @@ These return new `Rolodex.Request`s which will respond with the previous and nex
 ###  Requesting an account's followers:
 
 >   ```javascript
->       function requestCallback(event) {
->           //  Do something with the rolodex
->       }
+>   function requestCallback(event) {
+>       //  Do something with the rolodex
+>   }
 >
->       var request = new Laboratory.Rolodex.Request({
->           type: Laboratory.Rolodex.Type.FOLLOWERS
->           query: someProfile.id
->       });
->       request.addEventListener("response", requestCallback);
->       request.start();
+>   var request = new Laboratory.Rolodex.Request({
+>       type: Laboratory.Rolodex.Type.FOLLOWERS
+>       query: someProfile.id
+>   });
+>   request.addEventListener("response", requestCallback);
+>   request.start();
 >   ```
 
 ###  Searching for an account:
 
 >   ```javascript
->       function requestCallback(event) {
->           //  Do something with the rolodex
->       }
+>   function requestCallback(event) {
+>       //  Do something with the rolodex
+>   }
 >
->       var request = new Laboratory.Rolodex.Request({
->           type: Laboratory.Rolodex.Type.SEARCH
->           query: "account"
->           limit: 5
->       });
->       request.addEventListener("response", requestCallback);
->       request.start();
+>   var request = new Laboratory.Rolodex.Request({
+>       type: Laboratory.Rolodex.Type.SEARCH
+>       query: "account"
+>       limit: 5
+>   });
+>   request.addEventListener("response", requestCallback);
+>   request.start();
 >   ```
 
 ###  Checking a user's blocks:
 
 >   ```javascript
->       function requestCallback(event) {
->           //  Do something with the rolodex
->       }
+>   function requestCallback(event) {
+>       //  Do something with the rolodex
+>   }
 >
->       var request = new Laboratory.Rolodex.Request({
->           type: Laboratory.Rolodex.Type.BLOCKS
->       });
->       request.addEventListener("response", requestCallback);
->       request.start();
+>   var request = new Laboratory.Rolodex.Request({
+>       type: Laboratory.Rolodex.Type.BLOCKS
+>   });
+>   request.addEventListener("response", requestCallback);
+>   request.start();
 >   ```
 
 ###  Updating a request:
 
 >   ```javascript
->       request.update();  //  Will fire a "response" event for each update
+>   request.update();  //  Will fire a "response" event for each update
 >   ```
 
 ###  Paginating a request:
 
 >   ```javascript
->       function requestCallback(event) {
->           //  Do something with the rolodex
->       }
+>   function requestCallback(event) {
+>       //  Do something with the rolodex
+>   }
 >
->       function loadNextPage (request) {
->           var newRequest = request.next();
->           newRequest.addEventListener("response", requestCallback);
->           newRequest.start();
->           return newRequest;
->       }
+>   function loadNextPage (request) {
+>       var newRequest = request.next();
+>       newRequest.addEventListener("response", requestCallback);
+>       newRequest.start();
+>       return newRequest;
+>   }
 >
->       function loadPrevPage (request) {
->           var newRequest = request.prev();
->           newRequest.addEventListener("response", requestCallback);
->           newRequest.start();
->           return newRequest;
->       }
+>   function loadPrevPage (request) {
+>       var newRequest = request.prev();
+>       newRequest.addEventListener("response", requestCallback);
+>       newRequest.start();
+>       return newRequest;
+>   }
 >   ```
 
  - - -
@@ -132,17 +134,17 @@ These return new `Rolodex.Request`s which will respond with the previous and nex
 ###  Making the request:
 
     Object.defineProperties Rolodex, "Request",
-    
+
         configurable: no
         enumerable: yes
         writable: no
         value: do ->
 
             RolodexRequest = (data, before, after) ->
-        
+
                 unless this and this instanceof RolodexRequest
                     throw new TypeError "this is not a RolodexRequest"
-                    
+
 First, we handle our `data`.
 
                 unless (type = Rolodex.Type.fromValue data.type) and
@@ -181,7 +183,7 @@ Note that `Request()` ignores data parameters which have a value of `undefined` 
                             else
                                 max_id: before
                                 since_id: after
-                    ), Store.auth.accessToken, (result, params) => 
+                    ), Store.auth.accessToken, (result, params) =>
                         ids = []
                         before = ((params.prev?.match /.*since_id=([0-9]+)/) or [])[1]
                         after = ((params.next?.match /.*max_id=([0-9]+)/) or [])[1]
@@ -226,7 +228,7 @@ Note that `Request()` ignores data parameters which have a value of `undefined` 
                                     do next.start
                             (next = do @next).addEventListener "response", callback
                             do next.start
-                            
+
                 Object.freeze this
 
 Our `Rolodex.Request.prototype` inherits from `Request`, with additional dummy methods for the ones we define in our constructor.

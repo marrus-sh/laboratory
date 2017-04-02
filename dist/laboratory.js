@@ -14,7 +14,7 @@
              Source code available at:
       https://github.com/marrus-sh/laboratory
   
-                  Version 0.3.1
+                  Version 0.4.0
    */
   var Application, Attachment, Authorization, Client, CustomEvent, Enumeral, Exposed, Failure, Laboratory, LaboratoryEvent, LaboratoryEventTarget, Post, Profile, Request, Rolodex, Store, Timeline, checkDecree, decree, dispatch, finishRequest, fn, getToken, makeRequest, police, prop, reset, run, startRequest, stopRequest,
     hasProp = {}.hasOwnProperty,
@@ -22,7 +22,7 @@
 
   Laboratory = {
     ℹ: "https://github.com/marrus-sh/laboratory",
-    Nº: 3.1
+    Nº: 4.0
   };
 
   (function() {
@@ -39,10 +39,11 @@
 
   fn = function(prop) {
     return Object.defineProperty(Laboratory, prop, {
-      get: (function() {
+      enumerable: true,
+      configurable: false,
+      get: function() {
         return Exposed[prop];
-      }),
-      enumerable: true
+      }
     });
   };
   for (prop in Exposed) {
@@ -96,15 +97,15 @@
   })();
 
   LaboratoryEventTarget = (function() {
-    var LET, fragment, ref;
+    var LabEvtTgt, fragment, ref;
     fragment = document.createDocumentFragment();
-    LET = function() {
+    LabEvtTgt = function() {
       this.addEventListener = fragment.addEventListener.bind(this);
       this.removeEventListener = fragment.removeEventListener.bind(this);
       return this.dispatchEvent = fragment.dispatchEvent.bind(this);
     };
-    LET.prototype = Object.freeze(Object.create(((ref = window.EventTarget) != null ? ref.prototype : void 0) ? window.EventTarget.prototype : window.Object.prototype));
-    return Object.freeze(LET);
+    LabEvtTgt.prototype = Object.freeze(Object.create((((ref = window.EventTarget) != null ? ref.prototype : void 0) ? window.EventTarget.prototype : window.Object.prototype)));
+    return Object.freeze(LabEvtTgt);
   })();
 
   Laboratory.Enumeral = Enumeral = null;
@@ -636,7 +637,7 @@
     return this;
   };
 
-  Laboratory.Request = function() {
+  Laboratory.Request = function(data) {
     throw new TypeError("Illegal constructor");
   };
 
@@ -1077,8 +1078,6 @@
     })()
   });
 
-  LaboratoryEvent.create("LaboratoryAttachmentReceived", Attachment);
-
   stopRequest = function() {
     var ref;
     if (!((this != null ? this.currentRequest : void 0) instanceof Authorization.Request)) {
@@ -1249,7 +1248,7 @@
           currentRequest: this,
           waitingRequest: void 0,
           callback: void 0,
-          scope: (data.scope instanceof Authorization.Scope ? data.scope : Authorization.Scope.READ),
+          scope: data.scope instanceof Authorization.Scope ? data.scope : Authorization.Scope.READ,
           name: (String(data.name)) || "Laboratory",
           accessToken: (String(data.accessToken)) || null,
           window: data.window instanceof Window ? data.window : void 0,
@@ -1298,12 +1297,12 @@
     value: (function() {
       var ClientRequest;
       ClientRequest = function(data) {
-        var a, name, origin, redirect, scope;
+        var a, name, origin, redirect, scope, scopeList;
         if (!(this && this instanceof ClientRequest)) {
           throw new TypeError("this is not a ClientRequest");
         }
         name = (String(data.name)) || "Laboratory";
-        scope = (data.scope(instance in Authorization.Scope) ? data.scope : Authorization.Scope.READ);
+        scope = data.scope(instance in Authorization.Scope) ? data.scope : Authorization.Scope.READ;
         a = document.createElement("a");
         a.href = data.origin || "/";
         origin = a.origin;
@@ -1312,21 +1311,7 @@
         Request.call(this, "POST", origin + "/api/v1/apps", {
           client_name: name,
           redirect_uris: redirect,
-          scopes: (function() {
-            var scopeList;
-            scope = event.detail.scope;
-            scopeList = [];
-            if (scope & Authorization.Scope.READ) {
-              scopeList.push("read");
-            }
-            if (scope & Authorization.Scope.WRITE) {
-              scopeList.push("write");
-            }
-            if (scope & Authorization.Scope.FOLLOW) {
-              scopeList.push("follow");
-            }
-            return scopeList.join(" ");
-          })()
+          scopes: (scope = event.detail.scope, scopeList = [], scope & Authorization.Scope.READ ? scopeList.push("read") : void 0, scope & Authorization.Scope.WRITE ? scopeList.push("write") : void 0, scope & Authorization.Scope.FOLLOW ? scopeList.push("follow") : void 0, scopeList.join(" "))
         }, null, (function(_this) {
           return function(result) {
             return dispatch("LaboratoryClientReceived", decree(function() {

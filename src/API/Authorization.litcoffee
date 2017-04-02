@@ -25,7 +25,7 @@ The __Authorization__ module of the Laboratory API is comprised of those request
 ###  Requesting authorization:
 
 >   ```javascript
->       request = new Laboratory.Authorization.Request(data);
+>   request = new Laboratory.Authorization.Request(data);
 >   ```
 >
 >   - __API equivalent :__ `/oauth/token`, `/api/v1/verify_credentials`
@@ -45,37 +45,37 @@ This data will be made available through the `Laboratory` object, so you probabl
 
 ##  Examples  ##
 
-###  Requesting authorization:
+###  Getting authorization:
 
 >   ```javascript
->       function requestCallback(event) {
->           if (event.response instanceof Laboratory.Authorization) startMyApplication();
->       }
+>   function requestCallback(event) {
+>       if (event.response instanceof Laboratory.Authorization) startMyApplication();
+>   }
 >
->       var request = new Laboratory.Authorization.Request({
->           name: "My Application",
->           origin: "https://myinstance.social",
->           redirect: "/",
->           scope: Laboratory.Authorization.Scope.READWRITEFOLLOW
->       });
->       request.addEventListener("response", requestCallback);
->       request.start();
+>   var request = new Laboratory.Authorization.Request({
+>       name: "My Application",
+>       origin: "https://myinstance.social",
+>       redirect: "/",
+>       scope: Laboratory.Authorization.Scope.READWRITEFOLLOW
+>   });
+>   request.addEventListener("response", requestCallback);
+>   request.start();
 >   ```
 
 ###  Using a predetermined access token:
 
 >   ```javascript
->       function requestCallback(event) {
->           if (event.response instanceof Laboratory.Authorization) startMyApplication();
->       }
+>   function requestCallback(event) {
+>       if (event.response instanceof Laboratory.Authorization) startMyApplication();
+>   }
 >
->       var request = new Laboratory.Authorization.Request({
->           origin: "https://myinstance.social",
->           accessToken: myAccessToken
->           scope: Laboratory.Authorization.Scope.READWRITEFOLLOW
->       });
->       request.addEventListener("response", requestCallback);
->       request.start();
+>   var request = new Laboratory.Authorization.Request({
+>       origin: "https://myinstance.social",
+>       accessToken: myAccessToken
+>       scope: Laboratory.Authorization.Scope.READWRITEFOLLOW
+>   });
+>   request.addEventListener("response", requestCallback);
+>   request.start();
 >   ```
 
  - - -
@@ -83,6 +83,9 @@ This data will be made available through the `Laboratory` object, so you probabl
 ##  Implementation  ##
 
 ###  Making the request:
+
+This code is very complex because OAuth is very complex lol.
+It is split among a number of functions because it depends on several asynchronous calls.
 
 ####  Stopping an existing request.
 
@@ -93,7 +96,7 @@ We explicitly return nothing because `stopRequest` is actually made transparent 
 
         unless this?.currentRequest instanceof Authorization.Request
             throw new TypeError "No defined AuthorizationRequest"
-            
+
         do @wrapup if typeof @wrapup is "function"
         do @waitingRequest.stop if typeof @waitingRequest?.stop is "function"
         do @window.close if @window instanceof Window
@@ -121,22 +124,23 @@ Here we try to access that data if present:
             else []
 
 If we have an access token which supports our `scope` then we can immediately try using it.
-We'll just forward it to `LaboratoryAuthorizationGranted`.
+We'll just forward it to `finishRequest()`.
 It is important that we `return` here or else we'll end up requesting another token anyway.
 
-        if (accessToken = @accessToken) or (accessToken = storedAccessToken) and (@scope & storedScope) is +@scope
-            finishRequest.call this,
-                access_token: accessToken
-                created_at: NaN
-                scope: (
-                    scopeList = []
-                    scopeList.push "read" if @scope & Authorization.Scope.READ
-                    scopeList.push "write" if @scope & Authorization.Scope.WRITE
-                    scopeList.push "follow" if @scope & Authorization.Scope.FOLLOW
-                    scopeList.join " "
-                )
-                token_type: "bearer"
-            return
+        if (accessToken = @accessToken) or (accessToken = storedAccessToken) and
+            (@scope & storedScope) is +@scope
+                finishRequest.call this,
+                    access_token: accessToken
+                    created_at: NaN
+                    scope: (
+                        scopeList = []
+                        scopeList.push "read" if @scope & Authorization.Scope.READ
+                        scopeList.push "write" if @scope & Authorization.Scope.WRITE
+                        scopeList.push "follow" if @scope & Authorization.Scope.FOLLOW
+                        scopeList.join " "
+                    )
+                    token_type: "bearer"
+                return
 
 If we have client credentials and they are properly associated with our `redirect` and `scope`, we can go ahead and `makeRequest()`.
 
@@ -169,7 +173,7 @@ Otherwise, we need to get new client credentials before proceeding.
                 url: recalled.origin
                 redirect: recalled.redirect
                 scope: recalled.scope
-                
+
             @waitingRequest.addEventListener "response", handleClient
             @wrapup = => @waitingRequest.removeEventListener "response", handleClient
             do @waitingRequest.start
@@ -258,6 +262,7 @@ The `getToken()` function takes a code received from a Laboratory popup and uses
 ####  Finishing the request.
 
 The `finishRequest()` function takes the server response from a token request and uses it to verify our token, and complete our authorization request.
+During verification, the Mastodon server will provide us with the current user's data, which we will dispatch via a `LaboratoryProfileReceived` event to our store.
 
     finishRequest = (result) ->
 
@@ -295,7 +300,7 @@ The `finishRequest()` function takes the server response from a token request an
         value: do ->
 
             AuthorizationRequest = (data) ->
-            
+
                 unless this and this instanceof AuthorizationRequest
                     throw new TypeError "this is not an AuthorizationRequest"
 
@@ -306,17 +311,16 @@ We store all our provided properties in an object called `recalled`, which we wi
                     currentRequest: this
                     waitingRequest: undefined
                     callback: undefined
-                    scope: (
+                    scope:
                         if data.scope instanceof Authorization.Scope then data.scope
                         else Authorization.Scope.READ
-                    )
                     name: (String data.name) or "Laboratory"
                     accessToken: (String data.accessToken) or null
                     window: if data.window instanceof Window then data.window else undefined
                     clientID: undefined
                     clientSecret: undefined
 
-We need to do some work to normalize our URL and get our final redirect URI.
+We need to do some work to normalize our origin and get our final redirect URI.
 
                     origin: (
                         a = document.createElement "a"
@@ -329,10 +333,9 @@ We need to do some work to normalize our URL and get our final redirect URI.
                     )
 
 We now set up our `Request()`—although we won't actually use it to talk to the server.
+Instead, the `start()` and `stop()` functions will handle this.
 
                 Request.call this
-
-Here we assign our `start()` and `stop()` functions, as well as the `response` getter.
 
                 Object.defineProperties this,
                     start:
@@ -376,7 +379,7 @@ Laboratory provides handlers for the following Authorization events:
 The `LaboratoryAuthorizationReceived` handler just saves the provided `Authorization` to the `Store`.
 It also exposes it to the window through `Exposed`.
 
->   __Note :__
+>   __[Issue #36](https://github.com/marrus-sh/laboratory/issues/36) :__
 >   Right now Laboratory is only set up to allow one active signin at a given time.
 >   This may change in the future.
 

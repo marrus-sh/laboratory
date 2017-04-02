@@ -53,8 +53,8 @@ Neither of the Laboratory Initialization events have `detail`s.
 ###  Initializing an application:
 
 >   ```javascript
->       if (Laboratory.ready) init();
->       else document.addEventListener("LaboratoryInitializationReady", init);
+>   if (Laboratory.ready) init();
+>   else document.addEventListener("LaboratoryInitializationReady", init);
 >   ```
 
  - - -

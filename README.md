@@ -14,7 +14,7 @@ Laboratory maintains a store of all the data it receives from the server for qui
 The principles which guide Laboratory development are as follows:
 
  -  __Abstraction of API and data storage.__
-    Laboratory does not make its internal storage mechanisms available to users, and data is only accessible through its event interface.
+    Laboratory does not make its internal storage mechanisms available to users, and data is only accessible through its request interface.
     This allows multiple components to share the same Laboratory store without conflicting with each other's operation.
     Laboratory does not require users to be familiar with the Mastodon API or its data structures.
 
@@ -41,16 +41,19 @@ However, it does not require the `CustomEvent()` constructor as this is not avai
 
 Given these requirements, the baseline browser compatability for Laboratory should be as seen in the table below:
 
+<div align="center">
+
 | Chrome | Edge  | Firefox |  IE   | Opera | Safari (Webkit) |
 | :----: | :---: | :-----: | :---: | :---: | :-------------: |
 |   6    | _Any_ |    6    |   9   | 12.10 |       5.1       |
+
+</div>
 
 Certain aspects of the API have additional requirements.
 Laboratory will not attempt to polyfill these features but will take advantage of them if present.
 
 - Remembering authorization credentials between sessions requires access to `localStorage()`
 - The `LaboratoryAttachmentRequested` event requires support for `FormData()` and `File()`
-- The `Laboratory.request()` method requires support for `Promise()`
 
 If your system doesn't support these features, you should still be able to safely use the remaining parts of the API.
 
@@ -58,51 +61,33 @@ If your system doesn't support these features, you should still be able to safel
 
 >  Current version: *0.4.0*
 
-###  Request pipelines:
+###  Requests
 
-| Mastodon API | Request | Response | Failure |
-| --- | --- | --- | --- |
-| [__Initialization__](src/API/Initialization.litcoffee) |  |  |  |
-| [__Request__](src/API/Request.litcoffee) |  |  |  |
-| [__Client__](src/API/Client.litcoffee) |  |  |  |
-| `/api/v1/apps` | `LaboratoryClientRequested` | `LaboratoryClientReceived` | `LaboratoryClientFailed` |
-| [__Authorization__](src/API/Authorization.litcoffee) |  |  |  |
-| `/oauth/token`, `/api/v1/accounts/verify_credentials` | `LaboratoryAuthorizationRequested` | `LaboratoryAuthorizationReceived` | `LaboratoryAuthorizationFailed` |
-| [__Profile__](src/API/Profile.litcoffee) |  |  |  |
-| `/api/v1/accounts/:id`, `/api/v1/accounts/relationships` | `LaboratoryProfileRequested` | `LaboratoryProfileReceived` | `LaboratoryProfileFailed` |
-| [__Rolodex__](src/API/Rolodex.litcoffee) |  |  |  |
-| `/api/v1/accounts/search`, `/api/v1/accounts/:id/followers`, `/api/v1/accounts/:id/following`, `/api/v1/statuses/:id/reblogged_by`, `/api/v1/statuses/:id/favourited_by`, `/api/v1/blocks` | `LaboratoryRolodexRequested` | `LaboratoryRolodexReceived` | `LaboratoryRolodexFailed` |
-| [__Attachment__](src/API/Attachment.litcoffee) |  |  |
-| `/api/v1/media` | `LaboratoryAttachmentRequested` | `LaboratoryAttachmentReceived` | `LaboratoryAttachmentFailed` |
-| [__Post__](src/Events/Post.litcoffee) |  |  |
-| `/api/v1/statuses/:id` | `LaboratoryPostRequested` | `LaboratoryPostReceived` | `LaboratoryPostFailed` |
-| [__Timeline__](src/API/Timeline.litcoffee) |  |  |  |
-| `/api/v1/timelines/home`, `/api/v1/timelines/public`, `/api/v1/timelines/tag/:hashtag`, `/api/v1/notifications/`, `/api/v1/favourites` | `LaboratoryTimelineRequested` | `LaboratoryTimelineReceived` | `LaboratoryTimelineFailed` |
-
-###  Other events:
-
-| Mastodon API | Event |
-| --- | --- |
+| Mastodon API | Request |
+| ------------ | ------- |
 | [__Initialization__](src/API/Initialization.litcoffee) |  |
-| *N/A* | `LaboratoryInitializationLoaded` |
-| *N/A* | `LaboratoryInitializationReady` |
 | [__Request__](src/API/Request.litcoffee) |  |
-| *N/A* | `LaboratoryRequestOpen` |
-| *N/A* | `LaboratoryRequestUpdate` |
-| *N/A* | `LaboratoryRequestComplete` |
-| *N/A* | `LaboratoryRequestError` |
 | [__Client__](src/API/Client.litcoffee) |  |
+| `/api/v1/apps` | `Laboratory.Client.Request()`
 | [__Authorization__](src/API/Authorization.litcoffee) |  |
+| `/oauth/token`, `/api/v1/accounts/verify_credentials` | `Laboratory.Authorization.Request()` |
 | [__Profile__](src/API/Profile.litcoffee) |  |
-| `/api/v1/accounts/follow`, `/api/v1/accounts/unfollow`, `/api/v1/accounts/block`, `/api/v1/accounts/unblock`, `/api/v1/accounts/mute`, `/api/v1/accounts/unmute` | `LaboratoryProfileSetRelationship` |
+| `/api/v1/accounts/:id`, `/api/v1/accounts/relationships` | `Laboratory.Profile.Request()` |
+| `/api/v1/accounts/follow`, `/api/v1/accounts/unfollow` | `Laboratory.Profile.SetFollow()` |
+| `/api/v1/accounts/block`, `/api/v1/accounts/unblock` | `Laboratory.Profile.SetBlock()` |
+| `/api/v1/accounts/mute`, `/api/v1/accounts/unmute` | `Laboratory.Profile.SetMute()` |
 | [__Rolodex__](src/API/Rolodex.litcoffee) |  |
+| `/api/v1/accounts/search`, `/api/v1/accounts/:id/followers`, `/api/v1/accounts/:id/following`, `/api/v1/statuses/:id/reblogged_by`, `/api/v1/statuses/:id/favourited_by`, `/api/v1/blocks` | `Laboratory.Rolodex.Request()` |
 | [__Attachment__](src/API/Attachment.litcoffee) |  |
-| [__Post__](src/API/Post.litcoffee) |  |
-| `/api/v1/statuses` | `LaboratoryPostCreation` |
-| `/api/v1/statuses/:id` | `LaboratoryPostDeletion` |
-| `/api/v1/statuses/:id/reblog`, `/api/v1/statuses/:id/unreblog` | `LaboratoryPostSetReblog` |
-| `/api/v1/statuses/:id/favourite`, `/api/v1/statuses/:id/unfavourite` | `LaboratoryPostSetFavourite` |
+| `/api/v1/media` | `Laboratory.Attachment.Request()` |
+| [__Post__](src/Events/Post.litcoffee) |  |
+| `/api/v1/statuses/:id` | `Laboratory.Post.Request()` |
+| `/api/v1/statuses` | `Laboratory.Post.Create()` |
+| `/api/v1/statuses/:id` | `Laboratory.Post.Delete()` |
+| `/api/v1/statuses/:id/reblog`, `/api/v1/statuses/:id/unreblog` | `Laboratory.Post.SetReblog()` |
+| `/api/v1/statuses/:id/favourite`, `/api/v1/statuses/:id/unfavourite` | `Laboratory.Post.SetFavourite()` |
 | [__Timeline__](src/API/Timeline.litcoffee) |  |
+| `/api/v1/timelines/home`, `/api/v1/timelines/public`, `/api/v1/timelines/tag/:hashtag`, `/api/v1/notifications/`, `/api/v1/favourites` | `Laboratory.Timeline.Request()` |
 
 ##  Labcoat  ##
 

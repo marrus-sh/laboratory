@@ -10,6 +10,8 @@ The __Timeline__ module of the Laboratory API is comprised of those requests whi
 
 ###  Quick reference:
 
+####  Requests.
+
 | Request | Description |
 | :------ | :---------- |
 | `Timeline.Request()` | Requests a `Timeline` from the Mastodon server |
@@ -17,8 +19,8 @@ The __Timeline__ module of the Laboratory API is comprised of those requests whi
 ###  Requesting a rolodex:
 
 >   ```javascript
->       request = new Laboratory.Timeline.Request(data);
->       rangedRequest = new Laboratory.Timeline.Request(data, before, after);
+>   request = new Laboratory.Timeline.Request(data);
+>   rangedRequest = new Laboratory.Timeline.Request(data, before, after);
 >   ```
 >
 >   - __API equivalent :__ `/api/v1/timelines/home`, `/api/v1/timelines/public`, `/api/v1/timelines/tag/:hashtag`, `/api/v1/notifications/`, `/api/v1/favourites`
@@ -52,73 +54,73 @@ These return new `Timeline.Request`s which will respond with the previous and ne
 ###  Requesting an account's statuses:
 
 >   ```javascript
->       function requestCallback(event) {
->           //  Do something with the timeline
->       }
+>   function requestCallback(event) {
+>       //  Do something with the timeline
+>   }
 >
->       var request = new Laboratory.Timeline.Request({
->           type: Laboratory.Timeline.Type.ACCOUNT
->           query: someProfile.id
->       });
->       request.addEventListener("response", requestCallback);
->       request.start();
+>   var request = new Laboratory.Timeline.Request({
+>       type: Laboratory.Timeline.Type.ACCOUNT
+>       query: someProfile.id
+>   });
+>   request.addEventListener("response", requestCallback);
+>   request.start();
 >   ```
 
 ###  Getting posts for a hashtag:
 
 >   ```javascript
->       function requestCallback(event) {
->           //  Do something with the rolodex
->       }
+>   function requestCallback(event) {
+>       //  Do something with the rolodex
+>   }
 >
->       var request = new Laboratory.Timeline.Request({
->           type: Laboratory.Timeline.Type.HASHTAG
->           query: "hashtag"
->       });
->       request.addEventListener("response", requestCallback);
->       request.start();
+>   var request = new Laboratory.Timeline.Request({
+>       type: Laboratory.Timeline.Type.HASHTAG
+>       query: "hashtag"
+>   });
+>   request.addEventListener("response", requestCallback);
+>   request.start();
 >   ```
 
 ###  Getting the home timeline:
 
 >   ```javascript
->       function requestCallback(event) {
->           //  Do something with the rolodex
->       }
+>   function requestCallback(event) {
+>       //  Do something with the rolodex
+>   }
 >
->       var request = new Laboratory.Timeline.Request({
->           type: Laboratory.Timeline.Type.HOME
->       });
->       request.addEventListener("response", requestCallback);
->       request.start();
+>   var request = new Laboratory.Timeline.Request({
+>       type: Laboratory.Timeline.Type.HOME
+>   });
+>   request.addEventListener("response", requestCallback);
+>   request.start();
 >   ```
 
 ###  Updating a request:
 
 >   ```javascript
->       request.update();  //  Will fire a "response" event for each update
+>   request.update();  //  Will fire a "response" event for each update
 >   ```
 
 ###  Paginating a request:
 
 >   ```javascript
->       function requestCallback(event) {
->           //  Do something with the rolodex
->       }
+>   function requestCallback(event) {
+>       //  Do something with the rolodex
+>   }
 >
->       function loadNextPage (request) {
->           var newRequest = request.next();
->           newRequest.addEventListener("response", requestCallback);
->           newRequest.start();
->           return newRequest;
->       }
+>   function loadNextPage (request) {
+>       var newRequest = request.next();
+>       newRequest.addEventListener("response", requestCallback);
+>       newRequest.start();
+>       return newRequest;
+>   }
 >
->       function loadPrevPage (request) {
->           var newRequest = request.prev();
->           newRequest.addEventListener("response", requestCallback);
->           newRequest.start();
->           return newRequest;
->       }
+>   function loadPrevPage (request) {
+>       var newRequest = request.prev();
+>       newRequest.addEventListener("response", requestCallback);
+>       newRequest.start();
+>       return newRequest;
+>   }
 >   ```
 
  - - -
@@ -127,18 +129,18 @@ These return new `Timeline.Request`s which will respond with the previous and ne
 
 ###  Making the request:
 
-    Object.defineProperty Timeline, "Request", 
-    
+    Object.defineProperty Timeline, "Request",
+
         configurable: no
         enumerable: yes
         writable: no
         value: do ->
 
             TimelineRequest = (data, before, after) ->
-        
+
                 unless this and this instanceof TimelineRequest
                     throw new TypeError "this is not a TimelineRequest"
-                    
+
 First, we handle our `data`.
 
                 unless (type = Timeline.Type.fromValue data.type) and
@@ -176,7 +178,7 @@ Note that `Request()` ignores data parameters which have a value of `undefined` 
                             else
                                 max_id: before
                                 since_id: after
-                    ), Store.auth.accessToken, (result, params) => 
+                    ), Store.auth.accessToken, (result, params) =>
                         acctIDs = []
                         mentions = []
                         mentionIDs = []
@@ -241,7 +243,7 @@ Note that `Request()` ignores data parameters which have a value of `undefined` 
                                     do next.start
                             (next = do @next).addEventListener "response", callback
                             do next.start
-                            
+
                 Object.freeze this
 
 Our `Rolodex.Request.prototype` inherits from `Request`, with additional dummy methods for the ones we define in our constructor.

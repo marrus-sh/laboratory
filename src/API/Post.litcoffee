@@ -6,7 +6,7 @@
 
 ##  Description  ##
 
-The __Post__ module of the Laboratory API is comprised of those requests which are related to Mastodon accounts.
+The __Post__ module of the Laboratory API is comprised of those requests which are related to Mastodon statuses and notifications.
 
 ###  Quick reference:
 
@@ -30,7 +30,7 @@ The __Post__ module of the Laboratory API is comprised of those requests which a
 ###  Requesting a post:
 
 >   ```javascript
->       request = new Laboratory.Post.Request(data, isLive, useCached);
+>   request = new Laboratory.Post.Request(data, isLive, useCached);
 >   ```
 >
 >   - __API equivalent :__ `/api/v1/statuses/:id`, `/api/v1/notifications/:id`
@@ -46,7 +46,7 @@ Post requests may be either __static__ or __live__.
 Static post requests don't update their responses when new information is received from the server, whereas live post requests do.
 This behaviour is controlled by the `isLive` argument, which defaults to `true`.
 
->   __Note : __
+>   __Note :__
 >   You can call `request.stop()` to stop a live `Post.Request`, and `request.start()` to start it up again.
 >   Always call `request.stop()` when you are finished using a live request to allow it to be freed from memory.
 
@@ -57,7 +57,7 @@ It will still request the server for updated information unless `isLive` is `fal
 ###  Creating new statuses:
 
 >   ```javascript
->       request = new Laboratory.Post.Create(data);
+>   request = new Laboratory.Post.Create(data);
 >   ```
 >
 >   - __API equivalent :__ `/api/v1/statuses`
@@ -71,11 +71,12 @@ It will still request the server for updated information unless `isLive` is `fal
 >   - __Response :__ A [`Post`](../Constructors/Post.litcoffee)
 
 `Post.Create()` attempts to create a new status on the Mastodon server.
+You can see the parameters it accepts above.
 
 ###  Deleting statuses:
 
 >   ```javascript
->       request = new Laboratory.Post.Delete(data);
+>   request = new Laboratory.Post.Delete(data);
 >   ```
 >
 >   - __API equivalent :__ `/api/v1/statuses`
@@ -89,8 +90,8 @@ The `id` parameter provides the id of the status to delete.
 ###  Reblogging and favouriting posts:
 
 >   ```javascript
->       request = new Laboratory.Post.SetReblog(data);
->       request = new Laboratory.Post.SetFavourite(data);
+>   request = new Laboratory.Post.SetReblog(data);
+>   request = new Laboratory.Post.SetFavourite(data);
 >   ```
 >
 >   - __API equivalent :__ `/api/v1/statuses/:id/reblog`, `/api/v1/statuses/:id/unreblog`
@@ -109,63 +110,63 @@ They will respond with the updated post if they succeed.
 ###  Requesting a post's data:
 
 >   ```javascript
->       function requestCallback(event) {
->           //  Do something with the post
->       }
+>   function requestCallback(event) {
+>       //  Do something with the post
+>   }
 >
->       var request = new Laboratory.Post.Request({
->           id: postID,
->           type: Laboratory.Post.Type.STATUS
->       });
->       request.addEventListener("response", requestCallback);
->       request.start();
+>   var request = new Laboratory.Post.Request({
+>       id: postID,
+>       type: Laboratory.Post.Type.STATUS
+>   });
+>   request.addEventListener("response", requestCallback);
+>   request.start();
 >   ```
 
 ###  Creating a new post:
 
 >   ```javascript
->       var request = new Laboratory.Post.Create({
->           text: contents,
->           visibility: Laboratory.Post.Visibility.PUBLIC
->       });
->       request.start();
+>   var request = new Laboratory.Post.Create({
+>       text: contents,
+>       visibility: Laboratory.Post.Visibility.PUBLIC
+>   });
+>   request.start();
 >   ```
 
 ###  Deleting a post:
 
 >   ```javascript
->       var request = new Laboratory.Post.Delete({id: deleteThisID});
->       request.start();
+>   var request = new Laboratory.Post.Delete({id: deleteThisID});
+>   request.start();
 >   ```
 
 ###  Reblogging a post:
 
 >   ```javascript
->       function requestCallback(event) {
->           if (event.detail.response.isReblogged) success();
->       }
+>   function requestCallback(event) {
+>       if (event.detail.response.isReblogged) success();
+>   }
 >
->       var request = new Laboratory.Post.SetReblog({
->           id: somePost.id,
->           value: true
->       });
->       request.addEventListener("response", requestCallback);
->       request.start();
+>   var request = new Laboratory.Post.SetReblog({
+>       id: somePost.id,
+>       value: true
+>   });
+>   request.addEventListener("response", requestCallback);
+>   request.start();
 >   ```
 
 ###  Unfavouriting a post:
 
 >   ```javascript
->       function requestCallback(event) {
->           if (!event.detail.response.isFavourited) success();
->       }
+>   function requestCallback(event) {
+>       if (!event.detail.response.isFavourited) success();
+>   }
 >
->       var request = new Laboratory.Post.SetFavourite({
->           id: somePost.id,
->           value: false
->       });
->       request.addEventListener("response", requestCallback);
->       request.start();
+>   var request = new Laboratory.Post.SetFavourite({
+>       id: somePost.id,
+>       value: false
+>   });
+>   request.addEventListener("response", requestCallback);
+>   request.start();
 >   ```
 
  - - -
@@ -175,9 +176,9 @@ They will respond with the updated post if they succeed.
 ###  Making the requests:
 
     Object.defineProperties Post,
-    
+
 ####  `Post.Request`s.
-    
+
         Request:
             configurable: no
             enumerable: yes
@@ -185,7 +186,7 @@ They will respond with the updated post if they succeed.
             value: do ->
 
                 PostRequest = (data, isLive = yes, useCached = yes) ->
-            
+
                     unless this and this instanceof PostRequest
                         throw new TypeError "this is not a PostRequest"
 
@@ -229,13 +230,13 @@ We dispatch a failure unless the received post matches the requested `postID` an
                                     not of specified type"
                             return
                         dispatch "LaboratoryPostReceived", post
-                        
+
 We store the default `Request` `start()` and `stop()` values and then overwrite them with our own.
 This allows us to handle our `useCached` and `isLive` arguments.
-                        
+
                     requestStart = @start
                     requestStop = @stop
-                    
+
                     Object.defineProperties this,
                         start:
                             enumerable: no
@@ -265,9 +266,9 @@ Our `Post.Request.prototype` just inherits from `Request`.
                             value: PostRequest
 
                 return PostRequest
-    
+
 ####  `Post.Create`s.
-    
+
         Create:
             configurable: no
             enumerable: yes
@@ -275,7 +276,7 @@ Our `Post.Request.prototype` just inherits from `Request`.
             value: do ->
 
                 PostCreate = (data) ->
-                
+
                     unless this and this instanceof PostCreate
                         throw new TypeError "this is not a PostCreate"
 
@@ -329,12 +330,12 @@ Our `Post.Create.prototype` just inherits from `Request`.
                             value: PostCreate
 
                 return PostCreate
-    
+
 ####  `Post.Delete`s.
 
 >   __[Issue #21](https://github.com/marrus-sh/laboratory/issues/21) :__
 >   There needs to be better responses and error checking with regards to post deletion.
-    
+
         Delete:
             configurable: no
             enumerable: yes
@@ -342,7 +343,7 @@ Our `Post.Create.prototype` just inherits from `Request`.
             value: do ->
 
                 PostDelete = (data) ->
-            
+
                     unless this and this instanceof PostDelete
                         throw new TypeError "this is not a PostDelete"
                     unless Infinity > (postID = Math.floor data?.id) > 0
@@ -369,9 +370,9 @@ Our `Post.Delete.prototype` just inherits from `Request`.
                             value: PostDelete
 
                 return PostDelete
-    
+
 ####  `Post.SetReblog`s.
-    
+
         SetReblog:
             configurable: no
             enumerable: yes
@@ -379,7 +380,7 @@ Our `Post.Delete.prototype` just inherits from `Request`.
             value: do ->
 
                 PostSetReblog = (data) ->
-            
+
                     unless this and this instanceof PostSetReblog
                         throw new TypeError "this is not a PostSetReblog"
                     unless Infinity > (postID = Math.floor data?.id) > 0
@@ -409,9 +410,9 @@ Our `Post.SetReblog.prototype` just inherits from `Request`.
                             value: PostSetReblog
 
                 return PostSetReblog
-    
+
 ####  `Post.SetFavourite`s.
-    
+
         SetFavourite:
             configurable: no
             enumerable: yes
@@ -419,7 +420,7 @@ Our `Post.SetReblog.prototype` just inherits from `Request`.
             value: do ->
 
                 PostSetFavourite = (data) ->
-            
+
                     unless this and this instanceof PostSetFavourite
                         throw new TypeError "this is not a PostSetFavourite"
                     unless Infinity > (postID = Math.floor data?.id) > 0

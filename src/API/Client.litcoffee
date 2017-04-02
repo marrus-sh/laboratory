@@ -6,7 +6,8 @@
 
 ##  Description  ##
 
-The __Client__ module of the Laboratory API is comprised of those request which are related to the OAuth registration of the Laboratory client with the Mastodon server.
+The __Client__ module of the Laboratory API is comprised of those requests which are related to the OAuth registration of the Laboratory client with the Mastodon server.
+You shouldn't typically need to interact with this module directly.
 
 ###  Quick reference:
 
@@ -25,7 +26,7 @@ The __Client__ module of the Laboratory API is comprised of those request which 
 ###  Requesting a client:
 
 >   ```javascript
->       request = new Laboratory.Client.Request(data);
+>   request = new Laboratory.Client.Request(data);
 >   ```
 >
 >   - __API equivalent :__ `/api/v1/apps`
@@ -47,18 +48,18 @@ However, you can request this yourself if you find yourself needing new client a
 ###  Requesting client authorization:
 
 >   ```javascript
->       function requestCallback(event) {
->           //  Do something with the response
->       }
+>   function requestCallback(event) {
+>       //  Do something with the response
+>   }
 >
->       var request = new Laboratory.Client.Request({
->           name: "My Application",
->           origin: "https://myinstance.social",
->           redirect: "/",
->           scope: Laboratory.Authorization.Scope.READWRITEFOLLOW
->       });
->       request.addEventListener("response", requestCallback);
->       request.start();
+>   var request = new Laboratory.Client.Request({
+>       name: "My Application",
+>       origin: "https://myinstance.social",
+>       redirect: "/",
+>       scope: Laboratory.Authorization.Scope.READWRITEFOLLOW
+>   });
+>   request.addEventListener("response", requestCallback);
+>   request.start();
 >   ```
 
  - - -
@@ -74,7 +75,7 @@ However, you can request this yourself if you find yourself needing new client a
         value: do ->
 
             ClientRequest = (data) ->
-            
+
                 unless this and this instanceof ClientRequest
                     throw new TypeError "this is not a ClientRequest"
 
@@ -82,10 +83,9 @@ If we weren't provided with a scope, we'll set it to the default.
 We can set our default `name` here as well.
 
                 name = (String data.name) or "Laboratory"
-                scope = (
+                scope =
                     if data.scope instance of Authorization.Scope then data.scope
                     else Authorization.Scope.READ
-                )
 
 First, we normalize our URL.
 We also get our redirect URI at this point.
@@ -101,13 +101,14 @@ This creates our request.
                 Request.call this, "POST", origin + "/api/v1/apps", {
                     client_name: name
                     redirect_uris: redirect
-                    scopes: do ->
+                    scopes: (
                         scope = event.detail.scope
                         scopeList = []
                         scopeList.push "read" if scope & Authorization.Scope.READ
                         scopeList.push "write" if scope & Authorization.Scope.WRITE
                         scopeList.push "follow" if scope & Authorization.Scope.FOLLOW
-                        return scopeList.join " "
+                        scopeList.join " "
+                    )
                 }, null, (result) => dispatch "LaboratoryClientReceived", decree =>
                     @response = police -> new Client result, origin, name, scope
 
