@@ -115,7 +115,7 @@
     generator = false;
     Laboratory.Enumeral = Enumeral = function(value) {
       if (!generator) {
-        throw new Error("Laboratory Error : The `Enumeral()` constructor cannot be called directly—try `Enumeral.generate()` instead");
+        throw new TypeError("Laboratory Error : The `Enumeral()` constructor cannot be called directly—try `Enumeral.generate()` instead");
       }
       if (!(this && this instanceof Enumeral)) {
         throw new Error("Laboratory Error : `Enumeral()` must be called as a constructor");
@@ -224,7 +224,7 @@
     this.origin = String(origin);
     this.accessToken = String(data.access_token);
     this.datetime = new Date(data.created_at);
-    this.scope = Authorization.Scope.fromValue(Authorization.Scope.READ * (((scopes = (String(data.scope)).split(/[\s\+]+/g)).indexOf("read")) !== -1) + Authorization.Scope.WRITE * ((scopes.indexOf("write")) !== -1) + Authorization.Scope.FOLLOW * ((scopes.indexOf("follow")) !== -1));
+    this.scope = Authorization.Scope.fromValue(Authorization.Scope.READ * (indexOf.call((scopes = (String(data.scope)).split(/[\s\+]+/g)), "read") < 0) + Authorization.Scope.WRITE * (indexOf.call(scopes, "write") < 0) + Authorization.Scope.FOLLOW * (indexOf.call(scopes, "follow") < 0));
     this.tokenType = String(data.tokenType);
     this.me = +me;
     return Object.freeze(this);
@@ -386,11 +386,11 @@
         for (index = i = 0, len = ref.length; i < len; index = ++i) {
           mention = ref[index];
           Object.defineProperty(mentions, index, {
-            get: getProfile.bind(_this, mention.id),
-            enumerable: true
+            enumerable: true,
+            get: getProfile.bind(_this, mention.id)
           });
         }
-        return mentions;
+        return Object.freeze(mentions);
       };
     })(this)();
     this.application = data.application != null ? new Application(data.application) : null;
@@ -442,7 +442,7 @@
     } else {
       this.id = Number(data.id);
       this.username = String(data.username);
-      this.account = String(data.acct + (((origin = Store.auth.origin) != null) && data.acct.indexOf("@") === -1 ? "@" + origin : ""));
+      this.account = String(data.acct + (((origin = Store.auth.origin) != null) && indexOf.call(data.acct, "@") < 0 ? "@" + origin : ""));
       this.localAccount = String(data.acct);
       this.displayName = String(data.display_name);
       this.bio = String(data.note);
@@ -697,8 +697,8 @@
     for (index = j = 0, len = data.length; j < len; index = ++j) {
       value = data[index];
       Object.defineProperty(this.profiles, index, {
-        get: getProfile.bind(this, value.id),
-        enumerable: true
+        enumerable: true,
+        get: getProfile.bind(this, value.id)
       });
     }
     Object.freeze(this.profiles);
@@ -869,8 +869,8 @@
     for (index = j = 0, len = data.length; j < len; index = ++j) {
       value = data[index];
       Object.defineProperty(this.posts, index, {
-        get: getPost.bind(this, value.id, isNotification(value)),
-        enumerable: true
+        enumerable: true,
+        get: getPost.bind(this, value.id, isNotification(value))
       });
     }
     Object.freeze(this.posts);

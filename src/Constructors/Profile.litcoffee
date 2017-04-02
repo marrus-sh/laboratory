@@ -85,8 +85,10 @@ Additionally, the `relationship` argument can be used to set the Profile relatio
 
     Laboratory.Profile = Profile = (data, relationship) ->
 
-        throw new Error "Laboratory Error : `Profile()` must be called as a constructor" unless this and this instanceof Profile
-        throw new Error "Laboratory Error : `Profile()` was called without any `data`" unless data?
+        unless this and this instanceof Profile
+            throw new Error "Laboratory Error : `Profile()` must be called as a constructor"
+        unless data?
+            throw new Error "Laboratory Error : `Profile()` was called without any `data`"
         
 If the `relationship` isn't provided, we check to see if we already have one for this id in our `Store`.
 
@@ -94,14 +96,19 @@ If the `relationship` isn't provided, we check to see if we already have one for
 
 If our `data` is already a `Profile`, we can just copy its info over.
 
-        if data instanceof Profile then {@id, @username, @account, @localAccount, @displayName, @bio, @href, @avatar, @header, @isLocked, @followerCount, @followingCount, @statusCount, @relationship} = data
+        if data instanceof Profile then {@id, @username, @account, @localAccount, @displayName,
+            @bio, @href, @avatar, @header, @isLocked, @followerCount, @followingCount,
+            @statusCount, @relationship} = data
 
 Otherwise, we have to change some variable names around.
 
         else
             @id = Number data.id
             @username = String data.username
-            @account = String data.acct + (if (origin = Store.auth.origin)? and data.acct.indexOf("@") is -1 then "@" + origin else "")
+            @account = String data.acct + (
+                if (origin = Store.auth.origin)? and "@" not in data.acct then "@" + origin
+                else ""
+            )
             @localAccount = String data.acct
             @displayName = String data.display_name
             @bio = String data.note
@@ -112,13 +119,16 @@ Otherwise, we have to change some variable names around.
             @followerCount = Number data.followers_count
             @followingCount = Number data.following_count
             @statusCount = Number data.statuses_count
-            @relationship = if data.id is Store.auth.me then Profile.Relationship.SELF else Profile.Relationship.UNKNOWN
+            @relationship =
+                if data.id is Store.auth.me then Profile.Relationship.SELF
+                else Profile.Relationship.UNKNOWN
 
 We set the relationship last, overwriting any previous relationship if one is provided.
 This code will coerce the provided relationship into an Number and then back to an enumeral if possible.
 Remember that because enumerals are objects, they will always evaluate to `true` even if their value is `0x00`.
 
-        @relationship = Profile.Relationship.fromValue(relationship) || @relationship if relationship?
+        if relationship?
+            @relationship = Profile.Relationship.fromValue(relationship) or @relationship
 
         return Object.freeze this
 

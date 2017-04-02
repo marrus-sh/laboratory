@@ -45,7 +45,7 @@ Further discussion of specific enumeral types takes place in the various files i
 ####  `fromValue()`.
 
 >   ```javascript
->       MyType.fromValue(n);
+>   MyType.fromValue(n);
 >   ```
 >
 >   - __`n` :__ An integer value
@@ -69,8 +69,12 @@ The `Enumeral()` constructor takes a numeric `value`, which the resultant enumer
 
         Laboratory.Enumeral = Enumeral = (value) ->
 
-            throw new Error "Laboratory Error : The `Enumeral()` constructor cannot be called directly—try `Enumeral.generate()` instead" unless generator
-            throw new Error "Laboratory Error : `Enumeral()` must be called as a constructor" unless this and this instanceof Enumeral
+            unless generator
+                throw new TypeError "Laboratory Error : The `Enumeral()` constructor cannot be
+                    called directly—try `Enumeral.generate()` instead"
+            unless this and this instanceof Enumeral
+                throw new Error "Laboratory Error : `Enumeral()` must be called as a
+                    constructor"
 
             @value = value | 0
             return Object.freeze this

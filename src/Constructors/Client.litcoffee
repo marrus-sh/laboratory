@@ -31,8 +31,10 @@ It also takes a couple of other arguments.
 
     Laboratory.Client = Client = (data, origin, name, scope) ->
 
-        throw new Error "Laboratory Error : `Client()` must be called as a constructor" unless this and this instanceof Client
-        throw new Error "Laboratory Error : `Client()` was called without any `data`" unless data?
+        unless this and this instanceof Client
+            throw new Error "Laboratory Error : `Client()` must be called as a constructor"
+        unless data?
+            throw new Error "Laboratory Error : `Client()` was called without any `data`"
 
         @origin = origin
         @name = name

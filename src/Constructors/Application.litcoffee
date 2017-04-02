@@ -24,8 +24,11 @@ The `Application()` constructor takes a `data` object from an API response and r
 
     Laboratory.Application = Application = (data) ->
 
-        throw new Error "Laboratory Error : `Application()` must be called as a constructor" unless this and this instanceof Application
-        throw new Error "Laboratory Error : `Application()` was called without any `data`" unless data?
+        unless this and this instanceof Application
+            throw new Error "Laboratory Error : `Application()` must be called as a
+                constructor"
+        unless data?
+            throw new Error "Laboratory Error : `Application()` was called without any `data`"
 
         @name = data.name
         @href = data.website

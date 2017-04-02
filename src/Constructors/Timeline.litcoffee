@@ -76,12 +76,16 @@ The `Timeline()` constructor takes a `data` object and uses it to construct a ti
 
     Laboratory.Timeline = Timeline = (data, params) ->
 
-        throw new Error "Laboratory Error : `Timeline()` must be called as a constructor" unless this and this instanceof Timeline
-        throw new Error "Laboratory Error : `Timeline()` was called without any `data`" unless data?
+        unless this and this instanceof Timeline
+            throw new Error "Laboratory Error : `Timeline()` must be called as a constructor"
+        unless data?
+            throw new Error "Laboratory Error : `Timeline()` was called without any `data`"
 
 This loads our `params`.
 
-        @type = if params.type instanceof Timeline.Type then params.type else Timeline.Type.UNDEFINED
+        @type =
+            if params.type instanceof Timeline.Type then params.type
+            else Timeline.Type.UNDEFINED
         @query = String params.query
 
 Mastodon keeps track of ids for notifications separately from ids for posts, as best as I can tell, so we have to verify that our posts are of matching type before proceeding.
@@ -91,14 +95,15 @@ Really all we care about is whether the posts are notifications, so that's all w
             (
                 switch
                     when object instanceof Post then object.type
-                    when object.type? then Post.Type.NOTIFICATION  #  This is an approximation; the post could be a reaction.
+                    when object.type? then Post.Type.NOTIFICATION  #  This is an approximation
                     else Post.Type.STATUS
             ) & Post.Type.NOTIFICATION
         )
 
 We'll use the `getPost()` function in our post getters.
 
-        getPost = (id, isANotification) -> if isANotification then Store.notifications[id] else Store.statuses[id]
+        getPost = (id, isANotification) ->
+            if isANotification then Store.notifications[id] else Store.statuses[id]
 
 We sort our data according to when they were created, unless two posts were created at the same time.
 Then we use their ids.
@@ -107,7 +112,12 @@ Then we use their ids.
 >   Until/unless Mastodon starts assigning times to notifications, there are a few (albeit extremely unlikely) edge-cases where the following `sort()` function will cease to be well-defined.
 >   Regardless, attempting to create a timeline out of both notifications and statuses will likely result in a very odd sorting.
 
-        data.sort (first, second) -> if not (isNotification first) and not (isNotification second) and (a = Number first instanceof Post and first.datetime or Date first.created_at) isnt (b = Number second instanceof Post and second.datetime or Date second.created_at) then -1 + 2 * (a > b) else second.id - first.id
+        data.sort (first, second) ->
+            if not (isNotification first) and not (isNotification second) and (
+                a = Number first instanceof Post and first.datetime or Date first.created_at
+            ) isnt (
+                b = Number second instanceof Post and second.datetime or Date second.created_at
+            ) then -1 + 2 * (a > b) else second.id - first.id
 
 Next we walk the array and look for any duplicates, removing them.
 
@@ -119,9 +129,10 @@ Next we walk the array and look for any duplicates, removing them.
         prev = null
         for index in [data.length - 1 .. 0]
             currentID = (current = data[index]).id
-            if prev? and currentID is prev.id and (isNotification prev) is (isNotification current)
-                data.splice index, 1
-                continue
+            if prev? and currentID is prev.id and
+                (isNotification prev) is (isNotification current)
+                    data.splice index, 1
+                    continue
             prev = current
 
 Finally, we implement our list of `posts` as getters such that they always return the most current data.
@@ -131,7 +142,10 @@ Finally, we implement our list of `posts` as getters such that they always retur
 >   At some point in the future, `Timeline` might instead be implemented using a linked list.
 
         @posts = []
-        Object.defineProperty @posts, index, {get: getPost.bind(this, value.id, isNotification value), enumerable: true} for value, index in data
+        Object.defineProperty @posts, index, {
+            enumerable: yes
+            get: getPost.bind(this, value.id, isNotification value)
+        } for value, index in data
         Object.freeze @posts
 
         @length = data.length
@@ -152,7 +166,8 @@ Its `data` argument can be either a `Post`, an array thereof, or a `Timeline`.
 We don't have to worry about duplicates here because the `Timeline()` constructor should take care of them for us.
 
             join: (data) ->
-                return this unless data instanceof Post or data instanceof Array or data instanceof Timeline
+                return this unless data instanceof Post or data instanceof Array or
+                    data instanceof Timeline
                 combined = post for post in switch
                     when data instanceof Post then [data]
                     when data instanceof Timeline then data.posts
@@ -189,7 +204,8 @@ The `remove()` function returns a new `Timeline` with the provided `Post`s remov
 Its `data` argument can be either a `Post`, an array thereof, or a `Timeline`.
 
             remove: (data) ->
-                return this unless data instanceof Post or data instanceof Array or data instanceof Timeline
+                return this unless data instanceof Post or data instanceof Array or
+                    data instanceof Timeline
                 redacted = (post for post in @posts)
                 redacted.splice index, 1 for post in (
                     switch

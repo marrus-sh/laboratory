@@ -91,8 +91,10 @@ The `Post()` constructor takes a `data` object from an API response and reads it
 
     Laboratory.Post = Post = (data) ->
 
-        throw new Error "Laboratory Error : `Post()` must be called as a constructor" unless this and this instanceof Post
-        throw new Error "Laboratory Error : `Post()` was called without any `data`" unless data?
+        unless this and this instanceof Post
+            throw new Error "Laboratory Error : `Post()` must be called as a constructor"
+        unless data?
+            throw new Error "Laboratory Error : `Post()` was called without any `data`"
 
 We'll use the `getProfile()` function in our various account getters.
 
@@ -171,8 +173,11 @@ Now we can set the rest of our properties.
         @mediaAttachments = (new Attachment item for item in data.media_attachments)
         @mentions = do =>
             mentions = []
-            Object.defineProperty mentions, index, {get: getProfile.bind(this, mention.id), enumerable: yes} for mention, index in data.mentions
-            return mentions
+            Object.defineProperty mentions, index, {
+                enumerable: yes
+                get: getProfile.bind(this, mention.id)
+            } for mention, index in data.mentions
+            return Object.freeze mentions
         @application = if data.application? then new Application data.application else null
 
         return Object.freeze this

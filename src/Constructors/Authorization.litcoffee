@@ -44,13 +44,20 @@ We also need to provide it with an `origin`.
 
     Laboratory.Authorization = Authorization = (data, origin, me) ->
 
-        throw new Error "Laboratory Error : `Authorization()` must be called as a constructor" unless this and this instanceof Authorization
-        throw new Error "Laboratory Error : `Authorization()` was called without any `data`" unless data?
+        unless this and this instanceof Authorization
+            throw new Error "Laboratory Error : `Authorization()` must be called as a
+                constructor"
+        unless data?
+            throw new Error "Laboratory Error : `Authorization()` was called without any
+                `data`"
 
         @origin = String origin
         @accessToken = String data.access_token
         @datetime = new Date data.created_at
-        @scope = Authorization.Scope.fromValue Authorization.Scope.READ * (((scopes = (String data.scope).split /[\s\+]+/g).indexOf "read") isnt -1) + Authorization.Scope.WRITE * ((scopes.indexOf "write") isnt -1) + Authorization.Scope.FOLLOW * ((scopes.indexOf "follow") isnt -1)
+        @scope = Authorization.Scope.fromValue Authorization.Scope.READ *
+            ("read" not in (scopes = (String data.scope).split /[\s\+]+/g)) +
+            Authorization.Scope.WRITE * ("write" not in scopes) +
+            Authorization.Scope.FOLLOW * ("follow" not in scopes)
         @tokenType = String data.tokenType
         @me = +me
 

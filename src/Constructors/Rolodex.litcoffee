@@ -78,12 +78,15 @@ The `Rolodex()` constructor takes a `data` object and uses it to construct a rol
 
     Laboratory.Rolodex = Rolodex = (data, params) ->
 
-        throw new Error "Laboratory Error : `Rolodex()` must be called as a constructor" unless this and this instanceof Rolodex
-        throw new Error "Laboratory Error : `Rolodex()` was called without any `data`" unless data?
+        unless this and this instanceof Rolodex
+            throw new Error "Laboratory Error : `Rolodex()` must be called as a constructor"
+        unless data?
+            throw new Error "Laboratory Error : `Rolodex()` was called without any `data`"
 
 This loads our `params`.
 
-        @type = if params.type instanceof Rolodex.Type then params.type else Rolodex.Type.UNDEFINED
+        @type =
+            if params.type instanceof Rolodex.Type then params.type else Rolodex.Type.UNDEFINED
         @query = String params.query
 
 We'll use the `getProfile()` function in our profile getters.
@@ -111,7 +114,10 @@ Finally, we implement our list of `profiles` as getters such that they always re
 >   At some point in the future, `Rolodex` might instead be implemented using a linked list.
 
         @profiles = []
-        Object.defineProperty @profiles, index, {get: getProfile.bind(this, value.id), enumerable: true} for value, index in data
+        Object.defineProperty @profiles, index, {
+            enumerable: yes
+            get: getProfile.bind(this, value.id)
+        } for value, index in data
         Object.freeze @profiles
 
         @length = data.length
@@ -132,7 +138,8 @@ Its `data` argument can be either a `Profile`, an array thereof, or a `Rolodex`.
 We don't have to worry about duplicates here because the `Rolodex()` constructor should take care of them for us.
 
             join: (data) ->
-                return this unless data instanceof Profile or data instanceof Array or data instanceof Rolodex
+                return this unless data instanceof Profile or data instanceof Array or
+                    data instanceof Rolodex
                 combined = profile for profile in switch
                     when data instanceof Profile then [data]
                     when data instanceof Rolodex then data.profiles
@@ -169,7 +176,8 @@ The `remove()` function returns a new `Rolodex` with the provided `Profile`s rem
 Its `data` argument can be either a `Profile`, an array thereof, or a `Rolodex`.
 
             remove: (data) ->
-                return this unless data instanceof Profile or data instanceof Array or data instanceof Rolodex
+                return this unless data instanceof Profile or data instanceof Array or
+                    data instanceof Rolodex
                 redacted = (profile for profile in @profiles)
                 redacted.splice index, 1 for profile in (
                     switch

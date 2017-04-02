@@ -275,7 +275,7 @@ Further discussion of specific enumeral types takes place in the various files i
 ####  `fromValue()`.
 
 >   ```javascript
->       MyType.fromValue(n);
+>   MyType.fromValue(n);
 >   ```
 >
 >   - __`n` :__ An integer value
@@ -299,8 +299,12 @@ The `Enumeral()` constructor takes a numeric `value`, which the resultant enumer
 
         Laboratory.Enumeral = Enumeral = (value) ->
 
-            throw new Error "Laboratory Error : The `Enumeral()` constructor cannot be called directly—try `Enumeral.generate()` instead" unless generator
-            throw new Error "Laboratory Error : `Enumeral()` must be called as a constructor" unless this and this instanceof Enumeral
+            unless generator
+                throw new TypeError "Laboratory Error : The `Enumeral()` constructor cannot be
+                    called directly—try `Enumeral.generate()` instead"
+            unless this and this instanceof Enumeral
+                throw new Error "Laboratory Error : `Enumeral()` must be called as a
+                    constructor"
 
             @value = value | 0
             return Object.freeze this
@@ -378,8 +382,11 @@ The `Application()` constructor takes a `data` object from an API response and r
 
     Laboratory.Application = Application = (data) ->
 
-        throw new Error "Laboratory Error : `Application()` must be called as a constructor" unless this and this instanceof Application
-        throw new Error "Laboratory Error : `Application()` was called without any `data`" unless data?
+        unless this and this instanceof Application
+            throw new Error "Laboratory Error : `Application()` must be called as a
+                constructor"
+        unless data?
+            throw new Error "Laboratory Error : `Application()` was called without any `data`"
 
         @name = data.name
         @href = data.website
@@ -435,8 +442,10 @@ The `Attachment()` constructor takes a `data` object from an API response and re
 
     Laboratory.Attachment = Attachment = (data) ->
 
-        throw new Error "Laboratory Error : `Attachment()` must be called as a constructor" unless this and this instanceof Attachment
-        throw new Error "Laboratory Error : `Attachment()` was called without any `data`" unless data?
+        unless this and this instanceof Attachment
+            throw new Error "Laboratory Error : `Attachment()` must be called as a constructor"
+        unless data?
+            throw new Error "Laboratory Error : `Attachment()` was called without any `data`"
 
         @id = Number data.id
         @href = String data.url
@@ -515,13 +524,20 @@ We also need to provide it with an `origin`.
 
     Laboratory.Authorization = Authorization = (data, origin, me) ->
 
-        throw new Error "Laboratory Error : `Authorization()` must be called as a constructor" unless this and this instanceof Authorization
-        throw new Error "Laboratory Error : `Authorization()` was called without any `data`" unless data?
+        unless this and this instanceof Authorization
+            throw new Error "Laboratory Error : `Authorization()` must be called as a
+                constructor"
+        unless data?
+            throw new Error "Laboratory Error : `Authorization()` was called without any
+                `data`"
 
         @origin = String origin
         @accessToken = String data.access_token
         @datetime = new Date data.created_at
-        @scope = Authorization.Scope.fromValue Authorization.Scope.READ * (((scopes = (String data.scope).split /[\s\+]+/g).indexOf "read") isnt -1) + Authorization.Scope.WRITE * ((scopes.indexOf "write") isnt -1) + Authorization.Scope.FOLLOW * ((scopes.indexOf "follow") isnt -1)
+        @scope = Authorization.Scope.fromValue Authorization.Scope.READ *
+            ("read" not in (scopes = (String data.scope).split /[\s\+]+/g)) +
+            Authorization.Scope.WRITE * ("write" not in scopes) +
+            Authorization.Scope.FOLLOW * ("follow" not in scopes)
         @tokenType = String data.tokenType
         @me = +me
 
@@ -584,8 +600,10 @@ It also takes a couple of other arguments.
 
     Laboratory.Client = Client = (data, origin, name, scope) ->
 
-        throw new Error "Laboratory Error : `Client()` must be called as a constructor" unless this and this instanceof Client
-        throw new Error "Laboratory Error : `Client()` was called without any `data`" unless data?
+        unless this and this instanceof Client
+            throw new Error "Laboratory Error : `Client()` must be called as a constructor"
+        unless data?
+            throw new Error "Laboratory Error : `Client()` was called without any `data`"
 
         @origin = origin
         @name = name
@@ -635,8 +653,10 @@ We have to provide it with the `request` we made and the HTTP `code` of the resp
 
     Laboratory.Failure = Failure = (data, request, code) ->
 
-        throw new Error "Laboratory Error : `Failure()` must be called as a constructor" unless this and this instanceof Failure
-        throw new Error "Laboratory Error : `Failure()` was called without any `data`" unless data?
+        unless this and this instanceof Failure
+            throw new Error "Laboratory Error : `Failure()` must be called as a constructor"
+        unless data?
+            throw new Error "Laboratory Error : `Failure()` was called without any `data`"
 
         @request = String request
         @error = String data.error
@@ -747,8 +767,10 @@ The `Post()` constructor takes a `data` object from an API response and reads it
 
     Laboratory.Post = Post = (data) ->
 
-        throw new Error "Laboratory Error : `Post()` must be called as a constructor" unless this and this instanceof Post
-        throw new Error "Laboratory Error : `Post()` was called without any `data`" unless data?
+        unless this and this instanceof Post
+            throw new Error "Laboratory Error : `Post()` must be called as a constructor"
+        unless data?
+            throw new Error "Laboratory Error : `Post()` was called without any `data`"
 
 We'll use the `getProfile()` function in our various account getters.
 
@@ -827,8 +849,11 @@ Now we can set the rest of our properties.
         @mediaAttachments = (new Attachment item for item in data.media_attachments)
         @mentions = do =>
             mentions = []
-            Object.defineProperty mentions, index, {get: getProfile.bind(this, mention.id), enumerable: yes} for mention, index in data.mentions
-            return mentions
+            Object.defineProperty mentions, index, {
+                enumerable: yes
+                get: getProfile.bind(this, mention.id)
+            } for mention, index in data.mentions
+            return Object.freeze mentions
         @application = if data.application? then new Application data.application else null
 
         return Object.freeze this
@@ -967,8 +992,10 @@ Additionally, the `relationship` argument can be used to set the Profile relatio
 
     Laboratory.Profile = Profile = (data, relationship) ->
 
-        throw new Error "Laboratory Error : `Profile()` must be called as a constructor" unless this and this instanceof Profile
-        throw new Error "Laboratory Error : `Profile()` was called without any `data`" unless data?
+        unless this and this instanceof Profile
+            throw new Error "Laboratory Error : `Profile()` must be called as a constructor"
+        unless data?
+            throw new Error "Laboratory Error : `Profile()` was called without any `data`"
         
 If the `relationship` isn't provided, we check to see if we already have one for this id in our `Store`.
 
@@ -976,14 +1003,19 @@ If the `relationship` isn't provided, we check to see if we already have one for
 
 If our `data` is already a `Profile`, we can just copy its info over.
 
-        if data instanceof Profile then {@id, @username, @account, @localAccount, @displayName, @bio, @href, @avatar, @header, @isLocked, @followerCount, @followingCount, @statusCount, @relationship} = data
+        if data instanceof Profile then {@id, @username, @account, @localAccount, @displayName,
+            @bio, @href, @avatar, @header, @isLocked, @followerCount, @followingCount,
+            @statusCount, @relationship} = data
 
 Otherwise, we have to change some variable names around.
 
         else
             @id = Number data.id
             @username = String data.username
-            @account = String data.acct + (if (origin = Store.auth.origin)? and data.acct.indexOf("@") is -1 then "@" + origin else "")
+            @account = String data.acct + (
+                if (origin = Store.auth.origin)? and "@" not in data.acct then "@" + origin
+                else ""
+            )
             @localAccount = String data.acct
             @displayName = String data.display_name
             @bio = String data.note
@@ -994,13 +1026,16 @@ Otherwise, we have to change some variable names around.
             @followerCount = Number data.followers_count
             @followingCount = Number data.following_count
             @statusCount = Number data.statuses_count
-            @relationship = if data.id is Store.auth.me then Profile.Relationship.SELF else Profile.Relationship.UNKNOWN
+            @relationship =
+                if data.id is Store.auth.me then Profile.Relationship.SELF
+                else Profile.Relationship.UNKNOWN
 
 We set the relationship last, overwriting any previous relationship if one is provided.
 This code will coerce the provided relationship into an Number and then back to an enumeral if possible.
 Remember that because enumerals are objects, they will always evaluate to `true` even if their value is `0x00`.
 
-        @relationship = Profile.Relationship.fromValue(relationship) || @relationship if relationship?
+        if relationship?
+            @relationship = Profile.Relationship.fromValue(relationship) or @relationship
 
         return Object.freeze this
 
@@ -1380,12 +1415,15 @@ The `Rolodex()` constructor takes a `data` object and uses it to construct a rol
 
     Laboratory.Rolodex = Rolodex = (data, params) ->
 
-        throw new Error "Laboratory Error : `Rolodex()` must be called as a constructor" unless this and this instanceof Rolodex
-        throw new Error "Laboratory Error : `Rolodex()` was called without any `data`" unless data?
+        unless this and this instanceof Rolodex
+            throw new Error "Laboratory Error : `Rolodex()` must be called as a constructor"
+        unless data?
+            throw new Error "Laboratory Error : `Rolodex()` was called without any `data`"
 
 This loads our `params`.
 
-        @type = if params.type instanceof Rolodex.Type then params.type else Rolodex.Type.UNDEFINED
+        @type =
+            if params.type instanceof Rolodex.Type then params.type else Rolodex.Type.UNDEFINED
         @query = String params.query
 
 We'll use the `getProfile()` function in our profile getters.
@@ -1413,7 +1451,10 @@ Finally, we implement our list of `profiles` as getters such that they always re
 >   At some point in the future, `Rolodex` might instead be implemented using a linked list.
 
         @profiles = []
-        Object.defineProperty @profiles, index, {get: getProfile.bind(this, value.id), enumerable: true} for value, index in data
+        Object.defineProperty @profiles, index, {
+            enumerable: yes
+            get: getProfile.bind(this, value.id)
+        } for value, index in data
         Object.freeze @profiles
 
         @length = data.length
@@ -1434,7 +1475,8 @@ Its `data` argument can be either a `Profile`, an array thereof, or a `Rolodex`.
 We don't have to worry about duplicates here because the `Rolodex()` constructor should take care of them for us.
 
             join: (data) ->
-                return this unless data instanceof Profile or data instanceof Array or data instanceof Rolodex
+                return this unless data instanceof Profile or data instanceof Array or
+                    data instanceof Rolodex
                 combined = profile for profile in switch
                     when data instanceof Profile then [data]
                     when data instanceof Rolodex then data.profiles
@@ -1471,7 +1513,8 @@ The `remove()` function returns a new `Rolodex` with the provided `Profile`s rem
 Its `data` argument can be either a `Profile`, an array thereof, or a `Rolodex`.
 
             remove: (data) ->
-                return this unless data instanceof Profile or data instanceof Array or data instanceof Rolodex
+                return this unless data instanceof Profile or data instanceof Array or
+                    data instanceof Rolodex
                 redacted = (profile for profile in @profiles)
                 redacted.splice index, 1 for profile in (
                     switch
@@ -1583,12 +1626,16 @@ The `Timeline()` constructor takes a `data` object and uses it to construct a ti
 
     Laboratory.Timeline = Timeline = (data, params) ->
 
-        throw new Error "Laboratory Error : `Timeline()` must be called as a constructor" unless this and this instanceof Timeline
-        throw new Error "Laboratory Error : `Timeline()` was called without any `data`" unless data?
+        unless this and this instanceof Timeline
+            throw new Error "Laboratory Error : `Timeline()` must be called as a constructor"
+        unless data?
+            throw new Error "Laboratory Error : `Timeline()` was called without any `data`"
 
 This loads our `params`.
 
-        @type = if params.type instanceof Timeline.Type then params.type else Timeline.Type.UNDEFINED
+        @type =
+            if params.type instanceof Timeline.Type then params.type
+            else Timeline.Type.UNDEFINED
         @query = String params.query
 
 Mastodon keeps track of ids for notifications separately from ids for posts, as best as I can tell, so we have to verify that our posts are of matching type before proceeding.
@@ -1598,14 +1645,15 @@ Really all we care about is whether the posts are notifications, so that's all w
             (
                 switch
                     when object instanceof Post then object.type
-                    when object.type? then Post.Type.NOTIFICATION  #  This is an approximation; the post could be a reaction.
+                    when object.type? then Post.Type.NOTIFICATION  #  This is an approximation
                     else Post.Type.STATUS
             ) & Post.Type.NOTIFICATION
         )
 
 We'll use the `getPost()` function in our post getters.
 
-        getPost = (id, isANotification) -> if isANotification then Store.notifications[id] else Store.statuses[id]
+        getPost = (id, isANotification) ->
+            if isANotification then Store.notifications[id] else Store.statuses[id]
 
 We sort our data according to when they were created, unless two posts were created at the same time.
 Then we use their ids.
@@ -1614,7 +1662,12 @@ Then we use their ids.
 >   Until/unless Mastodon starts assigning times to notifications, there are a few (albeit extremely unlikely) edge-cases where the following `sort()` function will cease to be well-defined.
 >   Regardless, attempting to create a timeline out of both notifications and statuses will likely result in a very odd sorting.
 
-        data.sort (first, second) -> if not (isNotification first) and not (isNotification second) and (a = Number first instanceof Post and first.datetime or Date first.created_at) isnt (b = Number second instanceof Post and second.datetime or Date second.created_at) then -1 + 2 * (a > b) else second.id - first.id
+        data.sort (first, second) ->
+            if not (isNotification first) and not (isNotification second) and (
+                a = Number first instanceof Post and first.datetime or Date first.created_at
+            ) isnt (
+                b = Number second instanceof Post and second.datetime or Date second.created_at
+            ) then -1 + 2 * (a > b) else second.id - first.id
 
 Next we walk the array and look for any duplicates, removing them.
 
@@ -1626,9 +1679,10 @@ Next we walk the array and look for any duplicates, removing them.
         prev = null
         for index in [data.length - 1 .. 0]
             currentID = (current = data[index]).id
-            if prev? and currentID is prev.id and (isNotification prev) is (isNotification current)
-                data.splice index, 1
-                continue
+            if prev? and currentID is prev.id and
+                (isNotification prev) is (isNotification current)
+                    data.splice index, 1
+                    continue
             prev = current
 
 Finally, we implement our list of `posts` as getters such that they always return the most current data.
@@ -1638,7 +1692,10 @@ Finally, we implement our list of `posts` as getters such that they always retur
 >   At some point in the future, `Timeline` might instead be implemented using a linked list.
 
         @posts = []
-        Object.defineProperty @posts, index, {get: getPost.bind(this, value.id, isNotification value), enumerable: true} for value, index in data
+        Object.defineProperty @posts, index, {
+            enumerable: yes
+            get: getPost.bind(this, value.id, isNotification value)
+        } for value, index in data
         Object.freeze @posts
 
         @length = data.length
@@ -1659,7 +1716,8 @@ Its `data` argument can be either a `Post`, an array thereof, or a `Timeline`.
 We don't have to worry about duplicates here because the `Timeline()` constructor should take care of them for us.
 
             join: (data) ->
-                return this unless data instanceof Post or data instanceof Array or data instanceof Timeline
+                return this unless data instanceof Post or data instanceof Array or
+                    data instanceof Timeline
                 combined = post for post in switch
                     when data instanceof Post then [data]
                     when data instanceof Timeline then data.posts
@@ -1696,7 +1754,8 @@ The `remove()` function returns a new `Timeline` with the provided `Post`s remov
 Its `data` argument can be either a `Post`, an array thereof, or a `Timeline`.
 
             remove: (data) ->
-                return this unless data instanceof Post or data instanceof Array or data instanceof Timeline
+                return this unless data instanceof Post or data instanceof Array or
+                    data instanceof Timeline
                 redacted = (post for post in @posts)
                 redacted.splice index, 1 for post in (
                     switch
