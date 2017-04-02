@@ -204,7 +204,7 @@ And with that, we're done.
 
 ###  The dummy:
 
-External scripts don't actually get to access the `Request` constructor.
+External scripts don't actually get to access the `Request()` constructor.
 Instead, we feed them a dummy function with the same prototype—so `instanceof` will still match.
 (The prototype is set in the next section.)
 

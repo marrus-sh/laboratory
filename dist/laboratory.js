@@ -108,58 +108,76 @@
     return Object.freeze(LabEvtTgt);
   })();
 
-  Laboratory.Enumeral = Enumeral = null;
+  Enumeral = function(value) {
+    if (!(this && this instanceof Enumeral)) {
+      throw new TypeError("this is not a Enumeral");
+    }
+    this.value = value | 0;
+    return Object.freeze(this);
+  };
 
-  (function() {
-    var generator;
-    generator = false;
-    Laboratory.Enumeral = Enumeral = function(value) {
-      if (!generator) {
-        throw new TypeError("Laboratory Error : The `Enumeral()` constructor cannot be called directly—try `Enumeral.generate()` instead");
-      }
-      if (!(this && this instanceof Enumeral)) {
-        throw new Error("Laboratory Error : `Enumeral()` must be called as a constructor");
-      }
-      this.value = value | 0;
-      return Object.freeze(this);
-    };
-    Object.defineProperty(Enumeral, "prototype", {
-      value: Object.freeze({
-        toString: function() {
+  Laboratory.Enumeral = function(value) {
+    throw new TypeError("Illegal constructor");
+  };
+
+  Object.defineProperty(Enumeral, "prototype", {
+    configurable: false,
+    enumerable: false,
+    writable: false,
+    value: Object.freeze(Object.defineProperties({}, {
+      constructor: {
+        enumerable: false,
+        value: Laboratory.Enumeral
+      },
+      toString: {
+        enumerable: false,
+        value: function() {
           return "Enumeral(" + this.value + ")";
-        },
-        toSource: function() {
+        }
+      },
+      toSource: {
+        enumerable: false,
+        value: function() {
           return "Enumeral(" + this.value + ")";
-        },
-        valueOf: function() {
+        }
+      },
+      valueOf: {
+        enumerable: false,
+        value: function() {
           return this.value;
         }
-      })
-    });
-    return Enumeral.generate = function(data) {
-      var byValue, enumeral, type, value;
-      type = function(n) {
-        return Enumeral.call(this, n);
-      };
-      type.prototype = Object.create(Enumeral.prototype);
-      generator = true;
-      byValue = {};
-      for (enumeral in data) {
-        if (!hasProp.call(data, enumeral)) continue;
-        value = data[enumeral];
-        if (byValue[value] != null) {
-          continue;
-        }
-        type[enumeral] = new type(value);
-        byValue[value] = type[enumeral];
       }
-      generator = false;
-      type.fromValue = function(n) {
-        return byValue[n | 0];
-      };
-      return Object.freeze(type);
+    }))
+  });
+
+  Object.defineProperty(Laboratory.Enumeral, "prototype", {
+    configurable: false,
+    enumerable: false,
+    writable: false,
+    value: Enumeral.prototype
+  });
+
+  Enumeral.generate = function(data) {
+    var byValue, enumeral, type, value;
+    type = function(n) {
+      return Enumeral.call(this, n);
     };
-  })();
+    type.prototype = Object.create(Enumeral.prototype);
+    byValue = {};
+    for (enumeral in data) {
+      if (!hasProp.call(data, enumeral)) continue;
+      value = data[enumeral];
+      if (byValue[value] != null) {
+        continue;
+      }
+      type[enumeral] = new type(value);
+      byValue[value] = type[enumeral];
+    }
+    type.fromValue = function(n) {
+      return byValue[n | 0];
+    };
+    return Object.freeze(type);
+  };
 
   Laboratory.Application = Application = function(data) {
     if (!(this && this instanceof Application)) {
