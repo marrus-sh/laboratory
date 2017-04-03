@@ -174,6 +174,9 @@ This is a CoffeeScript re-implementation of the polyfill available on [the MDN](
 `LaboratoryEventTarget()` is a simple implementation of the [`EventTarget` interface](https://developer.mozilla.org/en-US/docs/Web/API/EventTarget), used to create an `XMLHttpRequest`-esque object for requesting Mastodon data.
 Note that the `addEventListener()`, `removeEventListener()`, and `dispatchEvent()` functions are (unlike with other `EventTarget`s) bound to the instance.
 
+>   __[Issue #63](https://github.com/marrus-sh/laboratory/issues/63) :__
+>   This interface may change drastically in the future.
+
     LaboratoryEventTarget = do ->
         addEventListener = (callbackObj, event, callback) ->
             unless this instanceof LaboratoryEventTarget
@@ -252,6 +255,22 @@ See the [Mastodon API documentation](https://github.com/tootsuite/mastodon/blob/
 
 See specific constructor pages for details on their implementation.
 
+>   __[Issue #6](https://github.com/marrus-sh/laboratory/issues/6) :__
+>   Constructor getters may be re-written to use lazy-loading in the future.
+
+>   __[Issue #9](https://github.com/marrus-sh/laboratory/issues/9) :__
+>   Right now arrays and objects passed to constructors must originate in the same window as the constructor.
+>   This requirement may be lifted in the future.
+
+>   __[Issue #10](https://github.com/marrus-sh/laboratory/issues/10) :__
+>   Right now constructors only require that they be called with a `this` that is an `instanceof` themselves, but this may change in the future.
+
+>   __[Issue #11](https://github.com/marrus-sh/laboratory/issues/11) :__
+>   As a matter of fact, the way `instanceof` works for Laboratory constructors may itself be modified at some future time.
+
+>   __[Issue #62](https://github.com/marrus-sh/laboratory/issues/62) :__
+>   Constructors may not support very recent additions to the Mastodon API.
+
 
 - - -
 
@@ -312,6 +331,13 @@ Further discussion of specific enumeral types takes place in the various files i
 >   - __`n` :__ An integer value
 
 The `fromValue()` method of an enumeral type can be used to get the enumeral associated with the given value.
+
+ - - -
+
+##  Examples  ##
+
+>   __[Issue #53](https://github.com/marrus-sh/laboratory/issues/53) :__
+>   Usage examples for constructors are forthcoming.
 
  - - -
 
@@ -417,6 +443,13 @@ Its properties are summarized below, alongside their Mastodon API equivalents:
 
  - - -
 
+##  Examples  ##
+
+>   __[Issue #53](https://github.com/marrus-sh/laboratory/issues/53) :__
+>   Usage examples for constructors are forthcoming.
+
+ - - -
+
 ##  Implementation  ##
 
 ###  The constructor:
@@ -473,6 +506,13 @@ The possible `Attachment.Type`s are as follows:
 | `Attachment.Type.PHOTO` | `01` | The media is a photo |
 | `Attachment.Type.VIDEO` | `10` | The media is a video |
 | `Attachment.Type.GIFV` | `11` | The media is a gif-video |
+
+ - - -
+
+##  Examples  ##
+
+>   __[Issue #53](https://github.com/marrus-sh/laboratory/issues/53) :__
+>   Usage examples for constructors are forthcoming.
 
  - - -
 
@@ -557,6 +597,13 @@ The possible `Authorization.Scope`s are as follows:
 
  - - -
 
+##  Examples  ##
+
+>   __[Issue #53](https://github.com/marrus-sh/laboratory/issues/53) :__
+>   Usage examples for constructors are forthcoming.
+
+ - - -
+
 ##  Implementation  ##
 
 ###  The constructor:
@@ -631,12 +678,22 @@ Its properties are summarized below, alongside their Mastodon API equivalents:
 
  - - -
 
+##  Examples  ##
+
+>   __[Issue #53](https://github.com/marrus-sh/laboratory/issues/53) :__
+>   Usage examples for constructors are forthcoming.
+
+ - - -
+
 ##  Implementation  ##
 
 ###  The constructor:
 
 The `Client()` constructor takes a `data` object from an API response and reads its attributes into an instance's properties.
 It also takes a couple of other arguments.
+
+>   __[Issue #37](https://github.com/marrus-sh/laboratory/issues/37) :__
+>   The `Client()` constructor may be modified to be more user-friendly in the future.
 
     Laboratory.Client = Client = (data, origin, name, scope) ->
 
@@ -684,6 +741,13 @@ Its properties are summarized below, alongside their Mastodon API equivalents:
 
  - - -
 
+##  Examples  ##
+
+>   __[Issue #29](https://github.com/marrus-sh/laboratory/issues/29) :__
+>   Usage examples for constructors are forthcoming.
+
+ - - -
+
 ##  Implementation  ##
 
 ###  The constructor:
@@ -691,14 +755,16 @@ Its properties are summarized below, alongside their Mastodon API equivalents:
 The `Failure()` constructor takes a `data` object from an API response and reads its attributes into an instance's properties.
 We have to provide it with the `request` we made and the HTTP `code` of the response as well.
 
-    Laboratory.Failure = Failure = (data, request, code) ->
+>   __[Issue #53](https://github.com/marrus-sh/laboratory/issues/53) :__
+>   `Failure`s may be localizable in the future.
+
+    Laboratory.Failure = Failure = (data, code) ->
 
         unless this and this instanceof Failure
             throw new TypeError "this is not a Failure"
         unless data?
             throw new TypeError "Unable to create Failure; no data provided"
 
-        @request = String request
         @error = String data.error
         @code = null unless isFinite @code = Number code
 
@@ -805,6 +871,13 @@ The remainder visibilities are provided for use with bitwise comparisons: `visib
 
 The `compare()` prototype method compares a `Post` with another and returns `true` if they have the same properties.
 For efficiency, if two `Post`s have the same `id` then `compare()` will only test those properties which are likely to change.
+
+ - - -
+
+##  Examples  ##
+
+>   __[Issue #53](https://github.com/marrus-sh/laboratory/issues/53) :__
+>   Usage examples for constructors are forthcoming.
 
  - - -
 
@@ -1037,6 +1110,13 @@ The `profile()` prototype method compares a `Profile` with another and returns `
 
  - - -
 
+##  Examples  ##
+
+>   __[Issue #53](https://github.com/marrus-sh/laboratory/issues/53) :__
+>   Usage examples for constructors are forthcoming.
+
+ - - -
+
 ##  Implementation  ##
 
 ###  The constructor:
@@ -1164,6 +1244,9 @@ Its properties are summarized below:
 |    `id`    | A unique numbered `id` for the request |
 | `response` | The request's response |
 
+>   __[Issue #38](https://github.com/marrus-sh/laboratory/issues/38) :__
+>   A `Request.STATE` enumeral is planned.
+
 ###  Prototype methods:
 
 ####  `start()`.
@@ -1184,11 +1267,24 @@ The `stop()` prototype method ends a request.
 
  - - -
 
+##  Examples  ##
+
+>   __[Issue #53](https://github.com/marrus-sh/laboratory/issues/53) :__
+>   Usage examples for constructors are forthcoming.
+
+ - - -
+
 ##  Implementation  ##
 
 ###  The constructor:
 
 The `Request()` constructor takes a number of arguments: the `method` for the request, the request's `location`, the `data` of the request, and callbacks to be called `onComplete`.
+
+>   __[Issue #47](https://github.com/marrus-sh/laboratory/issues/47) :__
+>   It would be great if it were possible to monitor the progress of `Request`s.
+
+>   __[Issue #63](https://github.com/marrus-sh/laboratory/issues/63) :__
+>   The method by which you listen for responses to `Request`s may change drastically in the future.
 
     Request = (method, location, data, token, onComplete) ->
 
@@ -1333,6 +1429,12 @@ Laboratory doesn't support HTTP status codes like `206 PARTIAL CONTENT`.
 We can now add our event listener and connect our `start` and `stop` properties to `send()` and `abort()` on the `request`.
 Note that `abort()` does *not* trigger a `readystatechange` event so our `callback()` will not be called.
 
+>   __[Issue #38](https://github.com/marrus-sh/laboratory/issues/38) :__
+>   `Request`s should have a `state` property which indicates their state (running or stopped).
+
+>   __[Issue #39](https://github.com/marrus-sh/laboratory/issues/39) :__
+>   These functions should be declared outside of the constructor and then bound to their proper values.
+
         Object.defineProperties this,
             start:
                 configurable: yes
@@ -1453,6 +1555,13 @@ The `join()` prototype method joins the `Profile`s of a `Rolodex` with that of t
 >   - __`data` :__ A `Profile`, array of `Profile`s, or a `Rolodex`
 
 The `remove()` prototype method collects the `Profile`s of a `Rolodex` except for those of the provided `data`, and returns a new `Rolodex` of the results.
+
+ - - -
+
+##  Examples  ##
+
+>   __[Issue #53](https://github.com/marrus-sh/laboratory/issues/53) :__
+>   Usage examples for constructors are forthcoming.
 
  - - -
 
@@ -1617,6 +1726,13 @@ The `join()` prototype method joins the `Post`s of a timeline with that of the p
 >   - __`data` :__ A `Post`, array of `Post`s, or a `Timeline`
 
 The `remove()` prototype method collects the `Post`s of a timeline except for those of the provided `data`, and returns a new `Timeline` of the results.
+
+ - - -
+
+##  Examples  ##
+
+>   __[Issue #53](https://github.com/marrus-sh/laboratory/issues/53) :__
+>   Usage examples for constructors are forthcoming.
 
  - - -
 
@@ -1825,6 +1941,9 @@ Generally speaking, using this API means following these basic steps:
 2.  Associate the `response` event with a callback using `request.addEventListener`
 3.  Send the request using `request.start()`
 
+>   __[Issue #63](https://github.com/marrus-sh/laboratory/issues/63) :__
+>   The method by which you listen for responses to `Request`s may change drastically in the future.
+
 Every `Request` object has `start()` and `stop()` methods which can be used to send and cancel the request.
 In order to prevent memory leaks, it is recommended that you always call `stop()` when you are done with a `Request`.
 However, this is only required if the `Request` you are using is listening for live updates.
@@ -1860,6 +1979,9 @@ These are as follows:
 >   ```
 
 ###  Requesting authorization:
+
+>   __[Issue #63](https://github.com/marrus-sh/laboratory/issues/63) :__
+>   The method by which you listen for responses to `Request`s may change drastically in the future.
 
 >   ```javascript
 >   request = Laboratory.Authorization.Request({
@@ -1922,6 +2044,9 @@ It sets things up so we can easily add our handlers later.
 
 We can now create our `dispatch()` function.
 It just sets up our detail and dispatches the event to `document`.
+
+>   __[Issue #30](https://github.com/marrus-sh/laboratory/issues/30) :__
+>   Event dispatching may be metered in the future.
 
     Laboratory.dispatch = dispatch = (event, props) ->
         return no unless (initials = LaboratoryEvent.Events[event = String event])?
@@ -2071,6 +2196,9 @@ The __Authorization__ module of the Laboratory API is comprised of those request
 | Event | Description |
 | :---- | :---------- |
 | `LaboratoryAuthorizationReceived` | Fires when an access token has been received from the OAuth server |
+
+>   __[Issue #50](https://github.com/marrus-sh/laboratory/issues/50) :__
+>   Authorization events may not fire in the future.
 
 ###  Requesting authorization:
 
@@ -2420,6 +2548,9 @@ Our `Authorization.Request.prototype` just inherits from `Request`.
 
 Here we create the events as per our specifications.
 
+>   __[Issue #50](https://github.com/marrus-sh/laboratory/issues/50) :__
+>   Authorization events may not fire in the future.
+
         LaboratoryEvent
 
             .create "LaboratoryAuthorizationReceived", Authorization
@@ -2471,6 +2602,9 @@ You shouldn't typically need to interact with this module directly.
 | Event | Description |
 | :---- | :---------- |
 | `LaboratoryClientReceived` | Fires when a client id and secret have been received from the OAuth server |
+
+>   __[Issue #50](https://github.com/marrus-sh/laboratory/issues/50) :__
+>   Client events may not fire in the future.
 
 ###  Requesting a client:
 
@@ -2578,6 +2712,9 @@ We just let our prototype inherit from `Request`.
 ###  Creating the events:
 
 Here we create the events as per our specifications.
+
+>   __[Issue #50](https://github.com/marrus-sh/laboratory/issues/50) :__
+>   Client events may not fire in the future.
 
     LaboratoryEvent
         .create "LaboratoryClientReceived", Client
@@ -2846,6 +2983,9 @@ They will respond with the updated post if they succeed.
 
     Object.defineProperties Post,
 
+>   __[Issue #58](https://github.com/marrus-sh/laboratory/issues/58) :__
+>   The code for interacting with posts may be simplified via function binding in the future.
+
 ####  `Post.Request`s.
 
         Request:
@@ -2902,6 +3042,9 @@ We dispatch a failure unless the received post matches the requested `postID` an
 
 We store the default `Request` `start()` and `stop()` values and then overwrite them with our own.
 This allows us to handle our `useCached` and `isLive` arguments.
+
+>   __[Issue #39](https://github.com/marrus-sh/laboratory/issues/39) :__
+>   These functions should be declared outside of the constructor and then bound to their proper values.
 
                     requestStart = @start
                     requestStop = @stop
@@ -3005,6 +3148,9 @@ Our `Post.Create.prototype` just inherits from `Request`.
 
 >   __[Issue #21](https://github.com/marrus-sh/laboratory/issues/21) :__
 >   There needs to be better responses and error checking with regards to post deletion.
+
+>   __[Issue #40](https://github.com/marrus-sh/laboratory/issues/40) :__
+>   `Post.Delete()` only works on statuses, which means there isn't currently a way to remove individual notifications from the `Store`.
 
         Delete:
             configurable: no
@@ -3141,6 +3287,12 @@ Laboratory provides handlers for the following Authorization events:
 
 The `LaboratoryPostReceived` event simply adds a received post to our store.
 
+>   __[Issue #35](https://github.com/marrus-sh/laboratory/issues/35) :__
+>   The internal representation of the `Store` may change in the future to support custom notifications, et cetera.
+
+>   __[Issue #36](https://github.com/marrus-sh/laboratory/issues/36) :__
+>   The internal representation of the `Store` may similarly change to support multiple simultaneous signins.
+
         .handle "LaboratoryPostReceived", (event) ->
             if (post = event.detail) instanceof Post and
                 (type = post.type) instanceof Post.Type and
@@ -3152,6 +3304,12 @@ The `LaboratoryPostReceived` event simply adds a received post to our store.
 ####  `LaboratoryPostDeletion`.
 
 The `LaboratoryPostDeleted` event removes the given post from our store.
+
+>   __[Issue #35](https://github.com/marrus-sh/laboratory/issues/35) :__
+>   The internal representation of the `Store` may change in the future to support custom notifications, et cetera.
+
+>   __[Issue #36](https://github.com/marrus-sh/laboratory/issues/36) :__
+>   The internal representation of the `Store` may similarly change to support multiple simultaneous signins.
 
         .handle "LaboratoryPostDeleted", (event) ->
             delete Store.statuses[id] if Infinity > (id = Math.floor event.detail.id) > 0
@@ -3298,6 +3456,9 @@ They should be fired with two parameters: `id`, which gives the id of the accoun
 
     Object.defineProperties Profile,
 
+>   __[Issue #58](https://github.com/marrus-sh/laboratory/issues/58) :__
+>   The code for interacting with profiles may be simplified via function binding in the future.
+
 ####  `Profile.Request`s.
 
         Request:
@@ -3362,6 +3523,9 @@ If this `isLive`, then we also need to create a `Request` for our relationships.
 We store the default `Request` `start()` and `stop()` values and then overwrite them with our own.
 This allows us to handle our `useCached` and `isLive` arguments.
 
+>   __[Issue #39](https://github.com/marrus-sh/laboratory/issues/39) :__
+>   These functions should be declared outside of the constructor and then bound to their proper values.
+
                     requestStart = @start
                     requestStop = @stop
 
@@ -3398,6 +3562,9 @@ Our `Profile.Request.prototype` just inherits from `Request`.
                 return ProfileRequest
 
 ####  `Post.SetFollow`s.
+
+>   __[Issue #47](https://github.com/marrus-sh/laboratory/issues/47) :__
+>   There is currently no way to follow a remote user that doesn't already have an internal Mastodon representation (ie, an id).
 
         SetFollow:
             configurable: no
@@ -3576,6 +3743,12 @@ Laboratory provides handlers for the following Authorization events:
 ####  `LaboratoryProfileReceived`.
 
 The `LaboratoryProfileReceived` event simply adds a received profile to our store.
+
+>   __[Issue #35](https://github.com/marrus-sh/laboratory/issues/35) :__
+>   The internal representation of the `Store` may change in the future to support custom notifications, et cetera.
+
+>   __[Issue #36](https://github.com/marrus-sh/laboratory/issues/36) :__
+>   The internal representation of the `Store` may similarly change to support multiple simultaneous signins.
 
         .handle "LaboratoryProfileReceived", (event) ->
             if (profile = event.detail) instanceof Profile and
@@ -3817,6 +3990,9 @@ First, we handle our `data`.
 Next, we set up our `Request`.
 Note that `Request()` ignores data parameters which have a value of `undefined` or `null`.
 
+>   __[Issue #27](https://github.com/marrus-sh/laboratory/issues/27) :__
+>   In the future, the events dispatched here may instead be dispatched from the `Rolodex()` constructor directly.
+
                 Request.call this, "GET", Store.auth.origin + (
                         switch type
                             when Rolodex.Type.SEARCH then "/api/v1/accounts/search"
@@ -3847,6 +4023,9 @@ Note that `Request()` ignores data parameters which have a value of `undefined` 
                             ids.push account.id
                             dispatch "LaboratoryProfileReceived", new Profile account
                         decree => @response = police -> new Rolodex result
+
+>   __[Issue #39](https://github.com/marrus-sh/laboratory/issues/39) :__
+>   These functions should be declared outside of the constructor and then bound to their proper values.
 
                 Object.defineProperties this,
                     before:
@@ -3947,6 +4126,14 @@ The __Timeline__ module of the Laboratory API is comprised of those requests whi
 
 Laboratory Rolodex events are used to request [`Timeline`](../Constructors/Timeline.litcoffee)s of accounts according to the specified `type` and `query`.
 If the `type` is `Timeline.Type.HASHTAG`, then `query` should provide the hashtag; in the case of `Timeline.Type.ACCOUNT`, then `query` should provide the account id; otherwise, no `query` is required.
+
+The `isLocal` parameter specifies whether to include federated posts in the resultant timeline; note however that this is only supported for some `Timeline.Type`s.
+
+>   __[Issue #56](https://github.com/marrus-sh/laboratory/issues/56) :__
+>   Future timelines should be able to limit their responses to just posts with media attachments.
+
+>   __[Issue #57](https://github.com/marrus-sh/laboratory/issues/57) :__
+>   Future timelines should be able to limit their responses to exclude posts with replies.
 
 The `before` and `after` arguments can be used to modify the range of the `Timeline`, but generally speaking you shouldn't need to specify these directly—instead use the built-in update and pagination functions to do this for you.
 
@@ -4074,6 +4261,15 @@ First, we handle our `data`.
 Next, we set up our `Request`.
 Note that `Request()` ignores data parameters which have a value of `undefined` or `null`.
 
+>   __[Issue #27](https://github.com/marrus-sh/laboratory/issues/27) :__
+>   In the future, the events dispatched here may instead be dispatched from the `Timeline()` constructor directly.
+
+>   __[Issue #56](https://github.com/marrus-sh/laboratory/issues/56) :__
+>   Future timelines should be able to limit their responses to just posts with media attachments.
+
+>   __[Issue #57](https://github.com/marrus-sh/laboratory/issues/57) :__
+>   Future timelines should be able to limit their responses to exclude posts with replies.
+
                 Request.call this, "GET", Store.auth.origin + (
                         switch type
                             when Timeline.Type.HASHTAG then "/api/v1/timelines/tag/" + query
@@ -4121,6 +4317,9 @@ Note that `Request()` ignores data parameters which have a value of `undefined` 
                             not Store.profiles[mention.id]?
                                 dispatch "LaboratoryProfileReceived", new Profile mention
                         decree => @response = police -> new Timeline result
+
+>   __[Issue #39](https://github.com/marrus-sh/laboratory/issues/39) :__
+>   These functions should be declared outside of the constructor and then bound to their proper values.
 
                 Object.defineProperties this,
                     before:
@@ -4219,7 +4418,7 @@ Laboratory doesn't have any external dependencies, and should run in any modern 
 >   <script type="text/javascript">
 >
 >       function init () {
->           var request = Laboratory.Authorization.Request({
+>           var request = new Laboratory.Authorization.Request({
 >               origin: "https://myinstance.social"
 >               name: "My Laboratory Client"
 >               redirect: "/"
@@ -4255,6 +4454,12 @@ The store is not exposed to the window.
 
 The `reset()` function resets our `Store` to its initial state.
 It's very important that we return nothing from this function and don't accidentially expose our `Store` lol.
+
+>   __[Issue #35](https://github.com/marrus-sh/laboratory/issues/35) :__
+>   The internal representation of the `Store` may change in the future to support custom notifications, et cetera.
+
+>   __[Issue #36](https://github.com/marrus-sh/laboratory/issues/36) :__
+>   The internal representation of the `Store` may similarly change to support multiple simultaneous signins.
 
     do Laboratory.reset = reset = ->
         Store =

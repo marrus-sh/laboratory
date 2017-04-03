@@ -33,6 +33,14 @@ The __Timeline__ module of the Laboratory API is comprised of those requests whi
 Laboratory Rolodex events are used to request [`Timeline`](../Constructors/Timeline.litcoffee)s of accounts according to the specified `type` and `query`.
 If the `type` is `Timeline.Type.HASHTAG`, then `query` should provide the hashtag; in the case of `Timeline.Type.ACCOUNT`, then `query` should provide the account id; otherwise, no `query` is required.
 
+The `isLocal` parameter specifies whether to include federated posts in the resultant timeline; note however that this is only supported for some `Timeline.Type`s.
+
+>   __[Issue #56](https://github.com/marrus-sh/laboratory/issues/56) :__
+>   Future timelines should be able to limit their responses to just posts with media attachments.
+
+>   __[Issue #57](https://github.com/marrus-sh/laboratory/issues/57) :__
+>   Future timelines should be able to limit their responses to exclude posts with replies.
+
 The `before` and `after` arguments can be used to modify the range of the `Timeline`, but generally speaking you shouldn't need to specify these directly—instead use the built-in update and pagination functions to do this for you.
 
 ####  Getting more entries.
@@ -159,6 +167,15 @@ First, we handle our `data`.
 Next, we set up our `Request`.
 Note that `Request()` ignores data parameters which have a value of `undefined` or `null`.
 
+>   __[Issue #27](https://github.com/marrus-sh/laboratory/issues/27) :__
+>   In the future, the events dispatched here may instead be dispatched from the `Timeline()` constructor directly.
+
+>   __[Issue #56](https://github.com/marrus-sh/laboratory/issues/56) :__
+>   Future timelines should be able to limit their responses to just posts with media attachments.
+
+>   __[Issue #57](https://github.com/marrus-sh/laboratory/issues/57) :__
+>   Future timelines should be able to limit their responses to exclude posts with replies.
+
                 Request.call this, "GET", Store.auth.origin + (
                         switch type
                             when Timeline.Type.HASHTAG then "/api/v1/timelines/tag/" + query
@@ -206,6 +223,9 @@ Note that `Request()` ignores data parameters which have a value of `undefined` 
                             not Store.profiles[mention.id]?
                                 dispatch "LaboratoryProfileReceived", new Profile mention
                         decree => @response = police -> new Timeline result
+
+>   __[Issue #39](https://github.com/marrus-sh/laboratory/issues/39) :__
+>   These functions should be declared outside of the constructor and then bound to their proper values.
 
                 Object.defineProperties this,
                     before:

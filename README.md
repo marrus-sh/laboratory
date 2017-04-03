@@ -1,7 +1,7 @@
 #  LABORATORY  #
 
 __Laboratory__ is a client-side engine for interfacing with the API of [__Mastodon__](https://github.com/tootsuite/mastodon), a free and open-source social networking server.
-Laboratory pulls and stores data from a Mastodon server and makes it accessible to frontends through its __Event API.__
+Laboratory pulls and stores data from a Mastodon server and makes it accessible to frontends through its __Request API.__
 Check out the __[source code](src)__ for more information how to Laboratory in your own projects.
 Or, you can keep reading for a brief overview of the project and what it's about.
 
@@ -53,7 +53,7 @@ Certain aspects of the API have additional requirements.
 Laboratory will not attempt to polyfill these features but will take advantage of them if present.
 
 - Remembering authorization credentials between sessions requires access to `localStorage()`
-- The `LaboratoryAttachmentRequested` event requires support for `FormData()` and `File()`
+- `Attachment.Request()` requires support for `FormData()` and `File()`
 
 If your system doesn't support these features, you should still be able to safely use the remaining parts of the API.
 
@@ -74,6 +74,7 @@ If your system doesn't support these features, you should still be able to safel
 | `/api/v1/accounts/follow`, `/api/v1/accounts/unfollow` | `Laboratory.Profile.SetFollow()` |
 | `/api/v1/accounts/block`, `/api/v1/accounts/unblock` | `Laboratory.Profile.SetBlock()` |
 | `/api/v1/accounts/mute`, `/api/v1/accounts/unmute` | `Laboratory.Profile.SetMute()` |
+| `/api/v1/follow_requests/authorize`, `/api/v1/follow_requests/reject` | `Laboratory.Profile.LetFollow()` |
 | [__Rolodex__](src/API/Rolodex.litcoffee) |  |
 | `/api/v1/accounts/search`, `/api/v1/accounts/:id/followers`, `/api/v1/accounts/:id/following`, `/api/v1/statuses/:id/reblogged_by`, `/api/v1/statuses/:id/favourited_by`, `/api/v1/blocks`, `/api/v1/follow_requests` | `Laboratory.Rolodex.Request()` |
 | [__Attachment__](src/API/Attachment.litcoffee) |  |
@@ -86,6 +87,32 @@ If your system doesn't support these features, you should still be able to safel
 | `/api/v1/statuses/:id/favourite`, `/api/v1/statuses/:id/unfavourite` | `Laboratory.Post.SetFavourite()` |
 | [__Timeline__](src/API/Timeline.litcoffee) |  |
 | `/api/v1/timelines/home`, `/api/v1/timelines/public`, `/api/v1/timelines/tag/:hashtag`, `/api/v1/notifications/`, `/api/v1/favourites` | `Laboratory.Timeline.Request()` |
+
+>   __[Issue #5](https://github.com/marrus-sh/laboratory/issues/5) :__
+>   Support for conversations / post context is planned but not yet implemented.
+
+>   __[Issue #7](https://github.com/marrus-sh/laboratory/issues/7) :__
+>   Support for `/api/v1/instances` is forthcoming.
+
+>   __[Issue #17](https://github.com/marrus-sh/laboratory/issues/17) :__
+>   Support for notification clearing is under discussion.
+
+>   __[Issue #47](https://github.com/marrus-sh/laboratory/issues/47) :__
+>   Support for `/api/v1/follows` is forthcoming.
+
+>   __[Issue #59](https://github.com/marrus-sh/laboratory/issues/59) :__
+>   Support for reporting is forthcoming.
+
+>   __[Issue #60](https://github.com/marrus-sh/laboratory/issues/60) :__
+>   Support for the new `/api/v1/search` API is forthcoming.
+
+>   __[Issue #61](https://github.com/marrus-sh/laboratory/issues/61) :__
+>   Card support is forthcoming.
+
+##  Extending Laboratory  ##
+
+>   __[Issue #55](https://github.com/marrus-sh/laboratory/issues/55) :__
+>   Documentation for Laboratory extensions is forthcoming.
 
 ##  Labcoat  ##
 

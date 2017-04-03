@@ -17,6 +17,13 @@ Its properties are summarized below, alongside their Mastodon API equivalents:
 
  - - -
 
+##  Examples  ##
+
+>   __[Issue #29](https://github.com/marrus-sh/laboratory/issues/29) :__
+>   Usage examples for constructors are forthcoming.
+
+ - - -
+
 ##  Implementation  ##
 
 ###  The constructor:
@@ -24,14 +31,16 @@ Its properties are summarized below, alongside their Mastodon API equivalents:
 The `Failure()` constructor takes a `data` object from an API response and reads its attributes into an instance's properties.
 We have to provide it with the `request` we made and the HTTP `code` of the response as well.
 
-    Laboratory.Failure = Failure = (data, request, code) ->
+>   __[Issue #53](https://github.com/marrus-sh/laboratory/issues/53) :__
+>   `Failure`s may be localizable in the future.
+
+    Laboratory.Failure = Failure = (data, code) ->
 
         unless this and this instanceof Failure
             throw new TypeError "this is not a Failure"
         unless data?
             throw new TypeError "Unable to create Failure; no data provided"
 
-        @request = String request
         @error = String data.error
         @code = null unless isFinite @code = Number code
 

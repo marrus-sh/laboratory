@@ -22,6 +22,9 @@ The __Authorization__ module of the Laboratory API is comprised of those request
 | :---- | :---------- |
 | `LaboratoryAuthorizationReceived` | Fires when an access token has been received from the OAuth server |
 
+>   __[Issue #50](https://github.com/marrus-sh/laboratory/issues/50) :__
+>   Authorization events may not fire in the future.
+
 ###  Requesting authorization:
 
 >   ```javascript
@@ -369,6 +372,9 @@ Our `Authorization.Request.prototype` just inherits from `Request`.
 ###  Creating the events:
 
 Here we create the events as per our specifications.
+
+>   __[Issue #50](https://github.com/marrus-sh/laboratory/issues/50) :__
+>   Authorization events may not fire in the future.
 
         LaboratoryEvent
 

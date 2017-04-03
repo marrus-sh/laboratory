@@ -177,6 +177,9 @@ They will respond with the updated post if they succeed.
 
     Object.defineProperties Post,
 
+>   __[Issue #58](https://github.com/marrus-sh/laboratory/issues/58) :__
+>   The code for interacting with posts may be simplified via function binding in the future.
+
 ####  `Post.Request`s.
 
         Request:
@@ -233,6 +236,9 @@ We dispatch a failure unless the received post matches the requested `postID` an
 
 We store the default `Request` `start()` and `stop()` values and then overwrite them with our own.
 This allows us to handle our `useCached` and `isLive` arguments.
+
+>   __[Issue #39](https://github.com/marrus-sh/laboratory/issues/39) :__
+>   These functions should be declared outside of the constructor and then bound to their proper values.
 
                     requestStart = @start
                     requestStop = @stop
@@ -336,6 +342,9 @@ Our `Post.Create.prototype` just inherits from `Request`.
 
 >   __[Issue #21](https://github.com/marrus-sh/laboratory/issues/21) :__
 >   There needs to be better responses and error checking with regards to post deletion.
+
+>   __[Issue #40](https://github.com/marrus-sh/laboratory/issues/40) :__
+>   `Post.Delete()` only works on statuses, which means there isn't currently a way to remove individual notifications from the `Store`.
 
         Delete:
             configurable: no
@@ -472,6 +481,12 @@ Laboratory provides handlers for the following Authorization events:
 
 The `LaboratoryPostReceived` event simply adds a received post to our store.
 
+>   __[Issue #35](https://github.com/marrus-sh/laboratory/issues/35) :__
+>   The internal representation of the `Store` may change in the future to support custom notifications, et cetera.
+
+>   __[Issue #36](https://github.com/marrus-sh/laboratory/issues/36) :__
+>   The internal representation of the `Store` may similarly change to support multiple simultaneous signins.
+
         .handle "LaboratoryPostReceived", (event) ->
             if (post = event.detail) instanceof Post and
                 (type = post.type) instanceof Post.Type and
@@ -483,6 +498,12 @@ The `LaboratoryPostReceived` event simply adds a received post to our store.
 ####  `LaboratoryPostDeletion`.
 
 The `LaboratoryPostDeleted` event removes the given post from our store.
+
+>   __[Issue #35](https://github.com/marrus-sh/laboratory/issues/35) :__
+>   The internal representation of the `Store` may change in the future to support custom notifications, et cetera.
+
+>   __[Issue #36](https://github.com/marrus-sh/laboratory/issues/36) :__
+>   The internal representation of the `Store` may similarly change to support multiple simultaneous signins.
 
         .handle "LaboratoryPostDeleted", (event) ->
             delete Store.statuses[id] if Infinity > (id = Math.floor event.detail.id) > 0

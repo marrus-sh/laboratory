@@ -14,6 +14,9 @@ Its properties are summarized below:
 |    `id`    | A unique numbered `id` for the request |
 | `response` | The request's response |
 
+>   __[Issue #38](https://github.com/marrus-sh/laboratory/issues/38) :__
+>   A `Request.STATE` enumeral is planned.
+
 ###  Prototype methods:
 
 ####  `start()`.
@@ -34,11 +37,24 @@ The `stop()` prototype method ends a request.
 
  - - -
 
+##  Examples  ##
+
+>   __[Issue #53](https://github.com/marrus-sh/laboratory/issues/53) :__
+>   Usage examples for constructors are forthcoming.
+
+ - - -
+
 ##  Implementation  ##
 
 ###  The constructor:
 
 The `Request()` constructor takes a number of arguments: the `method` for the request, the request's `location`, the `data` of the request, and callbacks to be called `onComplete`.
+
+>   __[Issue #47](https://github.com/marrus-sh/laboratory/issues/47) :__
+>   It would be great if it were possible to monitor the progress of `Request`s.
+
+>   __[Issue #63](https://github.com/marrus-sh/laboratory/issues/63) :__
+>   The method by which you listen for responses to `Request`s may change drastically in the future.
 
     Request = (method, location, data, token, onComplete) ->
 
@@ -182,6 +198,12 @@ Laboratory doesn't support HTTP status codes like `206 PARTIAL CONTENT`.
 
 We can now add our event listener and connect our `start` and `stop` properties to `send()` and `abort()` on the `request`.
 Note that `abort()` does *not* trigger a `readystatechange` event so our `callback()` will not be called.
+
+>   __[Issue #38](https://github.com/marrus-sh/laboratory/issues/38) :__
+>   `Request`s should have a `state` property which indicates their state (running or stopped).
+
+>   __[Issue #39](https://github.com/marrus-sh/laboratory/issues/39) :__
+>   These functions should be declared outside of the constructor and then bound to their proper values.
 
         Object.defineProperties this,
             start:

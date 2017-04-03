@@ -52,6 +52,13 @@ The `remove()` prototype method collects the `Post`s of a timeline except for th
 
  - - -
 
+##  Examples  ##
+
+>   __[Issue #53](https://github.com/marrus-sh/laboratory/issues/53) :__
+>   Usage examples for constructors are forthcoming.
+
+ - - -
+
 ##  Implementation  ##
 
 ###  The constructor:

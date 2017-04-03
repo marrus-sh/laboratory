@@ -22,12 +22,22 @@ Its properties are summarized below, alongside their Mastodon API equivalents:
 
  - - -
 
+##  Examples  ##
+
+>   __[Issue #53](https://github.com/marrus-sh/laboratory/issues/53) :__
+>   Usage examples for constructors are forthcoming.
+
+ - - -
+
 ##  Implementation  ##
 
 ###  The constructor:
 
 The `Client()` constructor takes a `data` object from an API response and reads its attributes into an instance's properties.
 It also takes a couple of other arguments.
+
+>   __[Issue #37](https://github.com/marrus-sh/laboratory/issues/37) :__
+>   The `Client()` constructor may be modified to be more user-friendly in the future.
 
     Laboratory.Client = Client = (data, origin, name, scope) ->
 

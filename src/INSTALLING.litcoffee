@@ -30,7 +30,7 @@ Laboratory doesn't have any external dependencies, and should run in any modern 
 >   <script type="text/javascript">
 >
 >       function init () {
->           var request = Laboratory.Authorization.Request({
+>           var request = new Laboratory.Authorization.Request({
 >               origin: "https://myinstance.social"
 >               name: "My Laboratory Client"
 >               redirect: "/"
@@ -66,6 +66,12 @@ The store is not exposed to the window.
 
 The `reset()` function resets our `Store` to its initial state.
 It's very important that we return nothing from this function and don't accidentially expose our `Store` lol.
+
+>   __[Issue #35](https://github.com/marrus-sh/laboratory/issues/35) :__
+>   The internal representation of the `Store` may change in the future to support custom notifications, et cetera.
+
+>   __[Issue #36](https://github.com/marrus-sh/laboratory/issues/36) :__
+>   The internal representation of the `Store` may similarly change to support multiple simultaneous signins.
 
     do Laboratory.reset = reset = ->
         Store =

@@ -137,6 +137,9 @@ They should be fired with two parameters: `id`, which gives the id of the accoun
 
     Object.defineProperties Profile,
 
+>   __[Issue #58](https://github.com/marrus-sh/laboratory/issues/58) :__
+>   The code for interacting with profiles may be simplified via function binding in the future.
+
 ####  `Profile.Request`s.
 
         Request:
@@ -201,6 +204,9 @@ If this `isLive`, then we also need to create a `Request` for our relationships.
 We store the default `Request` `start()` and `stop()` values and then overwrite them with our own.
 This allows us to handle our `useCached` and `isLive` arguments.
 
+>   __[Issue #39](https://github.com/marrus-sh/laboratory/issues/39) :__
+>   These functions should be declared outside of the constructor and then bound to their proper values.
+
                     requestStart = @start
                     requestStop = @stop
 
@@ -237,6 +243,9 @@ Our `Profile.Request.prototype` just inherits from `Request`.
                 return ProfileRequest
 
 ####  `Post.SetFollow`s.
+
+>   __[Issue #47](https://github.com/marrus-sh/laboratory/issues/47) :__
+>   There is currently no way to follow a remote user that doesn't already have an internal Mastodon representation (ie, an id).
 
         SetFollow:
             configurable: no
@@ -415,6 +424,12 @@ Laboratory provides handlers for the following Authorization events:
 ####  `LaboratoryProfileReceived`.
 
 The `LaboratoryProfileReceived` event simply adds a received profile to our store.
+
+>   __[Issue #35](https://github.com/marrus-sh/laboratory/issues/35) :__
+>   The internal representation of the `Store` may change in the future to support custom notifications, et cetera.
+
+>   __[Issue #36](https://github.com/marrus-sh/laboratory/issues/36) :__
+>   The internal representation of the `Store` may similarly change to support multiple simultaneous signins.
 
         .handle "LaboratoryProfileReceived", (event) ->
             if (profile = event.detail) instanceof Profile and

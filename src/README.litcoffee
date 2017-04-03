@@ -174,6 +174,9 @@ This is a CoffeeScript re-implementation of the polyfill available on [the MDN](
 `LaboratoryEventTarget()` is a simple implementation of the [`EventTarget` interface](https://developer.mozilla.org/en-US/docs/Web/API/EventTarget), used to create an `XMLHttpRequest`-esque object for requesting Mastodon data.
 Note that the `addEventListener()`, `removeEventListener()`, and `dispatchEvent()` functions are (unlike with other `EventTarget`s) bound to the instance.
 
+>   __[Issue #63](https://github.com/marrus-sh/laboratory/issues/63) :__
+>   This interface may change drastically in the future.
+
     LaboratoryEventTarget = do ->
         addEventListener = (callbackObj, event, callback) ->
             unless this instanceof LaboratoryEventTarget

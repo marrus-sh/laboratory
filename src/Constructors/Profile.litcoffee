@@ -76,6 +76,13 @@ The `profile()` prototype method compares a `Profile` with another and returns `
 
  - - -
 
+##  Examples  ##
+
+>   __[Issue #53](https://github.com/marrus-sh/laboratory/issues/53) :__
+>   Usage examples for constructors are forthcoming.
+
+ - - -
+
 ##  Implementation  ##
 
 ###  The constructor:

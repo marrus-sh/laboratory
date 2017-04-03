@@ -162,6 +162,9 @@ First, we handle our `data`.
 Next, we set up our `Request`.
 Note that `Request()` ignores data parameters which have a value of `undefined` or `null`.
 
+>   __[Issue #27](https://github.com/marrus-sh/laboratory/issues/27) :__
+>   In the future, the events dispatched here may instead be dispatched from the `Rolodex()` constructor directly.
+
                 Request.call this, "GET", Store.auth.origin + (
                         switch type
                             when Rolodex.Type.SEARCH then "/api/v1/accounts/search"
@@ -192,6 +195,9 @@ Note that `Request()` ignores data parameters which have a value of `undefined` 
                             ids.push account.id
                             dispatch "LaboratoryProfileReceived", new Profile account
                         decree => @response = police -> new Rolodex result
+
+>   __[Issue #39](https://github.com/marrus-sh/laboratory/issues/39) :__
+>   These functions should be declared outside of the constructor and then bound to their proper values.
 
                 Object.defineProperties this,
                     before:

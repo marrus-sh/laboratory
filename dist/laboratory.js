@@ -329,14 +329,13 @@
     value: Object.freeze({})
   });
 
-  Laboratory.Failure = Failure = function(data, request, code) {
+  Laboratory.Failure = Failure = function(data, code) {
     if (!(this && this instanceof Failure)) {
       throw new TypeError("this is not a Failure");
     }
     if (data == null) {
       throw new TypeError("Unable to create Failure; no data provided");
     }
-    this.request = String(request);
     this.error = String(data.error);
     if (!isFinite(this.code = Number(code))) {
       this.code = null;

@@ -13,18 +13,24 @@
 + Laboratory can now retrieve a list of follow requests and respond to them ([#18](https://github.com/marrus-sh/laboratory/issues/18))
 + Support for local hashtag searches ([#16](https://github.com/marrus-sh/laboratory/issues/16))
 + DM support added ([#20](https://github.com/marrus-sh/laboratory/issues/20))
++ The OAuth popup window can now be specified during authorization ([#33](https://github.com/marrus-sh/laboratory/issues/33))
++ Usage examples have been added to the API documentation ([#29](https://github.com/marrus-sh/laboratory/issues/29))
 
 #####  CHANGED
 
-* Fixed [Issue #34](https://github.com/marrus-sh/laboratory/issues/3), where Laboratory used `localStorage` for things where it didn't need to
-* The numeric values associated with the `Timeline.Type`s have changed
-* The numeric values associated with the `Post.Visibility`s have changed
+* Fixed a bug where Laboratory used `localStorage` for things where it didn't need to ([#34](https://github.com/marrus-sh/laboratory/issues/34))
+* The authorization workflow is much simpler for users ([#13](https://github.com/marrus-sh/laboratory/issues/13))
+* The numeric values associated with the `Timeline.Type`s have changed ([#16](https://github.com/marrus-sh/laboratory/issues/16))
+* The numeric values associated with the `Post.Visibility`s have changed ([#20](https://github.com/marrus-sh/laboratory/issues/20))
+* Faulty constructors now throw `TypeError`s instead of standard `Error`s ([#52](https://github.com/marrus-sh/laboratory/issues/52))
+* Code readability improvements ([#26](https://github.com/marrus-sh/laboratory/issues/26)), [#45](https://github.com/marrus-sh/laboratory/issues/45))
+* Code improvements and bugfixes ([#8](https://github.com/marrus-sh/laboratory/issues/8), [#12](https://github.com/marrus-sh/laboratory/issues/12), [#25](https://github.com/marrus-sh/laboratory/issues/25), [#47](https://github.com/marrus-sh/laboratory/issues/47), [#51](https://github.com/marrus-sh/laboratory/issues/51), [#54](https://github.com/marrus-sh/laboratory/issues/54))
 
 #####  REMOVED
 
-- Request events and Failure events have been removed, as these features are now provided by the Request API
-- `LaboratoryTimelineReceived` and `LaboratoryRolodexReceived` events have been removed, and the Event API now only concerns those data types which directly impact the store
-- `Timeline`s and `Rolodex`es no longer have `type`, `query`, `before` or `after` properties, as these are made available on their parent requests
+- Request events and Failure events have been removed, as these features are now provided by the Request API ([#4](https://github.com/marrus-sh/laboratory/issues/4), [#15](https://github.com/marrus-sh/laboratory/issues/15))
+- `LaboratoryTimelineReceived` and `LaboratoryRolodexReceived` events have been removed, and the Event API now only concerns those data types which directly impact the store ([#15](https://github.com/marrus-sh/laboratory/issues/15))
+- `Timeline`s and `Rolodex`es no longer have `type`, `query`, `before` or `after` properties, as these are made available on their parent requests ([#15](https://github.com/marrus-sh/laboratory/issues/15))
 
  - - -
 

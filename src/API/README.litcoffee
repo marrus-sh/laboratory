@@ -69,6 +69,9 @@ Generally speaking, using this API means following these basic steps:
 2.  Associate the `response` event with a callback using `request.addEventListener`
 3.  Send the request using `request.start()`
 
+>   __[Issue #63](https://github.com/marrus-sh/laboratory/issues/63) :__
+>   The method by which you listen for responses to `Request`s may change drastically in the future.
+
 Every `Request` object has `start()` and `stop()` methods which can be used to send and cancel the request.
 In order to prevent memory leaks, it is recommended that you always call `stop()` when you are done with a `Request`.
 However, this is only required if the `Request` you are using is listening for live updates.
@@ -104,6 +107,9 @@ These are as follows:
 >   ```
 
 ###  Requesting authorization:
+
+>   __[Issue #63](https://github.com/marrus-sh/laboratory/issues/63) :__
+>   The method by which you listen for responses to `Request`s may change drastically in the future.
 
 >   ```javascript
 >   request = Laboratory.Authorization.Request({
@@ -166,6 +172,9 @@ It sets things up so we can easily add our handlers later.
 
 We can now create our `dispatch()` function.
 It just sets up our detail and dispatches the event to `document`.
+
+>   __[Issue #30](https://github.com/marrus-sh/laboratory/issues/30) :__
+>   Event dispatching may be metered in the future.
 
     Laboratory.dispatch = dispatch = (event, props) ->
         return no unless (initials = LaboratoryEvent.Events[event = String event])?

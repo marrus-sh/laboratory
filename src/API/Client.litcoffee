@@ -23,6 +23,9 @@ You shouldn't typically need to interact with this module directly.
 | :---- | :---------- |
 | `LaboratoryClientReceived` | Fires when a client id and secret have been received from the OAuth server |
 
+>   __[Issue #50](https://github.com/marrus-sh/laboratory/issues/50) :__
+>   Client events may not fire in the future.
+
 ###  Requesting a client:
 
 >   ```javascript
@@ -129,6 +132,9 @@ We just let our prototype inherit from `Request`.
 ###  Creating the events:
 
 Here we create the events as per our specifications.
+
+>   __[Issue #50](https://github.com/marrus-sh/laboratory/issues/50) :__
+>   Client events may not fire in the future.
 
     LaboratoryEvent
         .create "LaboratoryClientReceived", Client
