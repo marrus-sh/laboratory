@@ -310,7 +310,8 @@ This is just a simple `POST` request to the mastodon server.
                         spoiler_text: message
                         visibility: switch visibility
                             when Post.Visibility.PUBLIC then "public"
-                            when Post.Visibility.REBLOGGABLE then "unlisted"
+                            when Post.Visibility.UNLISTED then "unlisted"
+                            when Post.Visibility.DIRECT then "direct"
                             else "private"
                     }, Store.auth.accessToken, (result) =>
                         dispatch "LaboratoryPostReceived", decree =>

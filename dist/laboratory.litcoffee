@@ -147,7 +147,7 @@ For obvious reasons, none of these functions are exposed to the window.
             isPrivileged = wasPrivileged
             return result
         police = (callback) ->
-            initial = isPrivileged
+            wasPrivileged = isPrivileged
             isPrivileged = no
             result = do callback
             isPrivileged = wasPrivileged
@@ -172,13 +172,39 @@ This is a CoffeeScript re-implementation of the polyfill available on [the MDN](
 ###  `LaboratoryEventTarget()`:
 
 `LaboratoryEventTarget()` is a simple implementation of the [`EventTarget` interface](https://developer.mozilla.org/en-US/docs/Web/API/EventTarget), used to create an `XMLHttpRequest`-esque object for requesting Mastodon data.
+Note that the `addEventListener()`, `removeEventListener()`, and `dispatchEvent()` functions are (unlike with other `EventTarget`s) bound to the instance.
 
     LaboratoryEventTarget = do ->
-        fragment = do document.createDocumentFragment
+        addEventListener = (callbackObj, event, callback) ->
+            unless this instanceof LaboratoryEventTarget
+                throw TypeError "this isnt a LaboratoryEventTarget"
+            unless typeof callback is "function"
+                throw TypeError "Listener is not a function"
+            event = do (String event).toUpperCase
+            callbackObj[event] = [] unless callbackObj[event]?
+            callbackObj[event].push callback unless callback in callbackObj[event]
+            return
+        removeEventListener = (callbackObj, event, callback) ->
+            unless this instanceof LaboratoryEventTarget
+                throw TypeError "this isnt a LaboratoryEventTarget"
+            event = do (String event).toUpperCase
+            if (index = callbackObj[event].indexOf callback) isnt -1
+                callbackObj[event]?.splice index, 1
+            return
+        dispatchEvent = (callbackObj, object) ->
+            unless this instanceof LaboratoryEventTarget
+                throw TypeError "this isnt a LaboratoryEventTarget"
+            unless object instanceof Event
+                throw TypeError "Attempted to dispatch something which wasn't an event"
+            event = do (String object.type).toUpperCase
+            if callbackObj[event]
+                callback object for callback in callbackObj[event]
+            return
         LabEvtTgt = ->
-            @addEventListener = fragment.addEventListener.bind this
-            @removeEventListener = fragment.removeEventListener.bind this
-            @dispatchEvent = fragment.dispatchEvent.bind this
+            callbacks = {}
+            @addEventListener = addEventListener.bind this, callbacks
+            @removeEventListener = removeEventListener.bind this, callbacks
+            @dispatchEvent = dispatchEvent.bind this, callbacks
         LabEvtTgt.prototype = Object.freeze Object.create (
             if window.EventTarget?.prototype then window.EventTarget.prototype
             else window.Object.prototype
@@ -865,10 +891,11 @@ Now we can set the rest of our properties.
         @isNSFW = !!data.sensitive
         @message = String data.spoiler_text
         @visibility = {
-            private: Post.Visibility.PRIVATE
-            unlisted: Post.Visibility.REBLOGGABLE
+            direct: Post.Visibility.DIRECT
+            private: Post.Visibility.IN_HOME
+            unlisted: Post.Visibility.UNLISTED
             public: Post.Visibility.PUBLIC
-        }[data.visibility] or Post.Visibility.PRIVATE
+        }[data.visibility] or Post.Visibility.IN_HOME
         @mediaAttachments = (new Attachment item for item in data.media_attachments)
         @mentions = do =>
             mentions = []
@@ -1170,6 +1197,10 @@ The `Request()` constructor takes a number of arguments: the `method` for the re
         unless this and this instanceof Request
             throw new TypeError "this is not a Request"
 
+First, we set up our `Request` as an event target.
+
+        LaboratoryEventTarget.call this
+
 Our `response` starts out as `null`.
 `Request()` never actually sets the value of its instances' `response`; it's up to others to make that decree.
 
@@ -1185,8 +1216,9 @@ Our `response` starts out as `null`.
                 if do checkDecree then police =>
                     response = n
                     @dispatchEvent new CustomEvent "response",
-                        request: this
-                        response: n
+                        detail:
+                            request: this
+                            response: n
 
 If the provided method isn't `GET`, `POST`, or `DELETE`, then we aren't going to make any requests ourselves.
 
@@ -1252,7 +1284,7 @@ Laboratory doesn't support HTTP status codes like `206 PARTIAL CONTENT`.
                     data =
                         try
                             if request.responseText then JSON.parse request.responseText
-                            else null
+                            else {}
                         catch
                             error: "The response could not be parsed."
                     link = request.getResponseHeader "Link"
@@ -1281,16 +1313,18 @@ Laboratory doesn't support HTTP status codes like `206 PARTIAL CONTENT`.
                         when 200 <= status <= 205
                             if data?.error?
                                 @dispatchEvent new CustomEvent "failure",
-                                    request: this
-                                    response: new Failure data.error, status
+                                    detail:
+                                        request: this
+                                        response: new Failure data, status
                                 dispatch "LaboratoryRequestError", request
                             else
                                 onComplete data, params if typeof onComplete is "function"
                                 dispatch "LaboratoryRequestComplete", request
                         else
                             @dispatchEvent new CustomEvent "failure",
-                                request: this
-                                response: new Failure data?.error, status
+                                detail:
+                                    request: this
+                                    response: new Failure data, status
                             dispatch "LaboratoryRequestError", request
                     request.removeEventListener "readystatechange", callback
 
@@ -1311,7 +1345,7 @@ Note that `abort()` does *not* trigger a `readystatechange` event so our `callba
                             "application/x-www-form-urlencoded"
                     request.setRequestHeader "Authorization", "Bearer " + token if token?
                     request.addEventListener "readystatechange", callback
-                    do request.send if method is "POST" then contents else undefined
+                    request.send if method is "POST" then contents else undefined
                     return
             stop:
                 configurable: yes
@@ -2107,220 +2141,217 @@ You don't need to specify a `window` if you're passing through an `accessToken`.
 This code is very complex because OAuth is very complex lol.
 It is split among a number of functions because it depends on several asynchronous calls.
 
+    Object.defineProperty Authorization, "Request",
+        configurable: no
+        enumerable: yes
+        writable: no
+        value: do ->
+
 ####  Stopping an existing request.
 
 The `stopRequest()` function closes out of any existing request.
 We explicitly return nothing because `stopRequest` is actually made transparent to the window.
 
-    stopRequest = ->
+            stopRequest = ->
 
-        unless this?.currentRequest instanceof Authorization.Request
-            throw new TypeError "No defined AuthorizationRequest"
+                unless this?.currentRequest instanceof Authorization.Request
+                    throw new TypeError "No defined AuthorizationRequest"
 
-        do @wrapup if typeof @wrapup is "function"
-        do @waitingRequest.stop if typeof @waitingRequest?.stop is "function"
-        do @window.close if @window instanceof Window
-        @waitingRequest = @callback = @window = undefined
-        return
+                do @wrapup if typeof @wrapup is "function"
+                do @waitingRequest.stop if typeof @waitingRequest?.stop is "function"
+                do @window.close if @window instanceof Window
+                @waitingRequest = @callback = @window = undefined
+                return
 
 ####  Starting a new request.
 
 The `startRequest()` function starts a new request.
 Its `this` value is an object which contains the request parameters and will get passed along the entire request.
 
-    startRequest = (window) ->
+            startRequest = (window) ->
 
-        unless this?.currentRequest instanceof Authorization.Request
-            throw new TypeError "No defined AuthorizationRequest"
-        do @currentRequest.stop
-        @window = window if window? and not window.closed
+                unless this?.currentRequest instanceof Authorization.Request
+                    throw new TypeError "No defined AuthorizationRequest"
+                do @currentRequest.stop
+                @window = window if window? and not window.closed
 
 We can only make our request once we have been registered as a client.
 Laboratory stores its client and authorization data in `localStorage`.
 Here we try to access that data if present:
 
-        [storedRedirect, @clientID, @clientSecret, storedScope, storedAccessToken] =
-            if localStorage?.getItem "Laboratory | " + @origin
-                (localStorage.getItem "Laboratory | " + @origin).split " ", 5
-            else []
+                [storedRedirect, @clientID, @clientSecret, storedScope, storedAccessToken] =
+                    if localStorage?.getItem "Laboratory | " + @origin
+                        (localStorage.getItem "Laboratory | " + @origin).split " ", 5
+                    else []
 
 If we have an access token which supports our `scope` then we can immediately try using it.
 We'll just forward it to `finishRequest()`.
 It is important that we `return` here or else we'll end up requesting another token anyway.
 
-        if (accessToken = @accessToken) or (accessToken = storedAccessToken) and
-            (@scope & storedScope) is +@scope
-                finishRequest.call this,
-                    access_token: accessToken
-                    created_at: NaN
-                    scope: (
-                        scopeList = []
-                        scopeList.push "read" if @scope & Authorization.Scope.READ
-                        scopeList.push "write" if @scope & Authorization.Scope.WRITE
-                        scopeList.push "follow" if @scope & Authorization.Scope.FOLLOW
-                        scopeList.join " "
-                    )
-                    token_type: "bearer"
-                return
+                if (accessToken = @accessToken) or (accessToken = storedAccessToken) and
+                    (@scope & storedScope) is +@scope
+                        finishRequest.call this,
+                            access_token: accessToken
+                            created_at: NaN
+                            scope: (
+                                scopeList = []
+                                scopeList.push "read" if @scope & Authorization.Scope.READ
+                                scopeList.push "write" if @scope & Authorization.Scope.WRITE
+                                scopeList.push "follow" if @scope & Authorization.Scope.FOLLOW
+                                scopeList.join " "
+                            )
+                            token_type: "bearer"
+                        return
 
 If we have client credentials and they are properly associated with our `redirect` and `scope`, we can go ahead and `makeRequest()`.
 
-        if storedRedirect is @redirect and (@scope & storedScope) is +@scope and
-            @clientID and @clientSecret then makeRequest.call this
+                if storedRedirect is @redirect and (@scope & storedScope) is +@scope and
+                    @clientID and @clientSecret then makeRequest.call this
 
 Otherwise, we need to get new client credentials before proceeding.
 
-        else
+                else
 
-            handleClient = (event) =>
-                return unless (client = event.detail.response) instanceof Client and
-                    currentRequest and client.origin is @origin and
-                    (@scope & client.scope) is +@scope and client.redirect is @redirect and
-                    client.clientID and client.clientSecret
-                [@clientID, @clientSecret] = [client.clientID, client.clientSecret]
-                localStorage.setItem "Laboratory | " + @origin, [
-                    client.redirect,
-                    client.clientID,
-                    client.clientSecret,
-                    +client.scope
-                ].join " "
-                clearTimeout timeout
-                @wrapup = undefined
-                @waitingRequest.removeEventListener "response", handleClient
-                makeRequest.call this
+                    handleClient = (event) =>
+                        return unless (client = event.detail.response) instanceof Client and
+                            @currentRequest and client.origin is @origin and
+                            (@scope & client.scope) is +@scope and client.redirect is @redirect and
+                            client.clientID and client.clientSecret
+                        [@clientID, @clientSecret] = [client.clientID, client.clientSecret]
+                        localStorage.setItem "Laboratory | " + @origin, [
+                            client.redirect,
+                            client.clientID,
+                            client.clientSecret,
+                            +client.scope
+                        ].join " "
+                        clearTimeout timeout
+                        @wrapup = undefined
+                        @waitingRequest.removeEventListener "response", handleClient
+                        makeRequest.call this
 
-            @waitingRequest = new Client.Request
-                name: recalled.name
-                url: recalled.origin
-                redirect: recalled.redirect
-                scope: recalled.scope
+                    @waitingRequest = new Client.Request {@name, @origin, @redirect, @scope}
 
-            @waitingRequest.addEventListener "response", handleClient
-            @wrapup = => @waitingRequest.removeEventListener "response", handleClient
-            do @waitingRequest.start
+                    @waitingRequest.addEventListener "response", handleClient
+                    @wrapup = => @waitingRequest.removeEventListener "response", handleClient
+                    do @waitingRequest.start
 
 If we aren't able to acquire a client ID within 30 seconds, we timeout.
 
-            timeout = setTimeout (
-                ->
-                    do @currentRequest.stop
-                    @dispatchEvent new CustomEvent "failure",
-                        request: this
-                        response: new Failure "Unable to authorize client"
-            ), 30000
+                    timeout = setTimeout (
+                        ->
+                            do @currentRequest.stop
+                            @dispatchEvent new CustomEvent "failure",
+                                request: this
+                                response: new Failure "Unable to authorize client"
+                    ), 30000
 
 Again, we have to explicitly return nothing because the window can see us.
 
-        return
+                return
 
 ####  Requesting a token.
 
 The `makeRequest()` function will request our token once we acquire a client id and secret.
 Of course, it is possible that we already have these.
 
-    makeRequest = ->
+            makeRequest = ->
 
-        unless this?.currentRequest instanceof Authorization.Request
-            throw new TypeError "No defined AuthorizationRequest"
+                unless this?.currentRequest instanceof Authorization.Request
+                    throw new TypeError "No defined AuthorizationRequest"
 
 The actual token requesting takes place after authorization has been granted by the popup window (see the script at the beginning of [README](../README.litcoffee)); but we open it up here.
 
 >   __Note :__
 >   This window **will be blocked** by popup blockers unless it has already been opened previously in response to a click or keyboard event.
 
-        location = @origin + "/oauth/authorize?" + (
-            (
-                (encodeURIComponent key) + "=" + (encodeURIComponent value) for key, value of {
-                    client_id: @clientID
-                    response_type: "code"
-                    redirect_uri: @redirect
-                    scope: (
-                        scopeList = []
-                        scopeList.push "read" if @scope & Authorization.Scope.READ
-                        scopeList.push "write" if @scope & Authorization.Scope.WRITE
-                        scopeList.push "follow" if @scope & Authorization.Scope.FOLLOW
-                        scopeList.join " "
-                    )
-                }
-            ).join "&"
-        )
-        if @window then @window.location = location
-        else @window = window.open location, "LaboratoryOAuth"
+                location = @origin + "/oauth/authorize?" + (
+                    (
+                        (encodeURIComponent key) + "=" + (encodeURIComponent value) for key, value of {
+                            client_id: @clientID
+                            response_type: "code"
+                            redirect_uri: @redirect
+                            scope: (
+                                scopeList = []
+                                scopeList.push "read" if @scope & Authorization.Scope.READ
+                                scopeList.push "write" if @scope & Authorization.Scope.WRITE
+                                scopeList.push "follow" if @scope & Authorization.Scope.FOLLOW
+                                scopeList.join " "
+                            )
+                        }
+                    ).join "&"
+                )
+                if @window then @window.location = location
+                else @window = window.open location, "LaboratoryOAuth"
 
 Now we wait for a message from the popup window containing its key.
 
-        callback = (event) =>
-            return unless event.source is @window and event.origin is window.location.origin
-            getToken.call this, event.data
-            do event.source.close
-            @window = null
-            @wrapup = undefined
-            window.removeEventListener "message", callback
-            callback = undefined
+                callback = (event) =>
+                    return unless event.source is @window and event.origin is window.location.origin
+                    getToken.call this, event.data
+                    do event.source.close
+                    @window = null
+                    @wrapup = undefined
+                    window.removeEventListener "message", callback
+                    callback = undefined
 
-        window.addEventListener "message", callback
-        @wrapup = -> window.removeEventListener "message", callback
+                window.addEventListener "message", callback
+                @wrapup = -> window.removeEventListener "message", callback
 
 ####  Getting an access token.
 
 The `getToken()` function takes a code received from a Laboratory popup and uses it to request a new access token from the server.
 
-    getToken = (code) ->
+            getToken = (code) ->
 
-        unless this?.currentRequest instanceof Authorization.Request
-            throw new TypeError "No defined AuthorizationRequest"
+                unless this?.currentRequest instanceof Authorization.Request
+                    throw new TypeError "No defined AuthorizationRequest"
 
-        do @waitingRequest.stop if typeof @waitingRequest?.stop is "function"
+                do @waitingRequest.stop if typeof @waitingRequest?.stop is "function"
 
-        do (
-            @waitingRequest = new Request "POST", @origin + "/oauth/token", {
-                client_id: @clientID
-                client_secret: @clientSecret
-                redirect_uri: @redirect
-                grant_type: "authorization_code"
-                code: code
-            }, null, finishRequest.bind this
-        ).start
+                do (
+                    @waitingRequest = new Request "POST", @origin + "/oauth/token", {
+                        client_id: @clientID
+                        client_secret: @clientSecret
+                        redirect_uri: @redirect
+                        grant_type: "authorization_code"
+                        code: code
+                    }, null, finishRequest.bind this
+                ).start
 
 ####  Finishing the request.
 
 The `finishRequest()` function takes the server response from a token request and uses it to verify our token, and complete our authorization request.
 During verification, the Mastodon server will provide us with the current user's data, which we will dispatch via a `LaboratoryProfileReceived` event to our store.
 
-    finishRequest = (result) ->
+            finishRequest = (result) ->
 
-        unless this?.currentRequest instanceof Authorization.Request
-            throw new TypeError "No defined AuthorizationRequest"
+                unless this?.currentRequest instanceof Authorization.Request
+                    throw new TypeError "No defined AuthorizationRequest"
 
-        do @waitingRequest.stop if typeof @waitingRequest?.stop is "function"
-        location = @origin + "/api/v1/accounts/verify_credentials"
-        @accessToken = String result.access_token
+                do @waitingRequest.stop if typeof @waitingRequest?.stop is "function"
+                location = @origin + "/api/v1/accounts/verify_credentials"
+                @accessToken = String result.access_token
 
-        do (
-            @waitingRequest = new Request "GET", location, null, @accessToken, (mine) =>
-                decree -> @currentRequest.response = police ->
-                    new Authorization result, @origin, mine.id
-                dispatch "LaboratoryAuthorizationReceived", @currentRequest.response
-                localStorage.setItem "Laboratory | " + @origin, [
-                    @redirect,
-                    @clientID,
-                    @clientSecret,
-                    Authorization.Scope.READ *
-                        ("read" in (scopes = result.scope.split /[\s\+]+/g)) +
-                        Authorization.Scope.WRITE * ("write" in scopes) +
-                        Authorization.Scope.FOLLOW * ("follow" in scopes), @access_token
-                    ].join " "
-                dispatch "LaboratoryProfileReceived", new Profile mine
-                do @currentRequest.stop
-        ).start
+                do (
+                    @waitingRequest = new Request "GET", location, null, @accessToken, (mine) =>
+                        decree => @currentRequest.response = police =>
+                            new Authorization result, @origin, mine.id
+                        dispatch "LaboratoryAuthorizationReceived", @currentRequest.response
+                        localStorage.setItem "Laboratory | " + @origin, [
+                            @redirect
+                            @clientID
+                            @clientSecret
+                            Authorization.Scope.READ *
+                                ("read" in (scopes = result.scope.split /[\s\+]+/g)) +
+                                Authorization.Scope.WRITE * ("write" in scopes) +
+                                Authorization.Scope.FOLLOW * ("follow" in scopes)
+                            @accessToken
+                            ].join " "
+                        dispatch "LaboratoryProfileReceived", new Profile mine
+                        do @currentRequest.stop
+                ).start
 
 ####  Defining the `Authorization.Request()` constructor.
-
-    Object.defineProperty Authorization, "Request",
-        configurable: no
-        enumerable: yes
-        writable: no
-        value: do ->
 
             AuthorizationRequest = (data) ->
 
@@ -2337,8 +2368,10 @@ We store all our provided properties in an object called `recalled`, which we wi
                     scope:
                         if data.scope instanceof Authorization.Scope then data.scope
                         else Authorization.Scope.READ
-                    name: (String data.name) or "Laboratory"
-                    accessToken: (String data.accessToken) or null
+                    name: if data.name? then String data.name else "Laboratory"
+                    accessToken:
+                        if data.accessToken? then String data.accessToken
+                        else undefined
                     window: undefined
                     clientID: undefined
                     clientSecret: undefined
@@ -2500,7 +2533,7 @@ We can set our default `name` here as well.
 
                 name = (String data.name) or "Laboratory"
                 scope =
-                    if data.scope instance of Authorization.Scope then data.scope
+                    if data.scope instanceof Authorization.Scope then data.scope
                     else Authorization.Scope.READ
 
 First, we normalize our URL.
@@ -2518,7 +2551,6 @@ This creates our request.
                     client_name: name
                     redirect_uris: redirect
                     scopes: (
-                        scope = event.detail.scope
                         scopeList = []
                         scopeList.push "read" if scope & Authorization.Scope.READ
                         scopeList.push "write" if scope & Authorization.Scope.WRITE
@@ -2947,7 +2979,8 @@ This is just a simple `POST` request to the mastodon server.
                         spoiler_text: message
                         visibility: switch visibility
                             when Post.Visibility.PUBLIC then "public"
-                            when Post.Visibility.REBLOGGABLE then "unlisted"
+                            when Post.Visibility.UNLISTED then "unlisted"
+                            when Post.Visibility.DIRECT then "direct"
                             else "private"
                     }, Store.auth.accessToken, (result) =>
                         dispatch "LaboratoryPostReceived", decree =>
@@ -3308,9 +3341,9 @@ We dispatch a failure unless the received profile matches the requested `profile
 If this `isLive`, then we also need to create a `Request` for our relationships.
 
                     relationshipRequest = new Request "GET",
-                        Store.auth.origin + "/api/v1/accounts/relationships", {id: postID},
+                        Store.auth.origin + "/api/v1/accounts/relationships", {id: profileID},
                         Store.auth.accessToken, (result) =>
-                            relationships = response[0]
+                            relationships = result[0]
                             relID = relationships.id
                             relationship = Profile.Relationship.fromValue (
                                 Profile.Relationship.FOLLOWER * relationships.followed_by +
@@ -3320,7 +3353,7 @@ If this `isLive`, then we also need to create a `Request` for our relationships.
                                 Profile.Relationship.MUTING * relationships.muting +
                                 Profile.Relationship.SELF * (relID is Store.auth.me)
                             ) or Profile.Relationship.UNKNOWN
-                            unless Store.profiles[relID]?.relationship is relaltionship
+                            unless Store.profiles[relID]?.relationship is relationship
                                 dispatch "LaboratoryProfileReceived",
                                     new Profile (
                                         Store.profiles[relID] or {id: relID}
@@ -3755,7 +3788,7 @@ These return new `Rolodex.Request`s which will respond with the previous and nex
 
 ###  Making the request:
 
-    Object.defineProperties Rolodex, "Request",
+    Object.defineProperty Rolodex, "Request",
 
         configurable: no
         enumerable: yes
@@ -4044,8 +4077,7 @@ Note that `Request()` ignores data parameters which have a value of `undefined` 
                 Request.call this, "GET", Store.auth.origin + (
                         switch type
                             when Timeline.Type.HASHTAG then "/api/v1/timelines/tag/" + query
-                            when Timeline.Type.LOCAL then "/api/v1/timelines/public"
-                            when Timeline.Type.GLOBAL then "/api/v1/timelines/public"
+                            when Timeline.Type.PUBLIC then "/api/v1/timelines/public"
                             when Timeline.Type.HOME then "/api/v1/timelines/home"
                             when Timeline.Type.NOTIFICATIONS then "/api/v1/notifications"
                             when Timeline.Type.FAVOURITES then "/api/v1/favourites"
@@ -4078,10 +4110,10 @@ Note that `Request()` ignores data parameters which have a value of `undefined` 
                                 acctIDs.push account.id
                                 dispatch "LaboratoryProfileReceived", new Profile account
                             if (
-                                mentions = status.mentions or status.status?.mentions or
+                                srcMentions = status.mentions or status.status?.mentions or
                                     status.reblog?.mentions
                             ) instanceof Array
-                                for account in mentions when account.id not in mentionIDs
+                                for account in srcMentions when account.id not in mentionIDs
                                     mentionIDs.push account.id
                                     mentions.push account
                             dispatch "LaboratoryPostReceived", new Post status
@@ -4264,7 +4296,7 @@ The `run()` function runs Laboratory once the document has finished loaded.
 Our first task is to initialize our event handlers.
 It's pretty easy; we just enumerate over `LaboratoryEvent.Handlers`.
 
-        listen handler.type, handler for handler in LaboratoryEvent.Handlers
+        document.addEventListener handler.type, handler for handler in LaboratoryEvent.Handlers
 
 ####  Starting operations.
 

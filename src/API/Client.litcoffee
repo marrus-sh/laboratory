@@ -84,7 +84,7 @@ We can set our default `name` here as well.
 
                 name = (String data.name) or "Laboratory"
                 scope =
-                    if data.scope instance of Authorization.Scope then data.scope
+                    if data.scope instanceof Authorization.Scope then data.scope
                     else Authorization.Scope.READ
 
 First, we normalize our URL.
@@ -102,7 +102,6 @@ This creates our request.
                     client_name: name
                     redirect_uris: redirect
                     scopes: (
-                        scope = event.detail.scope
                         scopeList = []
                         scopeList.push "read" if scope & Authorization.Scope.READ
                         scopeList.push "write" if scope & Authorization.Scope.WRITE

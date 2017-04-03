@@ -175,10 +175,11 @@ Now we can set the rest of our properties.
         @isNSFW = !!data.sensitive
         @message = String data.spoiler_text
         @visibility = {
-            private: Post.Visibility.PRIVATE
-            unlisted: Post.Visibility.REBLOGGABLE
+            direct: Post.Visibility.DIRECT
+            private: Post.Visibility.IN_HOME
+            unlisted: Post.Visibility.UNLISTED
             public: Post.Visibility.PUBLIC
-        }[data.visibility] or Post.Visibility.PRIVATE
+        }[data.visibility] or Post.Visibility.IN_HOME
         @mediaAttachments = (new Attachment item for item in data.media_attachments)
         @mentions = do =>
             mentions = []

@@ -180,9 +180,9 @@ We dispatch a failure unless the received profile matches the requested `profile
 If this `isLive`, then we also need to create a `Request` for our relationships.
 
                     relationshipRequest = new Request "GET",
-                        Store.auth.origin + "/api/v1/accounts/relationships", {id: postID},
+                        Store.auth.origin + "/api/v1/accounts/relationships", {id: profileID},
                         Store.auth.accessToken, (result) =>
-                            relationships = response[0]
+                            relationships = result[0]
                             relID = relationships.id
                             relationship = Profile.Relationship.fromValue (
                                 Profile.Relationship.FOLLOWER * relationships.followed_by +
@@ -192,7 +192,7 @@ If this `isLive`, then we also need to create a `Request` for our relationships.
                                 Profile.Relationship.MUTING * relationships.muting +
                                 Profile.Relationship.SELF * (relID is Store.auth.me)
                             ) or Profile.Relationship.UNKNOWN
-                            unless Store.profiles[relID]?.relationship is relaltionship
+                            unless Store.profiles[relID]?.relationship is relationship
                                 dispatch "LaboratoryProfileReceived",
                                     new Profile (
                                         Store.profiles[relID] or {id: relID}

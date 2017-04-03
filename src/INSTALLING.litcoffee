@@ -107,7 +107,7 @@ The `run()` function runs Laboratory once the document has finished loaded.
 Our first task is to initialize our event handlers.
 It's pretty easy; we just enumerate over `LaboratoryEvent.Handlers`.
 
-        listen handler.type, handler for handler in LaboratoryEvent.Handlers
+        document.addEventListener handler.type, handler for handler in LaboratoryEvent.Handlers
 
 ####  Starting operations.
 

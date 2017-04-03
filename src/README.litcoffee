@@ -147,7 +147,7 @@ For obvious reasons, none of these functions are exposed to the window.
             isPrivileged = wasPrivileged
             return result
         police = (callback) ->
-            initial = isPrivileged
+            wasPrivileged = isPrivileged
             isPrivileged = no
             result = do callback
             isPrivileged = wasPrivileged
@@ -172,13 +172,39 @@ This is a CoffeeScript re-implementation of the polyfill available on [the MDN](
 ###  `LaboratoryEventTarget()`:
 
 `LaboratoryEventTarget()` is a simple implementation of the [`EventTarget` interface](https://developer.mozilla.org/en-US/docs/Web/API/EventTarget), used to create an `XMLHttpRequest`-esque object for requesting Mastodon data.
+Note that the `addEventListener()`, `removeEventListener()`, and `dispatchEvent()` functions are (unlike with other `EventTarget`s) bound to the instance.
 
     LaboratoryEventTarget = do ->
-        fragment = do document.createDocumentFragment
+        addEventListener = (callbackObj, event, callback) ->
+            unless this instanceof LaboratoryEventTarget
+                throw TypeError "this isnt a LaboratoryEventTarget"
+            unless typeof callback is "function"
+                throw TypeError "Listener is not a function"
+            event = do (String event).toUpperCase
+            callbackObj[event] = [] unless callbackObj[event]?
+            callbackObj[event].push callback unless callback in callbackObj[event]
+            return
+        removeEventListener = (callbackObj, event, callback) ->
+            unless this instanceof LaboratoryEventTarget
+                throw TypeError "this isnt a LaboratoryEventTarget"
+            event = do (String event).toUpperCase
+            if (index = callbackObj[event].indexOf callback) isnt -1
+                callbackObj[event]?.splice index, 1
+            return
+        dispatchEvent = (callbackObj, object) ->
+            unless this instanceof LaboratoryEventTarget
+                throw TypeError "this isnt a LaboratoryEventTarget"
+            unless object instanceof Event
+                throw TypeError "Attempted to dispatch something which wasn't an event"
+            event = do (String object.type).toUpperCase
+            if callbackObj[event]
+                callback object for callback in callbackObj[event]
+            return
         LabEvtTgt = ->
-            @addEventListener = fragment.addEventListener.bind this
-            @removeEventListener = fragment.removeEventListener.bind this
-            @dispatchEvent = fragment.dispatchEvent.bind this
+            callbacks = {}
+            @addEventListener = addEventListener.bind this, callbacks
+            @removeEventListener = removeEventListener.bind this, callbacks
+            @dispatchEvent = dispatchEvent.bind this, callbacks
         LabEvtTgt.prototype = Object.freeze Object.create (
             if window.EventTarget?.prototype then window.EventTarget.prototype
             else window.Object.prototype

@@ -133,7 +133,7 @@ These return new `Rolodex.Request`s which will respond with the previous and nex
 
 ###  Making the request:
 
-    Object.defineProperties Rolodex, "Request",
+    Object.defineProperty Rolodex, "Request",
 
         configurable: no
         enumerable: yes

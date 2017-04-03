@@ -47,6 +47,10 @@ The `Request()` constructor takes a number of arguments: the `method` for the re
         unless this and this instanceof Request
             throw new TypeError "this is not a Request"
 
+First, we set up our `Request` as an event target.
+
+        LaboratoryEventTarget.call this
+
 Our `response` starts out as `null`.
 `Request()` never actually sets the value of its instances' `response`; it's up to others to make that decree.
 
@@ -62,8 +66,9 @@ Our `response` starts out as `null`.
                 if do checkDecree then police =>
                     response = n
                     @dispatchEvent new CustomEvent "response",
-                        request: this
-                        response: n
+                        detail:
+                            request: this
+                            response: n
 
 If the provided method isn't `GET`, `POST`, or `DELETE`, then we aren't going to make any requests ourselves.
 
@@ -129,7 +134,7 @@ Laboratory doesn't support HTTP status codes like `206 PARTIAL CONTENT`.
                     data =
                         try
                             if request.responseText then JSON.parse request.responseText
-                            else null
+                            else {}
                         catch
                             error: "The response could not be parsed."
                     link = request.getResponseHeader "Link"
@@ -158,16 +163,18 @@ Laboratory doesn't support HTTP status codes like `206 PARTIAL CONTENT`.
                         when 200 <= status <= 205
                             if data?.error?
                                 @dispatchEvent new CustomEvent "failure",
-                                    request: this
-                                    response: new Failure data.error, status
+                                    detail:
+                                        request: this
+                                        response: new Failure data, status
                                 dispatch "LaboratoryRequestError", request
                             else
                                 onComplete data, params if typeof onComplete is "function"
                                 dispatch "LaboratoryRequestComplete", request
                         else
                             @dispatchEvent new CustomEvent "failure",
-                                request: this
-                                response: new Failure data?.error, status
+                                detail:
+                                    request: this
+                                    response: new Failure data, status
                             dispatch "LaboratoryRequestError", request
                     request.removeEventListener "readystatechange", callback
 
@@ -188,7 +195,7 @@ Note that `abort()` does *not* trigger a `readystatechange` event so our `callba
                             "application/x-www-form-urlencoded"
                     request.setRequestHeader "Authorization", "Bearer " + token if token?
                     request.addEventListener "readystatechange", callback
-                    do request.send if method is "POST" then contents else undefined
+                    request.send if method is "POST" then contents else undefined
                     return
             stop:
                 configurable: yes

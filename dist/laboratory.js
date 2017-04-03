@@ -16,9 +16,9 @@
   
                   Version 0.4.0
    */
-  var Application, Attachment, Authorization, Client, CustomEvent, Enumeral, Exposed, Failure, Laboratory, LaboratoryEvent, LaboratoryEventTarget, Post, Profile, Request, Rolodex, Store, Timeline, checkDecree, decree, dispatch, finishRequest, fn, getToken, makeRequest, police, prop, reset, run, startRequest, stopRequest,
-    hasProp = {}.hasOwnProperty,
-    indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
+  var Application, Attachment, Authorization, Client, CustomEvent, Enumeral, Exposed, Failure, Laboratory, LaboratoryEvent, LaboratoryEventTarget, Post, Profile, Request, Rolodex, Store, Timeline, checkDecree, decree, dispatch, fn, police, prop, reset, run,
+    indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; },
+    hasProp = {}.hasOwnProperty;
 
   Laboratory = {
     ℹ: "https://github.com/marrus-sh/laboratory",
@@ -64,8 +64,8 @@
       return result;
     };
     police = function(callback) {
-      var initial, result;
-      initial = isPrivileged;
+      var result, wasPrivileged;
+      wasPrivileged = isPrivileged;
       isPrivileged = false;
       result = callback();
       isPrivileged = wasPrivileged;
@@ -97,12 +97,57 @@
   })();
 
   LaboratoryEventTarget = (function() {
-    var LabEvtTgt, fragment, ref;
-    fragment = document.createDocumentFragment();
+    var LabEvtTgt, addEventListener, dispatchEvent, ref, removeEventListener;
+    addEventListener = function(callbackObj, event, callback) {
+      if (!(this instanceof LaboratoryEventTarget)) {
+        throw TypeError("this isnt a LaboratoryEventTarget");
+      }
+      if (typeof callback !== "function") {
+        throw TypeError("Listener is not a function");
+      }
+      event = (String(event)).toUpperCase();
+      if (callbackObj[event] == null) {
+        callbackObj[event] = [];
+      }
+      if (indexOf.call(callbackObj[event], callback) < 0) {
+        callbackObj[event].push(callback);
+      }
+    };
+    removeEventListener = function(callbackObj, event, callback) {
+      var index, ref;
+      if (!(this instanceof LaboratoryEventTarget)) {
+        throw TypeError("this isnt a LaboratoryEventTarget");
+      }
+      event = (String(event)).toUpperCase();
+      if ((index = callbackObj[event].indexOf(callback)) !== -1) {
+        if ((ref = callbackObj[event]) != null) {
+          ref.splice(index, 1);
+        }
+      }
+    };
+    dispatchEvent = function(callbackObj, object) {
+      var callback, event, i, len, ref;
+      if (!(this instanceof LaboratoryEventTarget)) {
+        throw TypeError("this isnt a LaboratoryEventTarget");
+      }
+      if (!(object instanceof Event)) {
+        throw TypeError("Attempted to dispatch something which wasn't an event");
+      }
+      event = (String(object.type)).toUpperCase();
+      if (callbackObj[event]) {
+        ref = callbackObj[event];
+        for (i = 0, len = ref.length; i < len; i++) {
+          callback = ref[i];
+          callback(object);
+        }
+      }
+    };
     LabEvtTgt = function() {
-      this.addEventListener = fragment.addEventListener.bind(this);
-      this.removeEventListener = fragment.removeEventListener.bind(this);
-      return this.dispatchEvent = fragment.dispatchEvent.bind(this);
+      var callbacks;
+      callbacks = {};
+      this.addEventListener = addEventListener.bind(this, callbacks);
+      this.removeEventListener = removeEventListener.bind(this, callbacks);
+      return this.dispatchEvent = dispatchEvent.bind(this, callbacks);
     };
     LabEvtTgt.prototype = Object.freeze(Object.create((((ref = window.EventTarget) != null ? ref.prototype : void 0) ? window.EventTarget.prototype : window.Object.prototype)));
     return Object.freeze(LabEvtTgt);
@@ -382,10 +427,11 @@
     this.isNSFW = !!data.sensitive;
     this.message = String(data.spoiler_text);
     this.visibility = {
-      "private": Post.Visibility.PRIVATE,
-      unlisted: Post.Visibility.REBLOGGABLE,
+      direct: Post.Visibility.DIRECT,
+      "private": Post.Visibility.IN_HOME,
+      unlisted: Post.Visibility.UNLISTED,
       "public": Post.Visibility.PUBLIC
-    }[data.visibility] || Post.Visibility.PRIVATE;
+    }[data.visibility] || Post.Visibility.IN_HOME;
     this.mediaAttachments = (function() {
       var i, len, ref, results;
       ref = data.media_attachments;
@@ -517,6 +563,7 @@
     if (!(this && this instanceof Request)) {
       throw new TypeError("this is not a Request");
     }
+    LaboratoryEventTarget.call(this);
     response = null;
     Object.defineProperty(this, "response", {
       configurable: true,
@@ -530,8 +577,10 @@
             return function() {
               response = n;
               return _this.dispatchEvent(new CustomEvent("response", {
-                request: _this,
-                response: n
+                detail: {
+                  request: _this,
+                  response: n
+                }
               }));
             };
           })(this));
@@ -588,7 +637,7 @@
                 if (request.responseText) {
                   return JSON.parse(request.responseText);
                 } else {
-                  return null;
+                  return {};
                 }
               } catch (error) {
                 return {
@@ -607,8 +656,10 @@
               case !((200 <= status && status <= 205)):
                 if ((data != null ? data.error : void 0) != null) {
                   _this.dispatchEvent(new CustomEvent("failure", {
-                    request: _this,
-                    response: new Failure(data.error, status)
+                    detail: {
+                      request: _this,
+                      response: new Failure(data, status)
+                    }
                   }));
                   dispatch("LaboratoryRequestError", request);
                 } else {
@@ -620,8 +671,10 @@
                 break;
               default:
                 _this.dispatchEvent(new CustomEvent("failure", {
-                  request: _this,
-                  response: new Failure(data != null ? data.error : void 0, status)
+                  detail: {
+                    request: _this,
+                    response: new Failure(data, status)
+                  }
                 }));
                 dispatch("LaboratoryRequestError", request);
             }
@@ -643,7 +696,7 @@
             request.setRequestHeader("Authorization", "Bearer " + token);
           }
           request.addEventListener("readystatechange", callback);
-          request.send(method === "POST" ? contents : void 0)();
+          request.send(method === "POST" ? contents : void 0);
         }
       },
       stop: {
@@ -1020,175 +1073,170 @@
     })()
   });
 
-  stopRequest = function() {
-    var ref;
-    if (!((this != null ? this.currentRequest : void 0) instanceof Authorization.Request)) {
-      throw new TypeError("No defined AuthorizationRequest");
-    }
-    if (typeof this.wrapup === "function") {
-      this.wrapup();
-    }
-    if (typeof ((ref = this.waitingRequest) != null ? ref.stop : void 0) === "function") {
-      this.waitingRequest.stop();
-    }
-    if (this.window instanceof Window) {
-      this.window.close();
-    }
-    this.waitingRequest = this.callback = this.window = void 0;
-  };
-
-  startRequest = function(window) {
-    var accessToken, handleClient, ref, scopeList, storedAccessToken, storedRedirect, storedScope, timeout;
-    if (!((this != null ? this.currentRequest : void 0) instanceof Authorization.Request)) {
-      throw new TypeError("No defined AuthorizationRequest");
-    }
-    this.currentRequest.stop();
-    if ((window != null) && !window.closed) {
-      this.window = window;
-    }
-    ref = (typeof localStorage !== "undefined" && localStorage !== null ? localStorage.getItem("Laboratory | " + this.origin) : void 0) ? (localStorage.getItem("Laboratory | " + this.origin)).split(" ", 5) : [], storedRedirect = ref[0], this.clientID = ref[1], this.clientSecret = ref[2], storedScope = ref[3], storedAccessToken = ref[4];
-    if ((accessToken = this.accessToken) || (accessToken = storedAccessToken) && (this.scope & storedScope) === +this.scope) {
-      finishRequest.call(this, {
-        access_token: accessToken,
-        created_at: 0/0,
-        scope: (scopeList = [], this.scope & Authorization.Scope.READ ? scopeList.push("read") : void 0, this.scope & Authorization.Scope.WRITE ? scopeList.push("write") : void 0, this.scope & Authorization.Scope.FOLLOW ? scopeList.push("follow") : void 0, scopeList.join(" ")),
-        token_type: "bearer"
-      });
-      return;
-    }
-    if (storedRedirect === this.redirect && (this.scope & storedScope) === +this.scope && this.clientID && this.clientSecret) {
-      makeRequest.call(this);
-    } else {
-      handleClient = (function(_this) {
-        return function(event) {
-          var client, ref1;
-          if (!((client = event.detail.response) instanceof Client && currentRequest && client.origin === _this.origin && (_this.scope & client.scope) === +_this.scope && client.redirect === _this.redirect && client.clientID && client.clientSecret)) {
-            return;
-          }
-          ref1 = [client.clientID, client.clientSecret], _this.clientID = ref1[0], _this.clientSecret = ref1[1];
-          localStorage.setItem("Laboratory | " + _this.origin, [client.redirect, client.clientID, client.clientSecret, +client.scope].join(" "));
-          clearTimeout(timeout);
-          _this.wrapup = void 0;
-          _this.waitingRequest.removeEventListener("response", handleClient);
-          return makeRequest.call(_this);
-        };
-      })(this);
-      this.waitingRequest = new Client.Request({
-        name: recalled.name,
-        url: recalled.origin,
-        redirect: recalled.redirect,
-        scope: recalled.scope
-      });
-      this.waitingRequest.addEventListener("response", handleClient);
-      this.wrapup = (function(_this) {
-        return function() {
-          return _this.waitingRequest.removeEventListener("response", handleClient);
-        };
-      })(this);
-      this.waitingRequest.start();
-      timeout = setTimeout((function() {
-        this.currentRequest.stop();
-        return this.dispatchEvent(new CustomEvent("failure", {
-          request: this,
-          response: new Failure("Unable to authorize client")
-        }));
-      }), 30000);
-    }
-  };
-
-  makeRequest = function() {
-    var callback, key, location, scopeList, value;
-    if (!((this != null ? this.currentRequest : void 0) instanceof Authorization.Request)) {
-      throw new TypeError("No defined AuthorizationRequest");
-    }
-    location = this.origin + "/oauth/authorize?" + (((function() {
-      var ref, results;
-      ref = {
-        client_id: this.clientID,
-        response_type: "code",
-        redirect_uri: this.redirect,
-        scope: (scopeList = [], this.scope & Authorization.Scope.READ ? scopeList.push("read") : void 0, this.scope & Authorization.Scope.WRITE ? scopeList.push("write") : void 0, this.scope & Authorization.Scope.FOLLOW ? scopeList.push("follow") : void 0, scopeList.join(" "))
-      };
-      results = [];
-      for (key in ref) {
-        value = ref[key];
-        results.push((encodeURIComponent(key)) + "=" + (encodeURIComponent(value)));
-      }
-      return results;
-    }).call(this)).join("&"));
-    if (this.window) {
-      this.window.location = location;
-    } else {
-      this.window = window.open(location, "LaboratoryOAuth");
-    }
-    callback = (function(_this) {
-      return function(event) {
-        if (!(event.source === _this.window && event.origin === window.location.origin)) {
-          return;
-        }
-        getToken.call(_this, event.data);
-        event.source.close();
-        _this.window = null;
-        _this.wrapup = void 0;
-        window.removeEventListener("message", callback);
-        return callback = void 0;
-      };
-    })(this);
-    window.addEventListener("message", callback);
-    return this.wrapup = function() {
-      return window.removeEventListener("message", callback);
-    };
-  };
-
-  getToken = function(code) {
-    var ref;
-    if (!((this != null ? this.currentRequest : void 0) instanceof Authorization.Request)) {
-      throw new TypeError("No defined AuthorizationRequest");
-    }
-    if (typeof ((ref = this.waitingRequest) != null ? ref.stop : void 0) === "function") {
-      this.waitingRequest.stop();
-    }
-    return (this.waitingRequest = new Request("POST", this.origin + "/oauth/token", {
-      client_id: this.clientID,
-      client_secret: this.clientSecret,
-      redirect_uri: this.redirect,
-      grant_type: "authorization_code",
-      code: code
-    }, null, finishRequest.bind(this))).start();
-  };
-
-  finishRequest = function(result) {
-    var location, ref;
-    if (!((this != null ? this.currentRequest : void 0) instanceof Authorization.Request)) {
-      throw new TypeError("No defined AuthorizationRequest");
-    }
-    if (typeof ((ref = this.waitingRequest) != null ? ref.stop : void 0) === "function") {
-      this.waitingRequest.stop();
-    }
-    location = this.origin + "/api/v1/accounts/verify_credentials";
-    this.accessToken = String(result.access_token);
-    return (this.waitingRequest = new Request("GET", location, null, this.accessToken, (function(_this) {
-      return function(mine) {
-        var scopes;
-        decree(function() {
-          return this.currentRequest.response = police(function() {
-            return new Authorization(result, this.origin, mine.id);
-          });
-        });
-        dispatch("LaboratoryAuthorizationReceived", _this.currentRequest.response);
-        localStorage.setItem("Laboratory | " + _this.origin, [_this.redirect, _this.clientID, _this.clientSecret, Authorization.Scope.READ * (indexOf.call((scopes = result.scope.split(/[\s\+]+/g)), "read") >= 0) + Authorization.Scope.WRITE * (indexOf.call(scopes, "write") >= 0) + Authorization.Scope.FOLLOW * (indexOf.call(scopes, "follow") >= 0), _this.access_token].join(" "));
-        dispatch("LaboratoryProfileReceived", new Profile(mine));
-        return _this.currentRequest.stop();
-      };
-    })(this))).start();
-  };
-
   Object.defineProperty(Authorization, "Request", {
     configurable: false,
     enumerable: true,
     writable: false,
     value: (function() {
-      var AuthorizationRequest;
+      var AuthorizationRequest, finishRequest, getToken, makeRequest, startRequest, stopRequest;
+      stopRequest = function() {
+        var ref;
+        if (!((this != null ? this.currentRequest : void 0) instanceof Authorization.Request)) {
+          throw new TypeError("No defined AuthorizationRequest");
+        }
+        if (typeof this.wrapup === "function") {
+          this.wrapup();
+        }
+        if (typeof ((ref = this.waitingRequest) != null ? ref.stop : void 0) === "function") {
+          this.waitingRequest.stop();
+        }
+        if (this.window instanceof Window) {
+          this.window.close();
+        }
+        this.waitingRequest = this.callback = this.window = void 0;
+      };
+      startRequest = function(window) {
+        var accessToken, handleClient, ref, scopeList, storedAccessToken, storedRedirect, storedScope, timeout;
+        if (!((this != null ? this.currentRequest : void 0) instanceof Authorization.Request)) {
+          throw new TypeError("No defined AuthorizationRequest");
+        }
+        this.currentRequest.stop();
+        if ((window != null) && !window.closed) {
+          this.window = window;
+        }
+        ref = (typeof localStorage !== "undefined" && localStorage !== null ? localStorage.getItem("Laboratory | " + this.origin) : void 0) ? (localStorage.getItem("Laboratory | " + this.origin)).split(" ", 5) : [], storedRedirect = ref[0], this.clientID = ref[1], this.clientSecret = ref[2], storedScope = ref[3], storedAccessToken = ref[4];
+        if ((accessToken = this.accessToken) || (accessToken = storedAccessToken) && (this.scope & storedScope) === +this.scope) {
+          finishRequest.call(this, {
+            access_token: accessToken,
+            created_at: 0/0,
+            scope: (scopeList = [], this.scope & Authorization.Scope.READ ? scopeList.push("read") : void 0, this.scope & Authorization.Scope.WRITE ? scopeList.push("write") : void 0, this.scope & Authorization.Scope.FOLLOW ? scopeList.push("follow") : void 0, scopeList.join(" ")),
+            token_type: "bearer"
+          });
+          return;
+        }
+        if (storedRedirect === this.redirect && (this.scope & storedScope) === +this.scope && this.clientID && this.clientSecret) {
+          makeRequest.call(this);
+        } else {
+          handleClient = (function(_this) {
+            return function(event) {
+              var client, ref1;
+              if (!((client = event.detail.response) instanceof Client && _this.currentRequest && client.origin === _this.origin && (_this.scope & client.scope) === +_this.scope && client.redirect === _this.redirect && client.clientID && client.clientSecret)) {
+                return;
+              }
+              ref1 = [client.clientID, client.clientSecret], _this.clientID = ref1[0], _this.clientSecret = ref1[1];
+              localStorage.setItem("Laboratory | " + _this.origin, [client.redirect, client.clientID, client.clientSecret, +client.scope].join(" "));
+              clearTimeout(timeout);
+              _this.wrapup = void 0;
+              _this.waitingRequest.removeEventListener("response", handleClient);
+              return makeRequest.call(_this);
+            };
+          })(this);
+          this.waitingRequest = new Client.Request({
+            name: this.name,
+            origin: this.origin,
+            redirect: this.redirect,
+            scope: this.scope
+          });
+          this.waitingRequest.addEventListener("response", handleClient);
+          this.wrapup = (function(_this) {
+            return function() {
+              return _this.waitingRequest.removeEventListener("response", handleClient);
+            };
+          })(this);
+          this.waitingRequest.start();
+          timeout = setTimeout((function() {
+            this.currentRequest.stop();
+            return this.dispatchEvent(new CustomEvent("failure", {
+              request: this,
+              response: new Failure("Unable to authorize client")
+            }));
+          }), 30000);
+        }
+      };
+      makeRequest = function() {
+        var callback, key, location, scopeList, value;
+        if (!((this != null ? this.currentRequest : void 0) instanceof Authorization.Request)) {
+          throw new TypeError("No defined AuthorizationRequest");
+        }
+        location = this.origin + "/oauth/authorize?" + (((function() {
+          var ref, results;
+          ref = {
+            client_id: this.clientID,
+            response_type: "code",
+            redirect_uri: this.redirect,
+            scope: (scopeList = [], this.scope & Authorization.Scope.READ ? scopeList.push("read") : void 0, this.scope & Authorization.Scope.WRITE ? scopeList.push("write") : void 0, this.scope & Authorization.Scope.FOLLOW ? scopeList.push("follow") : void 0, scopeList.join(" "))
+          };
+          results = [];
+          for (key in ref) {
+            value = ref[key];
+            results.push((encodeURIComponent(key)) + "=" + (encodeURIComponent(value)));
+          }
+          return results;
+        }).call(this)).join("&"));
+        if (this.window) {
+          this.window.location = location;
+        } else {
+          this.window = window.open(location, "LaboratoryOAuth");
+        }
+        callback = (function(_this) {
+          return function(event) {
+            if (!(event.source === _this.window && event.origin === window.location.origin)) {
+              return;
+            }
+            getToken.call(_this, event.data);
+            event.source.close();
+            _this.window = null;
+            _this.wrapup = void 0;
+            window.removeEventListener("message", callback);
+            return callback = void 0;
+          };
+        })(this);
+        window.addEventListener("message", callback);
+        return this.wrapup = function() {
+          return window.removeEventListener("message", callback);
+        };
+      };
+      getToken = function(code) {
+        var ref;
+        if (!((this != null ? this.currentRequest : void 0) instanceof Authorization.Request)) {
+          throw new TypeError("No defined AuthorizationRequest");
+        }
+        if (typeof ((ref = this.waitingRequest) != null ? ref.stop : void 0) === "function") {
+          this.waitingRequest.stop();
+        }
+        return (this.waitingRequest = new Request("POST", this.origin + "/oauth/token", {
+          client_id: this.clientID,
+          client_secret: this.clientSecret,
+          redirect_uri: this.redirect,
+          grant_type: "authorization_code",
+          code: code
+        }, null, finishRequest.bind(this))).start();
+      };
+      finishRequest = function(result) {
+        var location, ref;
+        if (!((this != null ? this.currentRequest : void 0) instanceof Authorization.Request)) {
+          throw new TypeError("No defined AuthorizationRequest");
+        }
+        if (typeof ((ref = this.waitingRequest) != null ? ref.stop : void 0) === "function") {
+          this.waitingRequest.stop();
+        }
+        location = this.origin + "/api/v1/accounts/verify_credentials";
+        this.accessToken = String(result.access_token);
+        return (this.waitingRequest = new Request("GET", location, null, this.accessToken, (function(_this) {
+          return function(mine) {
+            var scopes;
+            decree(function() {
+              return _this.currentRequest.response = police(function() {
+                return new Authorization(result, _this.origin, mine.id);
+              });
+            });
+            dispatch("LaboratoryAuthorizationReceived", _this.currentRequest.response);
+            localStorage.setItem("Laboratory | " + _this.origin, [_this.redirect, _this.clientID, _this.clientSecret, Authorization.Scope.READ * (indexOf.call((scopes = result.scope.split(/[\s\+]+/g)), "read") >= 0) + Authorization.Scope.WRITE * (indexOf.call(scopes, "write") >= 0) + Authorization.Scope.FOLLOW * (indexOf.call(scopes, "follow") >= 0), _this.accessToken].join(" "));
+            dispatch("LaboratoryProfileReceived", new Profile(mine));
+            return _this.currentRequest.stop();
+          };
+        })(this))).start();
+      };
       AuthorizationRequest = function(data) {
         var a, recalled;
         if (!(this && this instanceof AuthorizationRequest)) {
@@ -1199,8 +1247,8 @@
           waitingRequest: void 0,
           callback: void 0,
           scope: data.scope instanceof Authorization.Scope ? data.scope : Authorization.Scope.READ,
-          name: (String(data.name)) || "Laboratory",
-          accessToken: (String(data.accessToken)) || null,
+          name: data.name != null ? String(data.name) : "Laboratory",
+          accessToken: data.accessToken != null ? String(data.accessToken) : void 0,
           window: void 0,
           clientID: void 0,
           clientSecret: void 0,
@@ -1252,7 +1300,7 @@
           throw new TypeError("this is not a ClientRequest");
         }
         name = (String(data.name)) || "Laboratory";
-        scope = data.scope(instance in Authorization.Scope) ? data.scope : Authorization.Scope.READ;
+        scope = data.scope instanceof Authorization.Scope ? data.scope : Authorization.Scope.READ;
         a = document.createElement("a");
         a.href = data.origin || "/";
         origin = a.origin;
@@ -1261,7 +1309,7 @@
         Request.call(this, "POST", origin + "/api/v1/apps", {
           client_name: name,
           redirect_uris: redirect,
-          scopes: (scope = event.detail.scope, scopeList = [], scope & Authorization.Scope.READ ? scopeList.push("read") : void 0, scope & Authorization.Scope.WRITE ? scopeList.push("write") : void 0, scope & Authorization.Scope.FOLLOW ? scopeList.push("follow") : void 0, scopeList.join(" "))
+          scopes: (scopeList = [], scope & Authorization.Scope.READ ? scopeList.push("read") : void 0, scope & Authorization.Scope.WRITE ? scopeList.push("write") : void 0, scope & Authorization.Scope.FOLLOW ? scopeList.push("follow") : void 0, scopeList.join(" "))
         }, null, (function(_this) {
           return function(result) {
             return dispatch("LaboratoryClientReceived", decree(function() {
@@ -1443,8 +1491,10 @@
               switch (visibility) {
                 case Post.Visibility.PUBLIC:
                   return "public";
-                case Post.Visibility.REBLOGGABLE:
+                case Post.Visibility.UNLISTED:
                   return "unlisted";
+                case Post.Visibility.DIRECT:
+                  return "direct";
                 default:
                   return "private";
               }
@@ -1659,14 +1709,14 @@
             };
           })(this));
           relationshipRequest = new Request("GET", Store.auth.origin + "/api/v1/accounts/relationships", {
-            id: postID
+            id: profileID
           }, Store.auth.accessToken, (function(_this) {
             return function(result) {
               var ref1, relID, relationship, relationships;
-              relationships = response[0];
+              relationships = result[0];
               relID = relationships.id;
               relationship = Profile.Relationship.fromValue((Profile.Relationship.FOLLOWER * relationships.followed_by + Profile.Relationship.FOLLOWING * relationships.following + Profile.Relationship.REQUESTED * relationships.requested + Profile.Relationship.BLOCKING * relationships.blocking + Profile.Relationship.MUTING * relationships.muting + Profile.Relationship.SELF * (relID === Store.auth.me)) || Profile.Relationship.UNKNOWN);
-              if (((ref1 = Store.profiles[relID]) != null ? ref1.relationship : void 0) !== relaltionship) {
+              if (((ref1 = Store.profiles[relID]) != null ? ref1.relationship : void 0) !== relationship) {
                 return dispatch("LaboratoryProfileReceived", new Profile(Store.profiles[relID] || {
                   id: relID
                 }, relationship));
@@ -1885,7 +1935,7 @@
 
   LaboratoryEvent.create("LaboratoryRequestOpen", XMLHttpRequest).create("LaboratoryRequestUpdate", XMLHttpRequest).create("LaboratoryRequestComplete", XMLHttpRequest).create("LaboratoryRequestError", XMLHttpRequest);
 
-  Object.defineProperties(Rolodex, "Request", {
+  Object.defineProperty(Rolodex, "Request", {
     configurable: false,
     enumerable: true,
     writable: false,
@@ -2089,9 +2139,7 @@
           switch (type) {
             case Timeline.Type.HASHTAG:
               return "/api/v1/timelines/tag/" + query;
-            case Timeline.Type.LOCAL:
-              return "/api/v1/timelines/public";
-            case Timeline.Type.GLOBAL:
+            case Timeline.Type.PUBLIC:
               return "/api/v1/timelines/public";
             case Timeline.Type.HOME:
               return "/api/v1/timelines/home";
@@ -2120,7 +2168,7 @@
           }
         })()), Store.auth.accessToken, (function(_this) {
           return function(result, params) {
-            var account, acctIDs, i, ids, j, k, l, len, len1, len2, len3, mention, mentionIDs, mentions, ref1, ref10, ref2, ref3, ref4, ref5, ref6, ref7, ref8, ref9, status;
+            var account, acctIDs, i, ids, j, k, l, len, len1, len2, len3, mention, mentionIDs, mentions, ref1, ref10, ref2, ref3, ref4, ref5, ref6, ref7, ref8, ref9, srcMentions, status;
             acctIDs = [];
             mentions = [];
             mentionIDs = [];
@@ -2142,9 +2190,9 @@
                 acctIDs.push(account.id);
                 dispatch("LaboratoryProfileReceived", new Profile(account));
               }
-              if ((mentions = status.mentions || ((ref7 = status.status) != null ? ref7.mentions : void 0) || ((ref8 = status.reblog) != null ? ref8.mentions : void 0)) instanceof Array) {
-                for (k = 0, len2 = mentions.length; k < len2; k++) {
-                  account = mentions[k];
+              if ((srcMentions = status.mentions || ((ref7 = status.status) != null ? ref7.mentions : void 0) || ((ref8 = status.reblog) != null ? ref8.mentions : void 0)) instanceof Array) {
+                for (k = 0, len2 = srcMentions.length; k < len2; k++) {
+                  account = srcMentions[k];
                   if (!(ref9 = account.id, indexOf.call(mentionIDs, ref9) < 0)) {
                     continue;
                   }
@@ -2302,7 +2350,7 @@
     ref = LaboratoryEvent.Handlers;
     for (i = 0, len = ref.length; i < len; i++) {
       handler = ref[i];
-      listen(handler.type, handler);
+      document.addEventListener(handler.type, handler);
     }
     Exposed.ready = true;
     return dispatch("LaboratoryInitializationReady");

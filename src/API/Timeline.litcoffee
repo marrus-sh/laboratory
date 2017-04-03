@@ -162,8 +162,7 @@ Note that `Request()` ignores data parameters which have a value of `undefined` 
                 Request.call this, "GET", Store.auth.origin + (
                         switch type
                             when Timeline.Type.HASHTAG then "/api/v1/timelines/tag/" + query
-                            when Timeline.Type.LOCAL then "/api/v1/timelines/public"
-                            when Timeline.Type.GLOBAL then "/api/v1/timelines/public"
+                            when Timeline.Type.PUBLIC then "/api/v1/timelines/public"
                             when Timeline.Type.HOME then "/api/v1/timelines/home"
                             when Timeline.Type.NOTIFICATIONS then "/api/v1/notifications"
                             when Timeline.Type.FAVOURITES then "/api/v1/favourites"
@@ -196,10 +195,10 @@ Note that `Request()` ignores data parameters which have a value of `undefined` 
                                 acctIDs.push account.id
                                 dispatch "LaboratoryProfileReceived", new Profile account
                             if (
-                                mentions = status.mentions or status.status?.mentions or
+                                srcMentions = status.mentions or status.status?.mentions or
                                     status.reblog?.mentions
                             ) instanceof Array
-                                for account in mentions when account.id not in mentionIDs
+                                for account in srcMentions when account.id not in mentionIDs
                                     mentionIDs.push account.id
                                     mentions.push account
                             dispatch "LaboratoryPostReceived", new Post status

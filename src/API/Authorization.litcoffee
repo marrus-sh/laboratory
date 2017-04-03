@@ -91,220 +91,217 @@ You don't need to specify a `window` if you're passing through an `accessToken`.
 This code is very complex because OAuth is very complex lol.
 It is split among a number of functions because it depends on several asynchronous calls.
 
+    Object.defineProperty Authorization, "Request",
+        configurable: no
+        enumerable: yes
+        writable: no
+        value: do ->
+
 ####  Stopping an existing request.
 
 The `stopRequest()` function closes out of any existing request.
 We explicitly return nothing because `stopRequest` is actually made transparent to the window.
 
-    stopRequest = ->
+            stopRequest = ->
 
-        unless this?.currentRequest instanceof Authorization.Request
-            throw new TypeError "No defined AuthorizationRequest"
+                unless this?.currentRequest instanceof Authorization.Request
+                    throw new TypeError "No defined AuthorizationRequest"
 
-        do @wrapup if typeof @wrapup is "function"
-        do @waitingRequest.stop if typeof @waitingRequest?.stop is "function"
-        do @window.close if @window instanceof Window
-        @waitingRequest = @callback = @window = undefined
-        return
+                do @wrapup if typeof @wrapup is "function"
+                do @waitingRequest.stop if typeof @waitingRequest?.stop is "function"
+                do @window.close if @window instanceof Window
+                @waitingRequest = @callback = @window = undefined
+                return
 
 ####  Starting a new request.
 
 The `startRequest()` function starts a new request.
 Its `this` value is an object which contains the request parameters and will get passed along the entire request.
 
-    startRequest = (window) ->
+            startRequest = (window) ->
 
-        unless this?.currentRequest instanceof Authorization.Request
-            throw new TypeError "No defined AuthorizationRequest"
-        do @currentRequest.stop
-        @window = window if window? and not window.closed
+                unless this?.currentRequest instanceof Authorization.Request
+                    throw new TypeError "No defined AuthorizationRequest"
+                do @currentRequest.stop
+                @window = window if window? and not window.closed
 
 We can only make our request once we have been registered as a client.
 Laboratory stores its client and authorization data in `localStorage`.
 Here we try to access that data if present:
 
-        [storedRedirect, @clientID, @clientSecret, storedScope, storedAccessToken] =
-            if localStorage?.getItem "Laboratory | " + @origin
-                (localStorage.getItem "Laboratory | " + @origin).split " ", 5
-            else []
+                [storedRedirect, @clientID, @clientSecret, storedScope, storedAccessToken] =
+                    if localStorage?.getItem "Laboratory | " + @origin
+                        (localStorage.getItem "Laboratory | " + @origin).split " ", 5
+                    else []
 
 If we have an access token which supports our `scope` then we can immediately try using it.
 We'll just forward it to `finishRequest()`.
 It is important that we `return` here or else we'll end up requesting another token anyway.
 
-        if (accessToken = @accessToken) or (accessToken = storedAccessToken) and
-            (@scope & storedScope) is +@scope
-                finishRequest.call this,
-                    access_token: accessToken
-                    created_at: NaN
-                    scope: (
-                        scopeList = []
-                        scopeList.push "read" if @scope & Authorization.Scope.READ
-                        scopeList.push "write" if @scope & Authorization.Scope.WRITE
-                        scopeList.push "follow" if @scope & Authorization.Scope.FOLLOW
-                        scopeList.join " "
-                    )
-                    token_type: "bearer"
-                return
+                if (accessToken = @accessToken) or (accessToken = storedAccessToken) and
+                    (@scope & storedScope) is +@scope
+                        finishRequest.call this,
+                            access_token: accessToken
+                            created_at: NaN
+                            scope: (
+                                scopeList = []
+                                scopeList.push "read" if @scope & Authorization.Scope.READ
+                                scopeList.push "write" if @scope & Authorization.Scope.WRITE
+                                scopeList.push "follow" if @scope & Authorization.Scope.FOLLOW
+                                scopeList.join " "
+                            )
+                            token_type: "bearer"
+                        return
 
 If we have client credentials and they are properly associated with our `redirect` and `scope`, we can go ahead and `makeRequest()`.
 
-        if storedRedirect is @redirect and (@scope & storedScope) is +@scope and
-            @clientID and @clientSecret then makeRequest.call this
+                if storedRedirect is @redirect and (@scope & storedScope) is +@scope and
+                    @clientID and @clientSecret then makeRequest.call this
 
 Otherwise, we need to get new client credentials before proceeding.
 
-        else
+                else
 
-            handleClient = (event) =>
-                return unless (client = event.detail.response) instanceof Client and
-                    currentRequest and client.origin is @origin and
-                    (@scope & client.scope) is +@scope and client.redirect is @redirect and
-                    client.clientID and client.clientSecret
-                [@clientID, @clientSecret] = [client.clientID, client.clientSecret]
-                localStorage.setItem "Laboratory | " + @origin, [
-                    client.redirect,
-                    client.clientID,
-                    client.clientSecret,
-                    +client.scope
-                ].join " "
-                clearTimeout timeout
-                @wrapup = undefined
-                @waitingRequest.removeEventListener "response", handleClient
-                makeRequest.call this
+                    handleClient = (event) =>
+                        return unless (client = event.detail.response) instanceof Client and
+                            @currentRequest and client.origin is @origin and
+                            (@scope & client.scope) is +@scope and client.redirect is @redirect and
+                            client.clientID and client.clientSecret
+                        [@clientID, @clientSecret] = [client.clientID, client.clientSecret]
+                        localStorage.setItem "Laboratory | " + @origin, [
+                            client.redirect,
+                            client.clientID,
+                            client.clientSecret,
+                            +client.scope
+                        ].join " "
+                        clearTimeout timeout
+                        @wrapup = undefined
+                        @waitingRequest.removeEventListener "response", handleClient
+                        makeRequest.call this
 
-            @waitingRequest = new Client.Request
-                name: recalled.name
-                url: recalled.origin
-                redirect: recalled.redirect
-                scope: recalled.scope
+                    @waitingRequest = new Client.Request {@name, @origin, @redirect, @scope}
 
-            @waitingRequest.addEventListener "response", handleClient
-            @wrapup = => @waitingRequest.removeEventListener "response", handleClient
-            do @waitingRequest.start
+                    @waitingRequest.addEventListener "response", handleClient
+                    @wrapup = => @waitingRequest.removeEventListener "response", handleClient
+                    do @waitingRequest.start
 
 If we aren't able to acquire a client ID within 30 seconds, we timeout.
 
-            timeout = setTimeout (
-                ->
-                    do @currentRequest.stop
-                    @dispatchEvent new CustomEvent "failure",
-                        request: this
-                        response: new Failure "Unable to authorize client"
-            ), 30000
+                    timeout = setTimeout (
+                        ->
+                            do @currentRequest.stop
+                            @dispatchEvent new CustomEvent "failure",
+                                request: this
+                                response: new Failure "Unable to authorize client"
+                    ), 30000
 
 Again, we have to explicitly return nothing because the window can see us.
 
-        return
+                return
 
 ####  Requesting a token.
 
 The `makeRequest()` function will request our token once we acquire a client id and secret.
 Of course, it is possible that we already have these.
 
-    makeRequest = ->
+            makeRequest = ->
 
-        unless this?.currentRequest instanceof Authorization.Request
-            throw new TypeError "No defined AuthorizationRequest"
+                unless this?.currentRequest instanceof Authorization.Request
+                    throw new TypeError "No defined AuthorizationRequest"
 
 The actual token requesting takes place after authorization has been granted by the popup window (see the script at the beginning of [README](../README.litcoffee)); but we open it up here.
 
 >   __Note :__
 >   This window **will be blocked** by popup blockers unless it has already been opened previously in response to a click or keyboard event.
 
-        location = @origin + "/oauth/authorize?" + (
-            (
-                (encodeURIComponent key) + "=" + (encodeURIComponent value) for key, value of {
-                    client_id: @clientID
-                    response_type: "code"
-                    redirect_uri: @redirect
-                    scope: (
-                        scopeList = []
-                        scopeList.push "read" if @scope & Authorization.Scope.READ
-                        scopeList.push "write" if @scope & Authorization.Scope.WRITE
-                        scopeList.push "follow" if @scope & Authorization.Scope.FOLLOW
-                        scopeList.join " "
-                    )
-                }
-            ).join "&"
-        )
-        if @window then @window.location = location
-        else @window = window.open location, "LaboratoryOAuth"
+                location = @origin + "/oauth/authorize?" + (
+                    (
+                        (encodeURIComponent key) + "=" + (encodeURIComponent value) for key, value of {
+                            client_id: @clientID
+                            response_type: "code"
+                            redirect_uri: @redirect
+                            scope: (
+                                scopeList = []
+                                scopeList.push "read" if @scope & Authorization.Scope.READ
+                                scopeList.push "write" if @scope & Authorization.Scope.WRITE
+                                scopeList.push "follow" if @scope & Authorization.Scope.FOLLOW
+                                scopeList.join " "
+                            )
+                        }
+                    ).join "&"
+                )
+                if @window then @window.location = location
+                else @window = window.open location, "LaboratoryOAuth"
 
 Now we wait for a message from the popup window containing its key.
 
-        callback = (event) =>
-            return unless event.source is @window and event.origin is window.location.origin
-            getToken.call this, event.data
-            do event.source.close
-            @window = null
-            @wrapup = undefined
-            window.removeEventListener "message", callback
-            callback = undefined
+                callback = (event) =>
+                    return unless event.source is @window and event.origin is window.location.origin
+                    getToken.call this, event.data
+                    do event.source.close
+                    @window = null
+                    @wrapup = undefined
+                    window.removeEventListener "message", callback
+                    callback = undefined
 
-        window.addEventListener "message", callback
-        @wrapup = -> window.removeEventListener "message", callback
+                window.addEventListener "message", callback
+                @wrapup = -> window.removeEventListener "message", callback
 
 ####  Getting an access token.
 
 The `getToken()` function takes a code received from a Laboratory popup and uses it to request a new access token from the server.
 
-    getToken = (code) ->
+            getToken = (code) ->
 
-        unless this?.currentRequest instanceof Authorization.Request
-            throw new TypeError "No defined AuthorizationRequest"
+                unless this?.currentRequest instanceof Authorization.Request
+                    throw new TypeError "No defined AuthorizationRequest"
 
-        do @waitingRequest.stop if typeof @waitingRequest?.stop is "function"
+                do @waitingRequest.stop if typeof @waitingRequest?.stop is "function"
 
-        do (
-            @waitingRequest = new Request "POST", @origin + "/oauth/token", {
-                client_id: @clientID
-                client_secret: @clientSecret
-                redirect_uri: @redirect
-                grant_type: "authorization_code"
-                code: code
-            }, null, finishRequest.bind this
-        ).start
+                do (
+                    @waitingRequest = new Request "POST", @origin + "/oauth/token", {
+                        client_id: @clientID
+                        client_secret: @clientSecret
+                        redirect_uri: @redirect
+                        grant_type: "authorization_code"
+                        code: code
+                    }, null, finishRequest.bind this
+                ).start
 
 ####  Finishing the request.
 
 The `finishRequest()` function takes the server response from a token request and uses it to verify our token, and complete our authorization request.
 During verification, the Mastodon server will provide us with the current user's data, which we will dispatch via a `LaboratoryProfileReceived` event to our store.
 
-    finishRequest = (result) ->
+            finishRequest = (result) ->
 
-        unless this?.currentRequest instanceof Authorization.Request
-            throw new TypeError "No defined AuthorizationRequest"
+                unless this?.currentRequest instanceof Authorization.Request
+                    throw new TypeError "No defined AuthorizationRequest"
 
-        do @waitingRequest.stop if typeof @waitingRequest?.stop is "function"
-        location = @origin + "/api/v1/accounts/verify_credentials"
-        @accessToken = String result.access_token
+                do @waitingRequest.stop if typeof @waitingRequest?.stop is "function"
+                location = @origin + "/api/v1/accounts/verify_credentials"
+                @accessToken = String result.access_token
 
-        do (
-            @waitingRequest = new Request "GET", location, null, @accessToken, (mine) =>
-                decree -> @currentRequest.response = police ->
-                    new Authorization result, @origin, mine.id
-                dispatch "LaboratoryAuthorizationReceived", @currentRequest.response
-                localStorage.setItem "Laboratory | " + @origin, [
-                    @redirect,
-                    @clientID,
-                    @clientSecret,
-                    Authorization.Scope.READ *
-                        ("read" in (scopes = result.scope.split /[\s\+]+/g)) +
-                        Authorization.Scope.WRITE * ("write" in scopes) +
-                        Authorization.Scope.FOLLOW * ("follow" in scopes), @access_token
-                    ].join " "
-                dispatch "LaboratoryProfileReceived", new Profile mine
-                do @currentRequest.stop
-        ).start
+                do (
+                    @waitingRequest = new Request "GET", location, null, @accessToken, (mine) =>
+                        decree => @currentRequest.response = police =>
+                            new Authorization result, @origin, mine.id
+                        dispatch "LaboratoryAuthorizationReceived", @currentRequest.response
+                        localStorage.setItem "Laboratory | " + @origin, [
+                            @redirect
+                            @clientID
+                            @clientSecret
+                            Authorization.Scope.READ *
+                                ("read" in (scopes = result.scope.split /[\s\+]+/g)) +
+                                Authorization.Scope.WRITE * ("write" in scopes) +
+                                Authorization.Scope.FOLLOW * ("follow" in scopes)
+                            @accessToken
+                            ].join " "
+                        dispatch "LaboratoryProfileReceived", new Profile mine
+                        do @currentRequest.stop
+                ).start
 
 ####  Defining the `Authorization.Request()` constructor.
-
-    Object.defineProperty Authorization, "Request",
-        configurable: no
-        enumerable: yes
-        writable: no
-        value: do ->
 
             AuthorizationRequest = (data) ->
 
@@ -321,8 +318,10 @@ We store all our provided properties in an object called `recalled`, which we wi
                     scope:
                         if data.scope instanceof Authorization.Scope then data.scope
                         else Authorization.Scope.READ
-                    name: (String data.name) or "Laboratory"
-                    accessToken: (String data.accessToken) or null
+                    name: if data.name? then String data.name else "Laboratory"
+                    accessToken:
+                        if data.accessToken? then String data.accessToken
+                        else undefined
                     window: undefined
                     clientID: undefined
                     clientSecret: undefined
