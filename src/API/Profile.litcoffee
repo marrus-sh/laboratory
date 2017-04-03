@@ -155,7 +155,8 @@ This `callback()` updates our `Profile.Request` if Laboratory receives another `
                     callback = (event) =>
                         response = event.detail
                         if response instanceof Profile and response.id is profileID
-                            (decree => @response = response) unless response.compare @response
+                            unless response.compare? and response.compare @response
+                                decree => @response = response
                             do @stop unless isLive
 
 We can now create our request.

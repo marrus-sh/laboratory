@@ -2831,7 +2831,7 @@ This `callback()` updates our `Post.Request` if Laboratory receives another `Pos
                         response = event.detail
                         if response instanceof Post and response.id is postID and
                             (response.type & Post.Type.NOTIFICATION) is isNotification
-                                unless response.compare @response
+                                unless response.compare? and response.compare @response
                                     decree => @response = response
                                 do @stop unless isLive
 
@@ -3272,7 +3272,8 @@ This `callback()` updates our `Profile.Request` if Laboratory receives another `
                     callback = (event) =>
                         response = event.detail
                         if response instanceof Profile and response.id is profileID
-                            (decree => @response = response) unless response.compare @response
+                            unless response.compare? and response.compare @response
+                                decree => @response = response
                             do @stop unless isLive
 
 We can now create our request.

@@ -1319,7 +1319,7 @@
               var response;
               response = event.detail;
               if (response instanceof Post && response.id === postID && (response.type & Post.Type.NOTIFICATION) === isNotification) {
-                if (!response.compare(_this.response)) {
+                if (!((response.compare != null) && response.compare(_this.response))) {
                   decree(function() {
                     return _this.response = response;
                   });
@@ -1629,7 +1629,7 @@
               var response;
               response = event.detail;
               if (response instanceof Profile && response.id === profileID) {
-                if (!response.compare(_this.response)) {
+                if (!((response.compare != null) && response.compare(_this.response))) {
                   decree(function() {
                     return _this.response = response;
                   });
