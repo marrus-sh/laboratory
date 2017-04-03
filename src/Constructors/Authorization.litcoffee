@@ -45,11 +45,9 @@ We also need to provide it with an `origin`.
     Laboratory.Authorization = Authorization = (data, origin, me) ->
 
         unless this and this instanceof Authorization
-            throw new Error "Laboratory Error : `Authorization()` must be called as a
-                constructor"
+            throw new TypeError "this is not an Authorization"
         unless data?
-            throw new Error "Laboratory Error : `Authorization()` was called without any
-                `data`"
+            throw new TypeError "Unable to create Authorization; no data provided"
 
         @origin = String origin
         @accessToken = String data.access_token

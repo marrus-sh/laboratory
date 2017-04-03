@@ -400,10 +400,9 @@ The `Application()` constructor takes a `data` object from an API response and r
     Laboratory.Application = Application = (data) ->
 
         unless this and this instanceof Application
-            throw new Error "Laboratory Error : `Application()` must be called as a
-                constructor"
+            throw new TypeError "this is not an Application"
         unless data?
-            throw new Error "Laboratory Error : `Application()` was called without any `data`"
+            throw new TypeError "Unable to create Application; no data provided"
 
         @name = data.name
         @href = data.website
@@ -460,9 +459,9 @@ The `Attachment()` constructor takes a `data` object from an API response and re
     Laboratory.Attachment = Attachment = (data) ->
 
         unless this and this instanceof Attachment
-            throw new Error "Laboratory Error : `Attachment()` must be called as a constructor"
+            throw new TypeError "this is not an Attachment"
         unless data?
-            throw new Error "Laboratory Error : `Attachment()` was called without any `data`"
+            throw new TypeError "Unable to create Attachment; no data provided"
 
         @id = Number data.id
         @href = String data.url
@@ -542,11 +541,9 @@ We also need to provide it with an `origin`.
     Laboratory.Authorization = Authorization = (data, origin, me) ->
 
         unless this and this instanceof Authorization
-            throw new Error "Laboratory Error : `Authorization()` must be called as a
-                constructor"
+            throw new TypeError "this is not an Authorization"
         unless data?
-            throw new Error "Laboratory Error : `Authorization()` was called without any
-                `data`"
+            throw new TypeError "Unable to create Authorization; no data provided"
 
         @origin = String origin
         @accessToken = String data.access_token
@@ -618,9 +615,9 @@ It also takes a couple of other arguments.
     Laboratory.Client = Client = (data, origin, name, scope) ->
 
         unless this and this instanceof Client
-            throw new Error "Laboratory Error : `Client()` must be called as a constructor"
+            throw new TypeError "this is not a Client"
         unless data?
-            throw new Error "Laboratory Error : `Client()` was called without any `data`"
+            throw new TypeError "Unable to create Client; no data provided"
 
         @origin = origin
         @name = name
@@ -671,9 +668,9 @@ We have to provide it with the `request` we made and the HTTP `code` of the resp
     Laboratory.Failure = Failure = (data, request, code) ->
 
         unless this and this instanceof Failure
-            throw new Error "Laboratory Error : `Failure()` must be called as a constructor"
+            throw new TypeError "this is not a Failure"
         unless data?
-            throw new Error "Laboratory Error : `Failure()` was called without any `data`"
+            throw new TypeError "Unable to create Failure; no data provided"
 
         @request = String request
         @error = String data.error
@@ -785,9 +782,9 @@ The `Post()` constructor takes a `data` object from an API response and reads it
     Laboratory.Post = Post = (data) ->
 
         unless this and this instanceof Post
-            throw new Error "Laboratory Error : `Post()` must be called as a constructor"
+            throw new TypeError "this is not a Post"
         unless data?
-            throw new Error "Laboratory Error : `Post()` was called without any `data`"
+            throw new TypeError "Unable to create Post; no data provided"
 
 We'll use the `getProfile()` function in our various account getters.
 
@@ -1010,9 +1007,9 @@ Additionally, the `relationship` argument can be used to set the Profile relatio
     Laboratory.Profile = Profile = (data, relationship) ->
 
         unless this and this instanceof Profile
-            throw new Error "Laboratory Error : `Profile()` must be called as a constructor"
+            throw new TypeError "this is not a Profile"
         unless data?
-            throw new Error "Laboratory Error : `Profile()` was called without any `data`"
+            throw new TypeError "Unable to create Profile; no data provided"
         
 If the `relationship` isn't provided, we check to see if we already have one for this id in our `Store`.
 
@@ -1157,7 +1154,8 @@ The `Request()` constructor takes a number of arguments: the `method` for the re
 
 ####  Initial setup.
 
-        throw new TypeError "this is not a Request" unless this and this instanceof Request
+        unless this and this instanceof Request
+            throw new TypeError "this is not a Request"
 
 Our `response` starts out as `null`.
 `Request()` never actually sets the value of its instances' `response`; it's up to others to make that decree.
@@ -1421,9 +1419,9 @@ The `Rolodex()` constructor takes a `data` object and uses it to construct a rol
     Laboratory.Rolodex = Rolodex = (data) ->
 
         unless this and this instanceof Rolodex
-            throw new Error "Laboratory Error : `Rolodex()` must be called as a constructor"
+            throw new TypeError "this is not a Rolodex"
         unless data?
-            throw new Error "Laboratory Error : `Rolodex()` was called without any `data`"
+            throw new TypeError "Unable to create Rolodex; no data provided"
 
 We'll use the `getProfile()` function in our profile getters.
 
@@ -1585,9 +1583,9 @@ The `Timeline()` constructor takes a `data` object and uses it to construct a ti
     Laboratory.Timeline = Timeline = (data) ->
 
         unless this and this instanceof Timeline
-            throw new Error "Laboratory Error : `Timeline()` must be called as a constructor"
+            throw new TypeError "this is not a Timeline"
         unless data?
-            throw new Error "Laboratory Error : `Timeline()` was called without any `data`"
+            throw new TypeError "Unable to create Timeline; no data provided"
 
 Mastodon keeps track of ids for notifications separately from ids for posts, as best as I can tell, so we have to verify that our posts are of matching type before proceeding.
 Really all we care about is whether the posts are notifications, so that's all we test.

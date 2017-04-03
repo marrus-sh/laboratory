@@ -67,9 +67,9 @@ The `Rolodex()` constructor takes a `data` object and uses it to construct a rol
     Laboratory.Rolodex = Rolodex = (data) ->
 
         unless this and this instanceof Rolodex
-            throw new Error "Laboratory Error : `Rolodex()` must be called as a constructor"
+            throw new TypeError "this is not a Rolodex"
         unless data?
-            throw new Error "Laboratory Error : `Rolodex()` was called without any `data`"
+            throw new TypeError "Unable to create Rolodex; no data provided"
 
 We'll use the `getProfile()` function in our profile getters.
 

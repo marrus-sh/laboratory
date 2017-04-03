@@ -86,9 +86,9 @@ Additionally, the `relationship` argument can be used to set the Profile relatio
     Laboratory.Profile = Profile = (data, relationship) ->
 
         unless this and this instanceof Profile
-            throw new Error "Laboratory Error : `Profile()` must be called as a constructor"
+            throw new TypeError "this is not a Profile"
         unless data?
-            throw new Error "Laboratory Error : `Profile()` was called without any `data`"
+            throw new TypeError "Unable to create Profile; no data provided"
         
 If the `relationship` isn't provided, we check to see if we already have one for this id in our `Store`.
 

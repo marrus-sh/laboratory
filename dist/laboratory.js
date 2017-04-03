@@ -181,10 +181,10 @@
 
   Laboratory.Application = Application = function(data) {
     if (!(this && this instanceof Application)) {
-      throw new Error("Laboratory Error : `Application()` must be called as a constructor");
+      throw new TypeError("this is not an Application");
     }
     if (data == null) {
-      throw new Error("Laboratory Error : `Application()` was called without any `data`");
+      throw new TypeError("Unable to create Application; no data provided");
     }
     this.name = data.name;
     this.href = data.website;
@@ -197,10 +197,10 @@
 
   Laboratory.Attachment = Attachment = function(data) {
     if (!(this && this instanceof Attachment)) {
-      throw new Error("Laboratory Error : `Attachment()` must be called as a constructor");
+      throw new TypeError("this is not an Attachment");
     }
     if (data == null) {
-      throw new Error("Laboratory Error : `Attachment()` was called without any `data`");
+      throw new TypeError("Unable to create Attachment; no data provided");
     }
     this.id = Number(data.id);
     this.href = String(data.url);
@@ -234,10 +234,10 @@
   Laboratory.Authorization = Authorization = function(data, origin, me) {
     var scopes;
     if (!(this && this instanceof Authorization)) {
-      throw new Error("Laboratory Error : `Authorization()` must be called as a constructor");
+      throw new TypeError("this is not an Authorization");
     }
     if (data == null) {
-      throw new Error("Laboratory Error : `Authorization()` was called without any `data`");
+      throw new TypeError("Unable to create Authorization; no data provided");
     }
     this.origin = String(origin);
     this.accessToken = String(data.access_token);
@@ -265,10 +265,10 @@
 
   Laboratory.Client = Client = function(data, origin, name, scope) {
     if (!(this && this instanceof Client)) {
-      throw new Error("Laboratory Error : `Client()` must be called as a constructor");
+      throw new TypeError("this is not a Client");
     }
     if (data == null) {
-      throw new Error("Laboratory Error : `Client()` was called without any `data`");
+      throw new TypeError("Unable to create Client; no data provided");
     }
     this.origin = origin;
     this.name = name;
@@ -286,10 +286,10 @@
 
   Laboratory.Failure = Failure = function(data, request, code) {
     if (!(this && this instanceof Failure)) {
-      throw new Error("Laboratory Error : `Failure()` must be called as a constructor");
+      throw new TypeError("this is not a Failure");
     }
     if (data == null) {
-      throw new Error("Laboratory Error : `Failure()` was called without any `data`");
+      throw new TypeError("Unable to create Failure; no data provided");
     }
     this.request = String(request);
     this.error = String(data.error);
@@ -306,10 +306,10 @@
   Laboratory.Post = Post = function(data) {
     var fromID, getProfile, item, profiles;
     if (!(this && this instanceof Post)) {
-      throw new Error("Laboratory Error : `Post()` must be called as a constructor");
+      throw new TypeError("this is not a Post");
     }
     if (data == null) {
-      throw new Error("Laboratory Error : `Post()` was called without any `data`");
+      throw new TypeError("Unable to create Post; no data provided");
     }
     profiles = Store.profiles;
     getProfile = function(id) {
@@ -447,10 +447,10 @@
   Laboratory.Profile = Profile = function(data, relationship) {
     var origin, ref;
     if (!(this && this instanceof Profile)) {
-      throw new Error("Laboratory Error : `Profile()` must be called as a constructor");
+      throw new TypeError("this is not a Profile");
     }
     if (data == null) {
-      throw new Error("Laboratory Error : `Profile()` was called without any `data`");
+      throw new TypeError("Unable to create Profile; no data provided");
     }
     if (relationship == null) {
       relationship = (ref = Store.profiles[data.id]) != null ? ref.relationship : void 0;
@@ -689,10 +689,10 @@
   Laboratory.Rolodex = Rolodex = function(data) {
     var current, currentID, getProfile, i, index, j, len, prev, ref, value;
     if (!(this && this instanceof Rolodex)) {
-      throw new Error("Laboratory Error : `Rolodex()` must be called as a constructor");
+      throw new TypeError("this is not a Rolodex");
     }
     if (data == null) {
-      throw new Error("Laboratory Error : `Rolodex()` was called without any `data`");
+      throw new TypeError("Unable to create Rolodex; no data provided");
     }
     getProfile = function(id) {
       return Store.profiles[id];
@@ -801,10 +801,10 @@
   Laboratory.Timeline = Timeline = function(data) {
     var current, currentID, getPost, i, index, isNotification, j, len, prev, ref, value;
     if (!(this && this instanceof Timeline)) {
-      throw new Error("Laboratory Error : `Timeline()` must be called as a constructor");
+      throw new TypeError("this is not a Timeline");
     }
     if (data == null) {
-      throw new Error("Laboratory Error : `Timeline()` was called without any `data`");
+      throw new TypeError("Unable to create Timeline; no data provided");
     }
     isNotification = function(object) {
       return !!(((function() {

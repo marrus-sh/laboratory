@@ -92,9 +92,9 @@ The `Post()` constructor takes a `data` object from an API response and reads it
     Laboratory.Post = Post = (data) ->
 
         unless this and this instanceof Post
-            throw new Error "Laboratory Error : `Post()` must be called as a constructor"
+            throw new TypeError "this is not a Post"
         unless data?
-            throw new Error "Laboratory Error : `Post()` was called without any `data`"
+            throw new TypeError "Unable to create Post; no data provided"
 
 We'll use the `getProfile()` function in our various account getters.
 

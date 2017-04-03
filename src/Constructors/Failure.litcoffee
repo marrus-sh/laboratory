@@ -27,9 +27,9 @@ We have to provide it with the `request` we made and the HTTP `code` of the resp
     Laboratory.Failure = Failure = (data, request, code) ->
 
         unless this and this instanceof Failure
-            throw new Error "Laboratory Error : `Failure()` must be called as a constructor"
+            throw new TypeError "this is not a Failure"
         unless data?
-            throw new Error "Laboratory Error : `Failure()` was called without any `data`"
+            throw new TypeError "Unable to create Failure; no data provided"
 
         @request = String request
         @error = String data.error

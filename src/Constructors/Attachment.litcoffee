@@ -38,9 +38,9 @@ The `Attachment()` constructor takes a `data` object from an API response and re
     Laboratory.Attachment = Attachment = (data) ->
 
         unless this and this instanceof Attachment
-            throw new Error "Laboratory Error : `Attachment()` must be called as a constructor"
+            throw new TypeError "this is not an Attachment"
         unless data?
-            throw new Error "Laboratory Error : `Attachment()` was called without any `data`"
+            throw new TypeError "Unable to create Attachment; no data provided"
 
         @id = Number data.id
         @href = String data.url

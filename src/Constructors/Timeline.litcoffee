@@ -62,9 +62,9 @@ The `Timeline()` constructor takes a `data` object and uses it to construct a ti
     Laboratory.Timeline = Timeline = (data) ->
 
         unless this and this instanceof Timeline
-            throw new Error "Laboratory Error : `Timeline()` must be called as a constructor"
+            throw new TypeError "this is not a Timeline"
         unless data?
-            throw new Error "Laboratory Error : `Timeline()` was called without any `data`"
+            throw new TypeError "Unable to create Timeline; no data provided"
 
 Mastodon keeps track of ids for notifications separately from ids for posts, as best as I can tell, so we have to verify that our posts are of matching type before proceeding.
 Really all we care about is whether the posts are notifications, so that's all we test.

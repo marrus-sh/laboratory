@@ -44,7 +44,8 @@ The `Request()` constructor takes a number of arguments: the `method` for the re
 
 ####  Initial setup.
 
-        throw new TypeError "this is not a Request" unless this and this instanceof Request
+        unless this and this instanceof Request
+            throw new TypeError "this is not a Request"
 
 Our `response` starts out as `null`.
 `Request()` never actually sets the value of its instances' `response`; it's up to others to make that decree.
