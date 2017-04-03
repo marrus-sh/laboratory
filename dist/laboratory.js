@@ -1833,6 +1833,42 @@
         });
         return ProfileSetMute;
       })()
+    },
+    LetFollow: {
+      configurable: false,
+      enumerable: true,
+      writable: false,
+      value: (function() {
+        var ProfileLetFollow;
+        ProfileLetFollow = function(data) {
+          var profileID, ref, value;
+          if (!(this && this instanceof ProfileLetFollow)) {
+            throw new TypeError("this is not a ProfileLetFollow");
+          }
+          if (!((2e308 > (ref = (profileID = Math.floor(data != null ? data.id : void 0))) && ref > 0))) {
+            throw new TypeError("Unable to follow account; no id provided");
+          }
+          value = data.value ? !!data.value : true;
+          Request.call(this, "POST", Store.auth.origin + "/api/v1/follow_requests" + (value ? "/authorize" : "/reject"), {
+            id: profileID
+          }, Store.auth.accessToken, (function(_this) {
+            return function(result) {};
+          })(this));
+          return Object.freeze(this);
+        };
+        Object.defineProperty(ProfileLetFollow, "prototype", {
+          configurable: false,
+          enumerable: false,
+          writable: false,
+          value: Object.freeze(Object.create(Request.prototype, {
+            constructor: {
+              enumerable: false,
+              value: ProfileLetFollow
+            }
+          }))
+        });
+        return ProfileLetFollow;
+      })()
     }
   });
 

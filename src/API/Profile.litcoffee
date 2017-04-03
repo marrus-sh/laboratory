@@ -18,6 +18,7 @@ The __Profile__ module of the Laboratory API is comprised of those events which 
 | `Profile.SetFollow()` | Petitions the Mastodon server to follow or unfollow the provided account |
 | `Profile.SetBlock()` | Petitions the Mastodon server to block or unblock the provided account |
 | `Profile.SetMute()` | Petitions the Mastodon server to mute or unmute the provided account |
+| `Profile.LetFollow()` | Responds to a follow request |
 
 ####  Events.
 
@@ -70,16 +71,17 @@ A summary of these options is provided by the table below:
 >       followRequest = new Laboratory.Profile.SetFollow(data);
 >       blockRequest = new Laboratory.Profile.SetBlock(data);
 >       muteRequest = new Laboratory.Profile.SetMute(data);
+>       adjudicationRequest = new Laboratory.Profile.LetFollow(data);
 >   ```
 >
 >   - __API equivalent :__ `/api/v1/accounts/follow`, `/api/v1/accounts/unfollow`, `/api/v1/accounts/block`, `/api/v1/accounts/unblock`, `/api/v1/accounts/mute`, `/api/v1/accounts/unmute`
 >   - __Request parameters :__
 >       - __`id` :__ The id of the account to change the relationship of
->       - __`value` :__ A `Profile.Relationship` specifying the new relationship.
+>       - __`value` :__ Whether to follow/block/mute/authorize an account or not
 >   - __Response :__ A [`Profile`](../Constructors/Profile.litcoffee)
 
-`Profile.SetFollow()`, `Profile.SetBlock()`, and `Profile.SetMute()` can be used to modify the relationship status for an account.
-They should be fired with two parameters: `id`, which gives the id of the account, and `value`, which should indicate whether to follow/block/mute an account, or do the opposite.
+`Profile.SetFollow()`, `Profile.SetBlock()`, `Profile.SetMute()`, and `Profile.LetFollow()` can be used to modify the relationship status for an account.
+They should be fired with two parameters: `id`, which gives the id of the account, and `value`, which should indicate whether to follow/block/mute/authorize an account, or do the opposite.
 
  - - -
 
@@ -104,24 +106,24 @@ They should be fired with two parameters: `id`, which gives the id of the accoun
 >       if (event.detail.response.relationship & Laboratory.Profile.Relationship.FOLLOWING) success();
 >   }
 >
->   var request = new Laboratory.Profile.SetRelationship({
+>   var request = new Laboratory.Profile.SetFollow({
 >       id: someProfile.id,
->       value: someProfile.relationship & Laboratory.Profile.Relationship.FOLLOWING
+>       value: true
 >   });
 >   request.addEventListener("response", requestCallback);
 >   request.start();
 >   ```
 
-###  Unmuting a profile:
+###  Rejecting a follow request:
 
 >   ```javascript
 >   function requestCallback(event) {
->       if (event.detail.response.relationship & ~Laboratory.Profile.Relationship.MUTING) success();
+>       if (event.detail.response.relationship & ~Laboratory.Profile.Relationship.FOLLOWED_BY) success();
 >   }
 >
->   var request = new Laboratory.Profile.SetRelationship({
+>   var request = new Laboratory.Profile.LetFollow({
 >       id: someProfile.id,
->       value: someProfile.relationship & ~Laboratory.Profile.Relationship.MUTING
+>       value: false
 >   });
 >   request.addEventListener("response", requestCallback);
 >   request.start();
@@ -314,7 +316,7 @@ Our `Profile.SetBlock.prototype` just inherits from `Request`.
 
                 return ProfileSetBlock
 
-####  `Post.SetFollow`s.
+####  `Post.SetMute`s.
 
         SetMute:
             configurable: no
@@ -353,6 +355,49 @@ Our `Profile.SetMute.prototype` just inherits from `Request`.
                             value: ProfileSetMute
 
                 return ProfileSetMute
+
+####  `Post.LetFollow`s.
+
+        LetFollow:
+            configurable: no
+            enumerable: yes
+            writable: no
+            value: do ->
+
+                ProfileLetFollow = (data) ->
+
+                    unless this and this instanceof ProfileLetFollow
+                        throw new TypeError "this is not a ProfileLetFollow"
+                    unless Infinity > (profileID = Math.floor data?.id) > 0
+                        throw new TypeError "Unable to follow account; no id provided"
+                    value = if data.value then !!data.value else on
+
+`Profile.LetFollow()` is mostly just an API request.
+
+>   __Note :__
+>   Mastodon does not currently support returning the authorized/rejected account after responding to a follow request.
+
+                    Request.call this, "POST",
+                        Store.auth.origin + "/api/v1/follow_requests" + (
+                            if value then "/authorize" else "/reject"
+                        ), {id: profileID}, Store.auth.accessToken, (result) =>
+                            #  dispatch "LaboratoryProfileReceived", decree =>
+                                #  @response = police -> new Profile result
+
+                    Object.freeze this
+
+Our `Profile.LetFollow.prototype` just inherits from `Request`.
+
+                Object.defineProperty ProfileLetFollow, "prototype",
+                    configurable: no
+                    enumerable: no
+                    writable: no
+                    value: Object.freeze Object.create Request.prototype,
+                        constructor:
+                            enumerable: no
+                            value: ProfileLetFollow
+
+                return ProfileLetFollow
 
 ###  Creating the events:
 
