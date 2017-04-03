@@ -11,7 +11,8 @@ Instead, it makes this information available through the __Laboratory API,__ whi
 This page will provide the basics on the API and how it works, and then direct you to further resources for specific components.
 
 The Laboratory API is split up into two parts, both of which you will need a basic understanding of in order to use the script.
-These are the __Event API__ and the __Request API__, and we will cover each of these in turn.
+These are the __Event API__ and the __Request API__.
+Generally speaking, you will use the Event API to initialize your scripts and create Laboratory extensions, while you will use the Request API for making API requests and retreiving information.
 
 ###  Understanding the Event API:
 
