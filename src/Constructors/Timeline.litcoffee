@@ -9,33 +9,24 @@
 The `Timeline()` constructor creates a unique, read-only object which represents a Mastodon timeline.
 Its properties are summarized below, alongside their Mastodon API equivalents:
 
->   __[Issue #15](https://github.com/marrus-sh/laboratory/issues/15) :__
->   The object returned by this constructor might be radically different in future versions of Laboratory.
-
-| Property |  API Response  | Description |
-| :------: | :------------: | :---------- |
-| `posts`  | [The response] | An ordered array of posts in the timeline, in reverse-chronological order |
-|  `type`  | *Not provided* | A `Timeline.Type` |
-| `query`  | *Not provided* | The minimum id of posts in the timeline |
-| `length` | *Not provided* | The length of the timeline |
+| Property  |  API Response  | Description |
+| :-------: | :------------: | :---------- |
+|  `posts`  | [The response] | An ordered array of posts in the timeline, in reverse-chronological order |
+| `length`  | *Not provided* | The length of the timeline |
 
 ###  Timeline types:
 
 The possible `Timeline.Type`s are as follows:
 
->   __[Issue #16](https://github.com/marrus-sh/laboratory/issues/16) :__
->   Hashtag searches can also be global/local, so the values of these enumerals may change at some point in the future.
-
 | Enumeral | Hex Value | Description |
 | :------: | :----------: | :---------- |
 | `Timeline.Type.UNDEFINED` | `0x00` | No type is defined |
-| `Timeline.Type.HASHTAG` | `0x10` | A timeline of hashtags |
-| `Timeline.Type.LOCAL` | `0x11` | A local timeline |
-| `Timeline.Type.GLOBAL` | `0x12` | A global (whole-known-network) timeline |
-| `Timeline.Type.HOME` | `0x22` | A user's home timeline |
-| `Timeline.Type.NOTIFICATIONS` | `0x23` | A user's notifications |
-| `Timeline.Type.FAVOURITES` | `0x24` | A list of a user's favourites |
+| `Timeline.Type.PUBLIC` | `0x10` | A public timeline |
+| `Timeline.Type.HOME` | `0x20` | A user's home timeline |
+| `Timeline.Type.NOTIFICATIONS` | `0x21` | A user's notifications |
+| `Timeline.Type.FAVOURITES` | `0x22` | A list of a user's favourites |
 | `Timeline.Type.ACCOUNT` | `0x40` | A timeline of an account's posts |
+| `Timeline.Type.HASHTAG` | `0x80` | A hashtag search |
 
 ###  Prototype methods:
 
@@ -48,10 +39,6 @@ The possible `Timeline.Type`s are as follows:
 >   - __`data` :__ A `Post`, array of `Post`s, or a `Timeline`
 
 The `join()` prototype method joins the `Post`s of a timeline with that of the provided `data`, and returns a new `Timeline` of the results.
-When merging two `Timeline`s, the `type` and `query` parameters will only be preserved if they match across both; in this case, `before` and `after` will be adjusted such that both `Timeline`s are contained in the range.
-Otherwise, the `type` of the resultant `Timeline` will be `Timeline.Type.UNDEFINED` and its `query` will be the empty string.
-
-When joining a `Timeline` with a different data type, the `type`, `query`, `before`, and `after` parameters remain unchanged.
 
 ####  `remove()`.
 
@@ -62,7 +49,6 @@ When joining a `Timeline` with a different data type, the `type`, `query`, `befo
 >   - __`data` :__ A `Post`, array of `Post`s, or a `Timeline`
 
 The `remove()` prototype method collects the `Post`s of a timeline except for those of the provided `data`, and returns a new `Timeline` of the results.
-The `type`, `query`, `before`, and `after` parameters are preserved from the original.
 
  - - -
 
@@ -72,21 +58,13 @@ The `type`, `query`, `before`, and `after` parameters are preserved from the ori
 
 The `Timeline()` constructor takes a `data` object and uses it to construct a timeline.
 `data` can be either an API response or an array of `Post`s.
-`params` provides additional information not given in `data`.
 
-    Laboratory.Timeline = Timeline = (data, params) ->
+    Laboratory.Timeline = Timeline = (data) ->
 
         unless this and this instanceof Timeline
             throw new Error "Laboratory Error : `Timeline()` must be called as a constructor"
         unless data?
             throw new Error "Laboratory Error : `Timeline()` was called without any `data`"
-
-This loads our `params`.
-
-        @type =
-            if params.type instanceof Timeline.Type then params.type
-            else Timeline.Type.UNDEFINED
-        @query = String params.query
 
 Mastodon keeps track of ids for notifications separately from ids for posts, as best as I can tell, so we have to verify that our posts are of matching type before proceeding.
 Really all we care about is whether the posts are notifications, so that's all we test.
@@ -173,30 +151,7 @@ We don't have to worry about duplicates here because the `Timeline()` constructo
                     when data instanceof Timeline then data.posts
                     else data
                 combined.push post for post in @posts
-                return new Timeline combined, (
-                    if data instanceof Timeline
-                        if data.type is @type and data.query is @query
-                            type: @type
-                            query: @query
-                            before: switch
-                                when data.before >= @before then data.before
-                                when data.before <= @before then @before
-                                else undefined
-                            after: switch
-                                when data.after <= @after then data.after
-                                when data.after >= @after then @after
-                                else undefined
-                        else
-                            type: if data.type is @type then @type else Timeline.Type.UNDEFINED
-                            query: ""
-                            before: undefined
-                            after: undefined
-                    else
-                        type: @type
-                        query: @query
-                        before: @before
-                        after: @after
-                )
+                return new Timeline combined
 
 ####  `remove()`.
 
@@ -213,25 +168,17 @@ Its `data` argument can be either a `Post`, an array thereof, or a `Timeline`.
                         when data instanceof Timeline then data.posts
                         else data
                 ) when (index = redacted.indexOf post) isnt -1
-                return new Timeline redacted,
-                    type: @type
-                    query: @query
-                    before: @before
-                    after: @after
+                return new Timeline redacted
 
 ###  Defining timeline types:
 
 Here we define our `Timeline.Type`s, as described above:
 
->   __[Issue #16](https://github.com/marrus-sh/laboratory/issues/16) :__
->   Hashtag searches can also be global/local, so the values of these enumerals may change at some point in the future.
-
     Timeline.Type = Enumeral.generate
         UNDEFINED     : 0x00
-        HASHTAG       : 0x10
-        LOCAL         : 0x11
-        GLOBAL        : 0x12
-        HOME          : 0x22
-        NOTIFICATIONS : 0x23
-        FAVOURITES    : 0x24
+        PUBLIC        : 0x10
+        HOME          : 0x20
+        NOTIFICATIONS : 0x21
+        FAVOURITES    : 0x22
         ACCOUNT       : 0x40
+        HASHTAG       : 0x80

@@ -1363,17 +1363,10 @@ You'll note that `Request.prototype.constructor` gives our dummy constructor, no
 The `Rolodex()` constructor creates a unique, read-only object which represents a list of [`Profile`](Profile.litcoffee)s.
 Its properties are summarized below, alongside their Mastodon API equivalents:
 
->   __[Issue #15](https://github.com/marrus-sh/laboratory/issues/15) :__
->   The object returned by this constructor might be radically different in future versions of Laboratory.
-
 |  Property  |  API Response  | Description |
 | :--------: | :------------: | :---------- |
 | `profiles` | [The response] | An ordered array of profiles, in reverse-chronological order |
-|   `type`   | *Not provided* | A `Rolodex.Type` |
-|  `query`   | *Not provided* | The query associated with the `Rolodex` |
 |  `length`  | *Not provided* | The length of the `Rolodex` |
-
-Note that `before` and `after` are special identifiers which may depend on the `Rolodex.Type`.
 
 ###  Rolodex types:
 
@@ -1405,10 +1398,6 @@ The possible `Rolodex.Type`s are as follows:
 >   - __`data` :__ A `Profile`, array of `Profile`s, or a `Rolodex`
 
 The `join()` prototype method joins the `Profile`s of a `Rolodex` with that of the provided `data`, and returns a new `Rolodex` of the results.
-When merging two `Rolodex`es, the `type` and `query` parameters will only be preserved if they match across both; in this case, `before` and `after` will be adjusted such that both `Rolodex`es are contained in the range.
-Otherwise, the `type` of the resultant `Rolodex` will be `Rolodex.Type.UNDEFINED` and its `query` will be the empty string.
-
-When joining a `Rolodex` with a different data type, the `type`, `query`, `before`, and `after` parameters remain unchanged.
 
 ####  `remove()`.
 
@@ -1419,7 +1408,6 @@ When joining a `Rolodex` with a different data type, the `type`, `query`, `befor
 >   - __`data` :__ A `Profile`, array of `Profile`s, or a `Rolodex`
 
 The `remove()` prototype method collects the `Profile`s of a `Rolodex` except for those of the provided `data`, and returns a new `Rolodex` of the results.
-The `type`, `query`, `before`, and `after` parameters are preserved from the original.
 
  - - -
 
@@ -1429,20 +1417,13 @@ The `type`, `query`, `before`, and `after` parameters are preserved from the ori
 
 The `Rolodex()` constructor takes a `data` object and uses it to construct a rolodex.
 `data` can be either an API response or an array of `Profile`s.
-`params` provides additional information not given in `data`.
 
-    Laboratory.Rolodex = Rolodex = (data, params) ->
+    Laboratory.Rolodex = Rolodex = (data) ->
 
         unless this and this instanceof Rolodex
             throw new Error "Laboratory Error : `Rolodex()` must be called as a constructor"
         unless data?
             throw new Error "Laboratory Error : `Rolodex()` was called without any `data`"
-
-This loads our `params`.
-
-        @type =
-            if params.type instanceof Rolodex.Type then params.type else Rolodex.Type.UNDEFINED
-        @query = String params.query
 
 We'll use the `getProfile()` function in our profile getters.
 
@@ -1500,30 +1481,7 @@ We don't have to worry about duplicates here because the `Rolodex()` constructor
                     when data instanceof Rolodex then data.profiles
                     else data
                 combined.push profile for profile in @profiles
-                return new Rolodex combined, (
-                    if data instanceof Rolodex
-                        if data.type is @type and data.query is @query
-                            type: @type
-                            query: @query
-                            before: switch
-                                when data.before >= @before then data.before
-                                when data.before <= @before then @before
-                                else undefined
-                            after: switch
-                                when data.after <= @after then data.after
-                                when data.after >= @after then @after
-                                else undefined
-                        else
-                            type: if data.type is @type then @type else Rolodex.Type.UNDEFINED
-                            query: ""
-                            before: undefined
-                            after: undefined
-                    else
-                        type: @type
-                        query: @query
-                        before: @before
-                        after: @after
-                )
+                return new Rolodex combined
 
 ####  `remove()`.
 
@@ -1540,11 +1498,7 @@ Its `data` argument can be either a `Profile`, an array thereof, or a `Rolodex`.
                         when data instanceof Rolodex then data.profiles
                         else data
                 ) when (index = redacted.indexOf profile) isnt -1
-                return new Rolodex redacted,
-                    type: @type
-                    query: @query
-                    before: @before
-                    after: @after
+                return new Rolodex redacted
 
 ###  Defining rolodex types:
 
@@ -1578,33 +1532,24 @@ Here we define our `Rolodex.Type`s, as described above:
 The `Timeline()` constructor creates a unique, read-only object which represents a Mastodon timeline.
 Its properties are summarized below, alongside their Mastodon API equivalents:
 
->   __[Issue #15](https://github.com/marrus-sh/laboratory/issues/15) :__
->   The object returned by this constructor might be radically different in future versions of Laboratory.
-
-| Property |  API Response  | Description |
-| :------: | :------------: | :---------- |
-| `posts`  | [The response] | An ordered array of posts in the timeline, in reverse-chronological order |
-|  `type`  | *Not provided* | A `Timeline.Type` |
-| `query`  | *Not provided* | The minimum id of posts in the timeline |
-| `length` | *Not provided* | The length of the timeline |
+| Property  |  API Response  | Description |
+| :-------: | :------------: | :---------- |
+|  `posts`  | [The response] | An ordered array of posts in the timeline, in reverse-chronological order |
+| `length`  | *Not provided* | The length of the timeline |
 
 ###  Timeline types:
 
 The possible `Timeline.Type`s are as follows:
 
->   __[Issue #16](https://github.com/marrus-sh/laboratory/issues/16) :__
->   Hashtag searches can also be global/local, so the values of these enumerals may change at some point in the future.
-
 | Enumeral | Hex Value | Description |
 | :------: | :----------: | :---------- |
 | `Timeline.Type.UNDEFINED` | `0x00` | No type is defined |
-| `Timeline.Type.HASHTAG` | `0x10` | A timeline of hashtags |
-| `Timeline.Type.LOCAL` | `0x11` | A local timeline |
-| `Timeline.Type.GLOBAL` | `0x12` | A global (whole-known-network) timeline |
-| `Timeline.Type.HOME` | `0x22` | A user's home timeline |
-| `Timeline.Type.NOTIFICATIONS` | `0x23` | A user's notifications |
-| `Timeline.Type.FAVOURITES` | `0x24` | A list of a user's favourites |
+| `Timeline.Type.PUBLIC` | `0x10` | A public timeline |
+| `Timeline.Type.HOME` | `0x20` | A user's home timeline |
+| `Timeline.Type.NOTIFICATIONS` | `0x21` | A user's notifications |
+| `Timeline.Type.FAVOURITES` | `0x22` | A list of a user's favourites |
 | `Timeline.Type.ACCOUNT` | `0x40` | A timeline of an account's posts |
+| `Timeline.Type.HASHTAG` | `0x80` | A hashtag search |
 
 ###  Prototype methods:
 
@@ -1617,10 +1562,6 @@ The possible `Timeline.Type`s are as follows:
 >   - __`data` :__ A `Post`, array of `Post`s, or a `Timeline`
 
 The `join()` prototype method joins the `Post`s of a timeline with that of the provided `data`, and returns a new `Timeline` of the results.
-When merging two `Timeline`s, the `type` and `query` parameters will only be preserved if they match across both; in this case, `before` and `after` will be adjusted such that both `Timeline`s are contained in the range.
-Otherwise, the `type` of the resultant `Timeline` will be `Timeline.Type.UNDEFINED` and its `query` will be the empty string.
-
-When joining a `Timeline` with a different data type, the `type`, `query`, `before`, and `after` parameters remain unchanged.
 
 ####  `remove()`.
 
@@ -1631,7 +1572,6 @@ When joining a `Timeline` with a different data type, the `type`, `query`, `befo
 >   - __`data` :__ A `Post`, array of `Post`s, or a `Timeline`
 
 The `remove()` prototype method collects the `Post`s of a timeline except for those of the provided `data`, and returns a new `Timeline` of the results.
-The `type`, `query`, `before`, and `after` parameters are preserved from the original.
 
  - - -
 
@@ -1641,21 +1581,13 @@ The `type`, `query`, `before`, and `after` parameters are preserved from the ori
 
 The `Timeline()` constructor takes a `data` object and uses it to construct a timeline.
 `data` can be either an API response or an array of `Post`s.
-`params` provides additional information not given in `data`.
 
-    Laboratory.Timeline = Timeline = (data, params) ->
+    Laboratory.Timeline = Timeline = (data) ->
 
         unless this and this instanceof Timeline
             throw new Error "Laboratory Error : `Timeline()` must be called as a constructor"
         unless data?
             throw new Error "Laboratory Error : `Timeline()` was called without any `data`"
-
-This loads our `params`.
-
-        @type =
-            if params.type instanceof Timeline.Type then params.type
-            else Timeline.Type.UNDEFINED
-        @query = String params.query
 
 Mastodon keeps track of ids for notifications separately from ids for posts, as best as I can tell, so we have to verify that our posts are of matching type before proceeding.
 Really all we care about is whether the posts are notifications, so that's all we test.
@@ -1742,30 +1674,7 @@ We don't have to worry about duplicates here because the `Timeline()` constructo
                     when data instanceof Timeline then data.posts
                     else data
                 combined.push post for post in @posts
-                return new Timeline combined, (
-                    if data instanceof Timeline
-                        if data.type is @type and data.query is @query
-                            type: @type
-                            query: @query
-                            before: switch
-                                when data.before >= @before then data.before
-                                when data.before <= @before then @before
-                                else undefined
-                            after: switch
-                                when data.after <= @after then data.after
-                                when data.after >= @after then @after
-                                else undefined
-                        else
-                            type: if data.type is @type then @type else Timeline.Type.UNDEFINED
-                            query: ""
-                            before: undefined
-                            after: undefined
-                    else
-                        type: @type
-                        query: @query
-                        before: @before
-                        after: @after
-                )
+                return new Timeline combined
 
 ####  `remove()`.
 
@@ -1782,28 +1691,20 @@ Its `data` argument can be either a `Post`, an array thereof, or a `Timeline`.
                         when data instanceof Timeline then data.posts
                         else data
                 ) when (index = redacted.indexOf post) isnt -1
-                return new Timeline redacted,
-                    type: @type
-                    query: @query
-                    before: @before
-                    after: @after
+                return new Timeline redacted
 
 ###  Defining timeline types:
 
 Here we define our `Timeline.Type`s, as described above:
 
->   __[Issue #16](https://github.com/marrus-sh/laboratory/issues/16) :__
->   Hashtag searches can also be global/local, so the values of these enumerals may change at some point in the future.
-
     Timeline.Type = Enumeral.generate
         UNDEFINED     : 0x00
-        HASHTAG       : 0x10
-        LOCAL         : 0x11
-        GLOBAL        : 0x12
-        HOME          : 0x22
-        NOTIFICATIONS : 0x23
-        FAVOURITES    : 0x24
+        PUBLIC        : 0x10
+        HOME          : 0x20
+        NOTIFICATIONS : 0x21
+        FAVOURITES    : 0x22
         ACCOUNT       : 0x40
+        HASHTAG       : 0x80
 
 
 - - -
@@ -3855,7 +3756,7 @@ Note that `Request()` ignores data parameters which have a value of `undefined` 
                         for account in result when account.id not in ids
                             ids.push account.id
                             dispatch "LaboratoryProfileReceived", new Profile account
-                        decree => @response = police -> new Rolodex result, data
+                        decree => @response = police -> new Rolodex result
 
                 Object.defineProperties this,
                     before:
@@ -3866,17 +3767,16 @@ Note that `Request()` ignores data parameters which have a value of `undefined` 
                         get: -> after
                     prev:
                         enumerable: no
-                        value: -> return new RolodexRequest data, undefined, before
+                        value: -> return new RolodexRequest {type, query, limit}, undefined, before
                     next:
                         enumerable: no
-                        value: -> return new RolodexRequest data, after
+                        value: -> return new RolodexRequest {type, query, limit}, after
                     loadMore:
                         enumerable: no
                         value: =>
                             callback = (event) =>
                                 after = next.after
-                                decree => @response = police ->
-                                    @response.join new Rolodex next.response
+                                decree => @response = police -> @response.join next.response
                                 next.removeEventListener "response", callback
                             (next = do @next).addEventListener "response", callback
                             do next.start
@@ -3885,14 +3785,13 @@ Note that `Request()` ignores data parameters which have a value of `undefined` 
                         value: (keepGoing) =>
                             callback = (event) =>
                                 before = prev.before
-                                result = new Rolodex prev.response
-                                decree => @response = police -> @response.join result
+                                decree => @response = police -> @response.join prev.response
                                 prev.removeEventListener "response", callback
-                                if keepGoing and result.length
-                                    (next = do @next).addEventListener "response", callback
-                                    do next.start
-                            (next = do @next).addEventListener "response", callback
-                            do next.start
+                                if keepGoing and prev.response.length
+                                    (prev = do @prev).addEventListener "response", callback
+                                    do prev.start
+                            (prev = do @prev).addEventListener "response", callback
+                            do prev.start
 
                 Object.freeze this
 
@@ -3953,7 +3852,7 @@ The __Timeline__ module of the Laboratory API is comprised of those requests whi
 >   - __Request parameters :__
 >       - __`type` :__ The [`Timeline.Type`](../Constructors/Timeline.litcoffee) of the `Timeline`
 >       - __`query` :__ The associated query
->       - __`limit` :__ The number of accounts to show (for searches only)
+>       - __`isLocal` :__ Whether to exclude federated posts (default: `false`)
 >   - __Response :__ A [`Timeline`](../Constructors/Timeline.litcoffee)
 
 Laboratory Rolodex events are used to request [`Timeline`](../Constructors/Timeline.litcoffee)s of accounts according to the specified `type` and `query`.
@@ -4073,6 +3972,7 @@ First, we handle our `data`.
                     type isnt Timeline.Type.UNDEFINED
                         throw new TypeError "Unable to request rolodex; no type provided"
                 query = if data.query? then String data.query else undefined
+                isLocal = !!data.isLocal
                 limit =
                     if Infinity > data.limit > 0 then Math.floor data.limit else undefined
 
@@ -4097,7 +3997,7 @@ Note that `Request()` ignores data parameters which have a value of `undefined` 
                             else "/api/v1"
                     ), (
                         switch type
-                            when Timeline.Type.LOCAL
+                            when isLocal
                                 local: yes
                                 max_id: before
                                 since_id: after
@@ -4131,7 +4031,7 @@ Note that `Request()` ignores data parameters which have a value of `undefined` 
                         for mention in mentions when mention.id not in acctIDs and
                             not Store.profiles[mention.id]?
                                 dispatch "LaboratoryProfileReceived", new Profile mention
-                        decree => @response = police -> new Timeline result, data
+                        decree => @response = police -> new Timeline result
 
                 Object.defineProperties this,
                     before:
@@ -4142,17 +4042,16 @@ Note that `Request()` ignores data parameters which have a value of `undefined` 
                         get: -> after
                     prev:
                         enumerable: no
-                        value: -> return new TimelineRequest data, undefined, before
+                        value: -> return new TimelineRequest {type, query, isLocal}, undefined, before
                     next:
                         enumerable: no
-                        value: -> return new TimelineRequest data, after
+                        value: -> return new TimelineRequest {type, query, isLocal}, after
                     loadMore:
                         enumerable: no
                         value: =>
                             callback = (event) =>
                                 after = next.after
-                                decree => @response = police ->
-                                    @response.join new Timeline next.response
+                                decree => @response = police -> @response.join next.response
                                 next.removeEventListener "response", callback
                             (next = do @next).addEventListener "response", callback
                             do next.start
@@ -4161,14 +4060,13 @@ Note that `Request()` ignores data parameters which have a value of `undefined` 
                         value: (keepGoing) =>
                             callback = (event) =>
                                 before = prev.before
-                                result = new Timeline prev.response
-                                decree => @response = police -> @response.join result
+                                decree => @response = police -> @response.join prev.response
                                 prev.removeEventListener "response", callback
-                                if keepGoing and result.length
-                                    (next = do @next).addEventListener "response", callback
-                                    do next.start
-                            (next = do @next).addEventListener "response", callback
-                            do next.start
+                                if keepGoing and prev.response.length
+                                    (prev = do @prev).addEventListener "response", callback
+                                    do prev.start
+                            (prev = do @prev).addEventListener "response", callback
+                            do prev.start
 
                 Object.freeze this
 

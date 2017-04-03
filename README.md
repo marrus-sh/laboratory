@@ -61,8 +61,6 @@ If your system doesn't support these features, you should still be able to safel
 
 >  Current version: *0.4.0*
 
-###  Requests
-
 | Mastodon API | Request |
 | ------------ | ------- |
 | [__Initialization__](src/API/Initialization.litcoffee) |  |
@@ -77,7 +75,7 @@ If your system doesn't support these features, you should still be able to safel
 | `/api/v1/accounts/block`, `/api/v1/accounts/unblock` | `Laboratory.Profile.SetBlock()` |
 | `/api/v1/accounts/mute`, `/api/v1/accounts/unmute` | `Laboratory.Profile.SetMute()` |
 | [__Rolodex__](src/API/Rolodex.litcoffee) |  |
-| `/api/v1/accounts/search`, `/api/v1/accounts/:id/followers`, `/api/v1/accounts/:id/following`, `/api/v1/statuses/:id/reblogged_by`, `/api/v1/statuses/:id/favourited_by`, `/api/v1/blocks` | `Laboratory.Rolodex.Request()` |
+| `/api/v1/accounts/search`, `/api/v1/accounts/:id/followers`, `/api/v1/accounts/:id/following`, `/api/v1/statuses/:id/reblogged_by`, `/api/v1/statuses/:id/favourited_by`, `/api/v1/blocks`, `/api/v1/follow_requests` | `Laboratory.Rolodex.Request()` |
 | [__Attachment__](src/API/Attachment.litcoffee) |  |
 | `/api/v1/media` | `Laboratory.Attachment.Request()` |
 | [__Post__](src/Events/Post.litcoffee) |  |

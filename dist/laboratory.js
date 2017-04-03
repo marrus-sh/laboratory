@@ -686,7 +686,7 @@
     value: Request.prototype
   });
 
-  Laboratory.Rolodex = Rolodex = function(data, params) {
+  Laboratory.Rolodex = Rolodex = function(data) {
     var current, currentID, getProfile, i, index, j, len, prev, ref, value;
     if (!(this && this instanceof Rolodex)) {
       throw new Error("Laboratory Error : `Rolodex()` must be called as a constructor");
@@ -694,8 +694,6 @@
     if (data == null) {
       throw new Error("Laboratory Error : `Rolodex()` was called without any `data`");
     }
-    this.type = params.type instanceof Rolodex.Type ? params.type : Rolodex.Type.UNDEFINED;
-    this.query = String(params.query);
     getProfile = function(id) {
       return Store.profiles[id];
     };
@@ -750,40 +748,7 @@
           profile = ref1[j];
           combined.push(profile);
         }
-        return new Rolodex(combined, (data instanceof Rolodex ? data.type === this.type && data.query === this.query ? {
-          type: this.type,
-          query: this.query,
-          before: (function() {
-            switch (false) {
-              case !(data.before >= this.before):
-                return data.before;
-              case !(data.before <= this.before):
-                return this.before;
-              default:
-                return void 0;
-            }
-          }).call(this),
-          after: (function() {
-            switch (false) {
-              case !(data.after <= this.after):
-                return data.after;
-              case !(data.after >= this.after):
-                return this.after;
-              default:
-                return void 0;
-            }
-          }).call(this)
-        } : {
-          type: data.type === this.type ? this.type : Rolodex.Type.UNDEFINED,
-          query: "",
-          before: void 0,
-          after: void 0
-        } : {
-          type: this.type,
-          query: this.query,
-          before: this.before,
-          after: this.after
-        }));
+        return new Rolodex(combined);
       },
       remove: function(data) {
         var i, index, len, profile, redacted, ref;
@@ -816,12 +781,7 @@
             redacted.splice(index, 1);
           }
         }
-        return new Rolodex(redacted, {
-          type: this.type,
-          query: this.query,
-          before: this.before,
-          after: this.after
-        });
+        return new Rolodex(redacted);
       }
     })
   });
@@ -838,7 +798,7 @@
     FOLLOW_REQUESTS: 0x86
   });
 
-  Laboratory.Timeline = Timeline = function(data, params) {
+  Laboratory.Timeline = Timeline = function(data) {
     var current, currentID, getPost, i, index, isNotification, j, len, prev, ref, value;
     if (!(this && this instanceof Timeline)) {
       throw new Error("Laboratory Error : `Timeline()` must be called as a constructor");
@@ -846,8 +806,6 @@
     if (data == null) {
       throw new Error("Laboratory Error : `Timeline()` was called without any `data`");
     }
-    this.type = params.type instanceof Timeline.Type ? params.type : Timeline.Type.UNDEFINED;
-    this.query = String(params.query);
     isNotification = function(object) {
       return !!(((function() {
         switch (false) {
@@ -923,40 +881,7 @@
           post = ref1[j];
           combined.push(post);
         }
-        return new Timeline(combined, (data instanceof Timeline ? data.type === this.type && data.query === this.query ? {
-          type: this.type,
-          query: this.query,
-          before: (function() {
-            switch (false) {
-              case !(data.before >= this.before):
-                return data.before;
-              case !(data.before <= this.before):
-                return this.before;
-              default:
-                return void 0;
-            }
-          }).call(this),
-          after: (function() {
-            switch (false) {
-              case !(data.after <= this.after):
-                return data.after;
-              case !(data.after >= this.after):
-                return this.after;
-              default:
-                return void 0;
-            }
-          }).call(this)
-        } : {
-          type: data.type === this.type ? this.type : Timeline.Type.UNDEFINED,
-          query: "",
-          before: void 0,
-          after: void 0
-        } : {
-          type: this.type,
-          query: this.query,
-          before: this.before,
-          after: this.after
-        }));
+        return new Timeline(combined);
       },
       remove: function(data) {
         var i, index, len, post, redacted, ref;
@@ -989,25 +914,19 @@
             redacted.splice(index, 1);
           }
         }
-        return new Timeline(redacted, {
-          type: this.type,
-          query: this.query,
-          before: this.before,
-          after: this.after
-        });
+        return new Timeline(redacted);
       }
     })
   });
 
   Timeline.Type = Enumeral.generate({
     UNDEFINED: 0x00,
-    HASHTAG: 0x10,
-    LOCAL: 0x11,
-    GLOBAL: 0x12,
-    HOME: 0x22,
-    NOTIFICATIONS: 0x23,
-    FAVOURITES: 0x24,
-    ACCOUNT: 0x40
+    PUBLIC: 0x10,
+    HOME: 0x20,
+    NOTIFICATIONS: 0x21,
+    FAVOURITES: 0x22,
+    ACCOUNT: 0x40,
+    HASHTAG: 0x80
   });
 
   LaboratoryEvent = {
@@ -1992,7 +1911,7 @@
             }
             return decree(function() {
               return _this.response = police(function() {
-                return new Rolodex(result, data);
+                return new Rolodex(result);
               });
             });
           };
@@ -2013,13 +1932,21 @@
           prev: {
             enumerable: false,
             value: function() {
-              return new RolodexRequest(data, void 0, before);
+              return new RolodexRequest({
+                type: type,
+                query: query,
+                limit: limit
+              }, void 0, before);
             }
           },
           next: {
             enumerable: false,
             value: function() {
-              return new RolodexRequest(data, after);
+              return new RolodexRequest({
+                type: type,
+                query: query,
+                limit: limit
+              }, after);
             }
           },
           loadMore: {
@@ -2031,7 +1958,7 @@
                   after = next.after;
                   decree(function() {
                     return _this.response = police(function() {
-                      return this.response.join(new Rolodex(next.response));
+                      return this.response.join(next.response);
                     });
                   });
                   return next.removeEventListener("response", callback);
@@ -2045,24 +1972,23 @@
             enumerable: false,
             value: (function(_this) {
               return function(keepGoing) {
-                var callback, next;
+                var callback, prev;
                 callback = function(event) {
-                  var next, result;
+                  var prev;
                   before = prev.before;
-                  result = new Rolodex(prev.response);
                   decree(function() {
                     return _this.response = police(function() {
-                      return this.response.join(result);
+                      return this.response.join(prev.response);
                     });
                   });
                   prev.removeEventListener("response", callback);
-                  if (keepGoing && result.length) {
-                    (next = _this.next()).addEventListener("response", callback);
-                    return next.start();
+                  if (keepGoing && prev.response.length) {
+                    (prev = _this.prev()).addEventListener("response", callback);
+                    return prev.start();
                   }
                 };
-                (next = _this.next()).addEventListener("response", callback);
-                return next.start();
+                (prev = _this.prev()).addEventListener("response", callback);
+                return prev.start();
               };
             })(this)
           }
@@ -2107,7 +2033,7 @@
     value: (function() {
       var TimelineRequest;
       TimelineRequest = function(data, before, after) {
-        var limit, query, ref, type;
+        var isLocal, limit, query, ref, type;
         if (!(this && this instanceof TimelineRequest)) {
           throw new TypeError("this is not a TimelineRequest");
         }
@@ -2115,6 +2041,7 @@
           throw new TypeError("Unable to request rolodex; no type provided");
         }
         query = data.query != null ? String(data.query) : void 0;
+        isLocal = !!data.isLocal;
         limit = (2e308 > (ref = data.limit) && ref > 0) ? Math.floor(data.limit) : void 0;
         before = void 0;
         after = void 0;
@@ -2139,7 +2066,7 @@
           }
         })()), ((function() {
           switch (type) {
-            case Timeline.Type.LOCAL:
+            case isLocal:
               return {
                 local: true,
                 max_id: before,
@@ -2195,7 +2122,7 @@
             }
             return decree(function() {
               return _this.response = police(function() {
-                return new Timeline(result, data);
+                return new Timeline(result);
               });
             });
           };
@@ -2216,13 +2143,21 @@
           prev: {
             enumerable: false,
             value: function() {
-              return new TimelineRequest(data, void 0, before);
+              return new TimelineRequest({
+                type: type,
+                query: query,
+                isLocal: isLocal
+              }, void 0, before);
             }
           },
           next: {
             enumerable: false,
             value: function() {
-              return new TimelineRequest(data, after);
+              return new TimelineRequest({
+                type: type,
+                query: query,
+                isLocal: isLocal
+              }, after);
             }
           },
           loadMore: {
@@ -2234,7 +2169,7 @@
                   after = next.after;
                   decree(function() {
                     return _this.response = police(function() {
-                      return this.response.join(new Timeline(next.response));
+                      return this.response.join(next.response);
                     });
                   });
                   return next.removeEventListener("response", callback);
@@ -2248,24 +2183,23 @@
             enumerable: false,
             value: (function(_this) {
               return function(keepGoing) {
-                var callback, next;
+                var callback, prev;
                 callback = function(event) {
-                  var next, result;
+                  var prev;
                   before = prev.before;
-                  result = new Timeline(prev.response);
                   decree(function() {
                     return _this.response = police(function() {
-                      return this.response.join(result);
+                      return this.response.join(prev.response);
                     });
                   });
                   prev.removeEventListener("response", callback);
-                  if (keepGoing && result.length) {
-                    (next = _this.next()).addEventListener("response", callback);
-                    return next.start();
+                  if (keepGoing && prev.response.length) {
+                    (prev = _this.prev()).addEventListener("response", callback);
+                    return prev.start();
                   }
                 };
-                (next = _this.next()).addEventListener("response", callback);
-                return next.start();
+                (prev = _this.prev()).addEventListener("response", callback);
+                return prev.start();
               };
             })(this)
           }

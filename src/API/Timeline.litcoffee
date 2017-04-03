@@ -27,7 +27,7 @@ The __Timeline__ module of the Laboratory API is comprised of those requests whi
 >   - __Request parameters :__
 >       - __`type` :__ The [`Timeline.Type`](../Constructors/Timeline.litcoffee) of the `Timeline`
 >       - __`query` :__ The associated query
->       - __`limit` :__ The number of accounts to show (for searches only)
+>       - __`isLocal` :__ Whether to exclude federated posts (default: `false`)
 >   - __Response :__ A [`Timeline`](../Constructors/Timeline.litcoffee)
 
 Laboratory Rolodex events are used to request [`Timeline`](../Constructors/Timeline.litcoffee)s of accounts according to the specified `type` and `query`.
@@ -147,6 +147,7 @@ First, we handle our `data`.
                     type isnt Timeline.Type.UNDEFINED
                         throw new TypeError "Unable to request rolodex; no type provided"
                 query = if data.query? then String data.query else undefined
+                isLocal = !!data.isLocal
                 limit =
                     if Infinity > data.limit > 0 then Math.floor data.limit else undefined
 
@@ -171,7 +172,7 @@ Note that `Request()` ignores data parameters which have a value of `undefined` 
                             else "/api/v1"
                     ), (
                         switch type
-                            when Timeline.Type.LOCAL
+                            when isLocal
                                 local: yes
                                 max_id: before
                                 since_id: after
@@ -205,7 +206,7 @@ Note that `Request()` ignores data parameters which have a value of `undefined` 
                         for mention in mentions when mention.id not in acctIDs and
                             not Store.profiles[mention.id]?
                                 dispatch "LaboratoryProfileReceived", new Profile mention
-                        decree => @response = police -> new Timeline result, data
+                        decree => @response = police -> new Timeline result
 
                 Object.defineProperties this,
                     before:
@@ -216,17 +217,16 @@ Note that `Request()` ignores data parameters which have a value of `undefined` 
                         get: -> after
                     prev:
                         enumerable: no
-                        value: -> return new TimelineRequest data, undefined, before
+                        value: -> return new TimelineRequest {type, query, isLocal}, undefined, before
                     next:
                         enumerable: no
-                        value: -> return new TimelineRequest data, after
+                        value: -> return new TimelineRequest {type, query, isLocal}, after
                     loadMore:
                         enumerable: no
                         value: =>
                             callback = (event) =>
                                 after = next.after
-                                decree => @response = police ->
-                                    @response.join new Timeline next.response
+                                decree => @response = police -> @response.join next.response
                                 next.removeEventListener "response", callback
                             (next = do @next).addEventListener "response", callback
                             do next.start
@@ -235,14 +235,13 @@ Note that `Request()` ignores data parameters which have a value of `undefined` 
                         value: (keepGoing) =>
                             callback = (event) =>
                                 before = prev.before
-                                result = new Timeline prev.response
-                                decree => @response = police -> @response.join result
+                                decree => @response = police -> @response.join prev.response
                                 prev.removeEventListener "response", callback
-                                if keepGoing and result.length
-                                    (next = do @next).addEventListener "response", callback
-                                    do next.start
-                            (next = do @next).addEventListener "response", callback
-                            do next.start
+                                if keepGoing and prev.response.length
+                                    (prev = do @prev).addEventListener "response", callback
+                                    do prev.start
+                            (prev = do @prev).addEventListener "response", callback
+                            do prev.start
 
                 Object.freeze this
 

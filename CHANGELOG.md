@@ -11,15 +11,18 @@
 + Added documentation for currently-open [GitHub Issues](https://github.com/marrus-sh/laboratory/issues) ([#14](https://github.com/marrus-sh/laboratory/issues/14))
 + Added a new Request API to make interacting with Laboratory substantially easier and less alien to those not used to event-based operations ([#15](https://github.com/marrus-sh/laboratory/issues/15))
 + Laboratory can now retrieve a list of follow requests ([#18](https://github.com/marrus-sh/laboratory/issues/18))
++ Support for local hashtag searches ([#16](https://github.com/marrus-sh/laboratory/issues/16))
 
 #####  CHANGED
 
 * Fixed [Issue #34](https://github.com/marrus-sh/laboratory/issues/3), where Laboratory used `localStorage` for things where it didn't need to
+* The numeric values associated with the `Timeline.Type`s have changed
 
 #####  REMOVED
 
 - Request events and Failure events have been removed, as these features are now provided by the Request API
 - `LaboratoryTimelineReceived` and `LaboratoryRolodexReceived` events have been removed, and the Event API now only concerns those data types which directly impact the store
+- `Timeline`s and `Rolodex`es no longer have `type`, `query`, `before` or `after` properties, as these are made available on their parent requests
 
  - - -
 

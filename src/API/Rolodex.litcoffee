@@ -191,7 +191,7 @@ Note that `Request()` ignores data parameters which have a value of `undefined` 
                         for account in result when account.id not in ids
                             ids.push account.id
                             dispatch "LaboratoryProfileReceived", new Profile account
-                        decree => @response = police -> new Rolodex result, data
+                        decree => @response = police -> new Rolodex result
 
                 Object.defineProperties this,
                     before:
@@ -202,17 +202,16 @@ Note that `Request()` ignores data parameters which have a value of `undefined` 
                         get: -> after
                     prev:
                         enumerable: no
-                        value: -> return new RolodexRequest data, undefined, before
+                        value: -> return new RolodexRequest {type, query, limit}, undefined, before
                     next:
                         enumerable: no
-                        value: -> return new RolodexRequest data, after
+                        value: -> return new RolodexRequest {type, query, limit}, after
                     loadMore:
                         enumerable: no
                         value: =>
                             callback = (event) =>
                                 after = next.after
-                                decree => @response = police ->
-                                    @response.join new Rolodex next.response
+                                decree => @response = police -> @response.join next.response
                                 next.removeEventListener "response", callback
                             (next = do @next).addEventListener "response", callback
                             do next.start
@@ -221,14 +220,13 @@ Note that `Request()` ignores data parameters which have a value of `undefined` 
                         value: (keepGoing) =>
                             callback = (event) =>
                                 before = prev.before
-                                result = new Rolodex prev.response
-                                decree => @response = police -> @response.join result
+                                decree => @response = police -> @response.join prev.response
                                 prev.removeEventListener "response", callback
-                                if keepGoing and result.length
-                                    (next = do @next).addEventListener "response", callback
-                                    do next.start
-                            (next = do @next).addEventListener "response", callback
-                            do next.start
+                                if keepGoing and prev.response.length
+                                    (prev = do @prev).addEventListener "response", callback
+                                    do prev.start
+                            (prev = do @prev).addEventListener "response", callback
+                            do prev.start
 
                 Object.freeze this
 
