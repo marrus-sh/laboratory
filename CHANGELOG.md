@@ -10,13 +10,15 @@
 
 + Added documentation for currently-open [GitHub Issues](https://github.com/marrus-sh/laboratory/issues) ([#14](https://github.com/marrus-sh/laboratory/issues/14))
 + Added a new Request API to make interacting with Laboratory substantially easier and less alien to those not used to event-based operations ([#15](https://github.com/marrus-sh/laboratory/issues/15))
-+ Laboratory can now retrieve a list of follow requests ([#18](https://github.com/marrus-sh/laboratory/issues/18))
++ Laboratory can now retrieve a list of follow requests and respond to them ([#18](https://github.com/marrus-sh/laboratory/issues/18))
 + Support for local hashtag searches ([#16](https://github.com/marrus-sh/laboratory/issues/16))
++ DM support added ([#20](https://github.com/marrus-sh/laboratory/issues/20))
 
 #####  CHANGED
 
 * Fixed [Issue #34](https://github.com/marrus-sh/laboratory/issues/3), where Laboratory used `localStorage` for things where it didn't need to
 * The numeric values associated with the `Timeline.Type`s have changed
+* The numeric values associated with the `Post.Visibility`s have changed
 
 #####  REMOVED
 

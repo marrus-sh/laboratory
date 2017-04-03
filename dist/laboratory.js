@@ -438,10 +438,14 @@
   });
 
   Post.Visibility = Enumeral.generate({
-    PRIVATE: 0x00,
-    REBLOGGABLE: 0x01,
-    LISTED: 0x02,
-    PUBLIC: 0x03
+    DIRECT: 0x0,
+    REBLOGGABLE: 0x1,
+    IN_HOME: 0x2,
+    UNLISTED: 0x3,
+    LISTED: 0x4,
+    NOT_IN_HOME: 0x5,
+    UNREBLOGGABLE: 0x6,
+    PUBLIC: 0x7
   });
 
   Laboratory.Profile = Profile = function(data, relationship) {

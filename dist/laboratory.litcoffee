@@ -749,14 +749,23 @@ The available `Post.Visibility`s are as follows:
 
 | Enumeral | Binary Value | Description |
 | :------: | :-----------: | :---------- |
-| `Post.Visibility.PRIVATE` | `00` | The post cannot be reblogged and appears as unlisted |
-| `Post.Visibility.REBLOGGABLE` | `01` | The post is unlisted but can be reblogged |
-| `Post.Visibility.LISTED` | `10` | The post is listed but can't be reblogged |
-| `Post.Visibility.PUBLIC` | `11` | The post is listed and can be reblogged |
+| `Post.Visibility.DIRECT` | `000` | The post can only be seen by those mentioned and cannot be reblogged |
+| `Post.Visibility.REBLOGGABLE` | `001` | The post can only be seen by those mentioned, but can be reblogged |
+| `Post.Visibility.IN_HOME` | `010` | The post can be viewed in users' home timelines |
+| `Post.Visibility.UNLISTED` | `011` | The post can be viewed in users' home timelines and can be reblogged |
+| `Post.Visibility.LISTED` | `100` | The post can be viewed in the global timelines |
+| `Post.Visibility.NOT_IN_HOME` | `101` | The post can be viewed in the global timelines and can be reblogged |
+| `Post.Visibility.UNREBLOGGABLE` | `110` | The post is listed but can't be reblogged |
+| `Post.Visibility.PUBLIC` | `111` | The post is listed and can be reblogged |
 
-However, note that `Visibility.LISTED` (`0x02`) is not a valid visibility for a Mastodon post.
+However, note that only some of these are valid Mastodon visibilities:
 
-The visibility of the post can be evaluating using bitwise comparisons: `visibility & Post.Visibility.LISTED` will detect whether a post is listed or unlisted, for example.
+- `Post.Visibility.DIRECT` is "direct" visibility
+- `Post.Visibility.IN_HOME` is "private" visibility
+- `Post.Visibility.UNLISTED` is "unlisted" visibility
+- `Post.Visibility.PUBLIC` is "public" visibility
+
+The remainder visibilities are provided for use with bitwise comparisons: `visibility & Post.Visibility.LISTED` will detect whether a post is listed or unlisted, for example.
 
 ###  Prototype methods:
 
@@ -910,10 +919,14 @@ Here we define our enumerals as described above.
         MENTION      : 0x33
 
     Post.Visibility = Enumeral.generate
-        PRIVATE      : 0x00
-        REBLOGGABLE  : 0x01
-        LISTED       : 0x02
-        PUBLIC       : 0x03
+        DIRECT        : 0b000
+        REBLOGGABLE   : 0b001
+        IN_HOME       : 0b010
+        UNLISTED      : 0b011
+        LISTED        : 0b100
+        NOT_IN_HOME   : 0b101
+        UNREBLOGGABLE : 0b110
+        PUBLIC        : 0b111
 
 
 
