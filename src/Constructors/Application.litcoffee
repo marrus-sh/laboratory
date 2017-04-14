@@ -1,4 +1,4 @@
-<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.4.0</i> <br> <code>Constructors/Application.litcoffee</code></p>
+<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.5.0</i> <br> <code>Constructors/Application.litcoffee</code></p>
 
 #  THE APPLICATION CONSTRUCTOR  #
 

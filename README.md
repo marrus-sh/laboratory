@@ -59,7 +59,7 @@ If your system doesn't support these features, you should still be able to safel
 
 ##  API Quick Reference  ##
 
->  Current version: *0.4.0*
+>  Current version: *0.5.0*
 
 | Mastodon API | Request |
 | ------------ | ------- |

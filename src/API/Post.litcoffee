@@ -1,4 +1,4 @@
-<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.4.0</i> <br> <code>API/Post.litcoffee</code></p>
+<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.5.0</i> <br> <code>API/Post.litcoffee</code></p>
 
 #  POST REQUESTS  #
 
@@ -118,7 +118,7 @@ They will respond with the updated post if they succeed.
 >       id: postID,
 >       type: Laboratory.Post.Type.STATUS
 >   });
->   request.addEventListener("response", requestCallback);
+>   request.assign(requestCallback);
 >   request.start();
 >   ```
 
@@ -150,7 +150,7 @@ They will respond with the updated post if they succeed.
 >       id: somePost.id,
 >       value: true
 >   });
->   request.addEventListener("response", requestCallback);
+>   request.assign(requestCallback);
 >   request.start();
 >   ```
 
@@ -165,7 +165,7 @@ They will respond with the updated post if they succeed.
 >       id: somePost.id,
 >       value: false
 >   });
->   request.addEventListener("response", requestCallback);
+>   request.assign(requestCallback);
 >   request.start();
 >   ```
 

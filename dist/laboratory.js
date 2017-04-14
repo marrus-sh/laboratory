@@ -14,15 +14,15 @@
              Source code available at:
       https://github.com/marrus-sh/laboratory
   
-                  Version 0.4.0
+                  Version 0.5.0
    */
-  var Application, Attachment, Authorization, Client, CustomEvent, Enumeral, Exposed, Failure, Laboratory, LaboratoryEvent, LaboratoryEventTarget, Post, Profile, Request, Rolodex, Store, Timeline, checkDecree, decree, dispatch, fn, police, prop, reset, run,
-    indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; },
-    hasProp = {}.hasOwnProperty;
+  var Application, Attachment, Authorization, Client, CustomEvent, Enumeral, Exposed, Failure, Laboratory, LaboratoryEvent, Post, Profile, Request, Rolodex, Store, Timeline, checkDecree, decree, dispatch, fn, give, isArray, police, prop, reflection, reset, run,
+    hasProp = {}.hasOwnProperty,
+    indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
   Laboratory = {
     ℹ: "https://github.com/marrus-sh/laboratory",
-    Nº: 4.0
+    Nº: 5.0
   };
 
   (function() {
@@ -96,62 +96,17 @@
     return Object.freeze(CE);
   })();
 
-  LaboratoryEventTarget = (function() {
-    var LabEvtTgt, addEventListener, dispatchEvent, ref, removeEventListener;
-    addEventListener = function(callbackObj, event, callback) {
-      if (!(this instanceof LaboratoryEventTarget)) {
-        throw TypeError("this isnt a LaboratoryEventTarget");
-      }
-      if (typeof callback !== "function") {
-        throw TypeError("Listener is not a function");
-      }
-      event = (String(event)).toUpperCase();
-      if (callbackObj[event] == null) {
-        callbackObj[event] = [];
-      }
-      if (indexOf.call(callbackObj[event], callback) < 0) {
-        callbackObj[event].push(callback);
-      }
-    };
-    removeEventListener = function(callbackObj, event, callback) {
-      var index, ref;
-      if (!(this instanceof LaboratoryEventTarget)) {
-        throw TypeError("this isnt a LaboratoryEventTarget");
-      }
-      event = (String(event)).toUpperCase();
-      if ((index = callbackObj[event].indexOf(callback)) !== -1) {
-        if ((ref = callbackObj[event]) != null) {
-          ref.splice(index, 1);
-        }
-      }
-    };
-    dispatchEvent = function(callbackObj, object) {
-      var callback, event, i, len, ref;
-      if (!(this instanceof LaboratoryEventTarget)) {
-        throw TypeError("this isnt a LaboratoryEventTarget");
-      }
-      if (!(object instanceof Event)) {
-        throw TypeError("Attempted to dispatch something which wasn't an event");
-      }
-      event = (String(object.type)).toUpperCase();
-      if (callbackObj[event]) {
-        ref = callbackObj[event];
-        for (i = 0, len = ref.length; i < len; i++) {
-          callback = ref[i];
-          callback(object);
-        }
-      }
-    };
-    LabEvtTgt = function() {
-      var callbacks;
-      callbacks = {};
-      this.addEventListener = addEventListener.bind(this, callbacks);
-      this.removeEventListener = removeEventListener.bind(this, callbacks);
-      return this.dispatchEvent = dispatchEvent.bind(this, callbacks);
-    };
-    LabEvtTgt.prototype = Object.freeze(Object.create((((ref = window.EventTarget) != null ? ref.prototype : void 0) ? window.EventTarget.prototype : window.Object.prototype)));
-    return Object.freeze(LabEvtTgt);
-  })();
+  reflection = function() {
+    return this;
+  };
+
+  give = function(n) {
+    return reflection.bind(n);
+  };
+
+  isArray = typeof Array.isArray === "function" ? Array.isArray : function(n) {
+    return (Object.prototype.toString.call(n)) === "[object Array]";
+  };
 
   Enumeral = function(value) {
     if (!(this && this instanceof Enumeral)) {
@@ -557,190 +512,266 @@
     SELF: 0x80
   });
 
-  Request = function(method, location, data, token, onComplete) {
-    var callback, contents, key, request, response, subvalue, value;
-    if (!(this && this instanceof Request)) {
-      throw new TypeError("this is not a Request");
-    }
-    LaboratoryEventTarget.call(this);
-    response = null;
-    Object.defineProperty(this, "response", {
-      configurable: true,
-      enumerable: true,
-      get: function() {
-        return response;
-      },
-      set: function(n) {
-        if (checkDecree()) {
-          return police((function(_this) {
-            return function() {
-              response = n;
-              return _this.dispatchEvent(new CustomEvent("response", {
-                detail: {
-                  request: _this,
-                  response: n
-                }
-              }));
-            };
-          })(this));
-        }
-      }
-    });
-    if (!(method === "GET" || method === "POST" || method === "DELETE")) {
-      return this;
-    }
-    location = String(location);
-    data = Object(data);
-    request = new XMLHttpRequest;
-    contents = method === "POST" && typeof FormData === "function" && data instanceof FormData ? data : (((function() {
-      var results;
-      results = [];
-      for (key in data) {
-        value = data[key];
-        if (value != null) {
-          if (value instanceof Array) {
-            results.push(((function() {
-              var i, len, results1;
-              results1 = [];
-              for (i = 0, len = value.length; i < len; i++) {
-                subvalue = value[i];
-                results1.push((encodeURIComponent(key)) + "[]=" + encodeURIComponent(subvalue));
+  Request = void 0;
+
+  (function() {
+    var assign, callback, remove, setResponse, start, stop;
+    setResponse = function(stored, n) {
+      if (checkDegree()) {
+        police((function(_this) {
+          return function() {
+            var callback, i, len, ref, results;
+            stored.response = n;
+            ref = stored.callbacks;
+            results = [];
+            for (i = 0, len = ref.length; i < len; i++) {
+              callback = ref[i];
+              if (typeof callback === "function") {
+                results.push(callback(_this));
               }
-              return results1;
-            })()).join("&"));
-          } else {
-            results.push((encodeURIComponent(key)) + "=" + encodeURIComponent(value));
-          }
-        }
-      }
-      return results;
-    })()).join("&")).replace(/%20/g, '+');
-    if (!(contents === "" || method === "POST")) {
-      location += ((location.indexOf("?")) !== -1 ? "&" : "?") + contents;
-    }
-    callback = (function(_this) {
-      return function() {
-        var link, params, status;
-        switch (request.readyState) {
-          case 0:
-            break;
-          case 1:
-            return dispatch("LaboratoryRequestOpen", request);
-          case 2:
-          case 3:
-            return dispatch("LaboratoryRequestUpdate", request);
-          case 4:
-            status = request.status;
-            data = (function() {
-              try {
-                if (request.responseText) {
-                  return JSON.parse(request.responseText);
-                } else {
-                  return {};
-                }
-              } catch (error) {
-                return {
-                  error: "The response could not be parsed."
-                };
-              }
-            })();
-            link = request.getResponseHeader("Link");
-            params = {
-              status: status,
-              url: location,
-              prev: ((link != null ? link.match(/<\s*([^,]*)\s*>\s*;(?:[^,]*[;\s])?rel="?prev(?:ious)?"?/) : void 0) || [])[1],
-              next: ((link != null ? link.match(/<\s*([^,]*)\s*>\s*;(?:[^,]*[;\s])?rel="?next"?/) : void 0) || [])[1]
-            };
-            switch (false) {
-              case !((200 <= status && status <= 205)):
-                if ((data != null ? data.error : void 0) != null) {
-                  _this.dispatchEvent(new CustomEvent("failure", {
-                    detail: {
-                      request: _this,
-                      response: new Failure(data, status)
-                    }
-                  }));
-                  dispatch("LaboratoryRequestError", request);
-                } else {
-                  if (typeof onComplete === "function") {
-                    onComplete(data, params);
-                  }
-                  dispatch("LaboratoryRequestComplete", request);
-                }
-                break;
-              default:
-                _this.dispatchEvent(new CustomEvent("failure", {
-                  detail: {
-                    request: _this,
-                    response: new Failure(data, status)
-                  }
-                }));
-                dispatch("LaboratoryRequestError", request);
             }
-            return request.removeEventListener("readystatechange", callback);
-        }
+            return results;
+          };
+        })(this));
+      }
+    };
+    callback = function(request, onComplete) {
+      var link, params, result, status;
+      switch (request.readyState) {
+        case 0:
+          break;
+        case 1:
+          return dispatch("LaboratoryRequestOpen", request);
+        case 2:
+        case 3:
+          return dispatch("LaboratoryRequestUpdate", request);
+        case 4:
+          status = request.status;
+          result = (function() {
+            try {
+              if (request.responseText) {
+                return JSON.parse(request.responseText);
+              } else {
+                return {};
+              }
+            } catch (error) {
+              return {
+                error: "The response could not be parsed."
+              };
+            }
+          })();
+          link = request.getResponseHeader("Link");
+          params = {
+            status: status,
+            url: location,
+            prev: ((link != null ? link.match(/<\s*([^,]*)\s*>\s*;(?:[^,]*[;\s])?rel="?prev(?:ious)?"?/) : void 0) || [])[1],
+            next: ((link != null ? link.match(/<\s*([^,]*)\s*>\s*;(?:[^,]*[;\s])?rel="?next"?/) : void 0) || [])[1]
+          };
+          switch (false) {
+            case !((200 <= status && status <= 205)):
+              if ((result != null ? result.error : void 0) != null) {
+                decree((function(_this) {
+                  return function() {
+                    return _this.response = police(function() {
+                      return new Failure(response, status);
+                    });
+                  };
+                })(this));
+                dispatch("LaboratoryRequestError", request);
+              } else {
+                if (typeof onComplete === "function") {
+                  onComplete(response, params);
+                }
+                dispatch("LaboratoryRequestComplete", request);
+              }
+              break;
+            default:
+              decree((function(_this) {
+                return function() {
+                  return _this.response = police(function() {
+                    return new Failure(response, status);
+                  });
+                };
+              })(this));
+              dispatch("LaboratoryRequestError", request);
+          }
+          return request.removeEventListener("readystatechange", callback);
+      }
+    };
+    assign = function(stored, callback) {
+      if (typeof callback !== "function") {
+        throw new TypeError("Provided callback was not a function");
+      }
+      if (indexOf.call(stored.callbacks, callback) < 0) {
+        stored.callbacks.push(callback);
+      }
+      return this;
+    };
+    remove = function(stored, callback) {
+      var index;
+      while ((index = stored.callbacks.indexOf(callback)) !== -1) {
+        stored.callbacks.splice(index, 1);
+      }
+      return this;
+    };
+    start = function(stored) {
+      var contents, method, request, token;
+      if (!((request = stored.request) instanceof XMLHttpRequest)) {
+        return;
+      }
+      this.stop();
+      contents = stored.contents;
+      token = stored.token;
+      request.open(method = stored.method, stored.location);
+      if (method === "POST" && !((typeof FormData !== "undefined" && FormData !== null) && contents instanceof FormData)) {
+        request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+      }
+      if (token != null) {
+        request.setRequestHeader("Authorization", "Bearer " + token);
+      }
+      request.addEventListener("readystatechange", stored.callback);
+      request.send(method === "POST" ? contents : void 0);
+    };
+    stop = function(stored) {
+      var request;
+      if (!((request = stored.request) instanceof XMLHttpRequest)) {
+        return;
+      }
+      request.removeEventListener("readystatechange", stored.callback);
+      request.abort();
+    };
+    Request = function(method, location, data, token, onComplete) {
+      var contents, key, stored, subvalue, value;
+      if (!(this && this instanceof Request)) {
+        throw new TypeError("this is not a Request");
+      }
+      data = Object(data);
+      stored = {
+        callback: void 0,
+        callbacks: [],
+        contents: void 0,
+        location: location = String(location),
+        method: method = String(method),
+        request: void 0,
+        response: null,
+        token: token != null ? String(token) : void 0
       };
-    })(this);
-    Object.defineProperties(this, {
-      start: {
-        configurable: true,
-        enumerable: false,
-        writable: false,
-        value: function() {
-          request.open(method, location);
-          if (method === "POST" && !((typeof FormData !== "undefined" && FormData !== null) && contents instanceof FormData)) {
-            request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-          }
-          if (token != null) {
-            request.setRequestHeader("Authorization", "Bearer " + token);
-          }
-          request.addEventListener("readystatechange", callback);
-          request.send(method === "POST" ? contents : void 0);
+      Object.defineProperties(this, {
+        assign: {
+          configurable: true,
+          enumerable: false,
+          writable: false,
+          value: assign.bind(this, stored)
+        },
+        remove: {
+          configurable: true,
+          enumerable: false,
+          writable: false,
+          value: remove.bind(this, stored)
+        },
+        response: {
+          configurable: true,
+          enumerable: true,
+          get: give(stored.response),
+          set: setResponse.bind(this, stored)
+        },
+        start: {
+          configurable: true,
+          enumerable: false,
+          writable: false,
+          value: start.bind(this, stored)
+        },
+        stop: {
+          configurable: true,
+          enumerable: false,
+          writable: false,
+          value: stop.bind(this, stored)
         }
-      },
-      stop: {
-        configurable: true,
-        enumerable: false,
-        writable: false,
-        value: function() {
-          request.removeEventListener("readystatechange", callback);
-          request.abort();
-        }
+      });
+      if (!(method === "GET" || method === "POST" || method === "DELETE")) {
+        return this;
       }
+      stored.callback = callback.bind(this, stored.request = new XMLHttpRequest, onComplete);
+      stored.contents = contents = method === "POST" && typeof FormData === "function" && data instanceof FormData ? data : (((function() {
+        var results;
+        results = [];
+        for (key in data) {
+          value = data[key];
+          if (value != null) {
+            if (isArray(value)) {
+              results.push(((function() {
+                var i, len, results1;
+                results1 = [];
+                for (i = 0, len = value.length; i < len; i++) {
+                  subvalue = value[i];
+                  results1.push((encodeURIComponent(key)) + "[]=" + encodeURIComponent(subvalue));
+                }
+                return results1;
+              })()).join("&"));
+            } else {
+              results.push((encodeURIComponent(key)) + "=" + encodeURIComponent(value));
+            }
+          }
+        }
+        return results;
+      })()).join("&")).replace(/%20/g, '+');
+      if (!(contents === "" || method === "POST")) {
+        stored.location += (indexOf.call(location, "?") >= 0 ? "&" : "?") + contents;
+      }
+      return this;
+    };
+    Laboratory.Request = function(data) {
+      throw new TypeError("Illegal constructor");
+    };
+    Object.defineProperty(Request, "prototype", {
+      configurable: false,
+      enumerable: false,
+      writable: false,
+      value: Object.freeze(Object.create(Object.prototype, {
+        assign: {
+          enumerable: false,
+          value: function() {}
+        },
+        constructor: {
+          enumerable: false,
+          value: Laboratory.Request
+        },
+        go: {
+          enumerable: false,
+          value: function() {
+            return new Promise((function(_this) {
+              return function(resolve, reject) {
+                callback = function(response) {
+                  (response instanceof Failure ? reject : resolve)(response);
+                  return _this.remove(callback);
+                };
+                _this.assign(callback);
+                return _this.start;
+              };
+            })(this));
+          }
+        },
+        remove: {
+          enumerable: false,
+          value: function() {}
+        },
+        start: {
+          enumerable: false,
+          value: function() {}
+        },
+        stop: {
+          enumerable: false,
+          value: function() {}
+        }
+      }))
     });
-    return this;
-  };
-
-  Laboratory.Request = function(data) {
-    throw new TypeError("Illegal constructor");
-  };
-
-  Object.defineProperty(Request, "prototype", {
-    configurable: false,
-    enumerable: false,
-    writable: false,
-    value: Object.freeze(Object.create(LaboratoryEventTarget.prototype, {
-      constructor: {
-        enumerable: false,
-        value: Laboratory.Request
-      },
-      start: {
-        enumerable: false,
-        value: function() {}
-      },
-      stop: {
-        enumerable: false,
-        value: function() {}
-      }
-    }))
-  });
-
-  Object.defineProperty(Laboratory.Request, "prototype", {
-    configurable: false,
-    enumerable: false,
-    writable: false,
-    value: Request.prototype
-  });
+    return Object.defineProperty(Laboratory.Request, "prototype", {
+      configurable: false,
+      enumerable: false,
+      writable: false,
+      value: Request.prototype
+    });
+  })();
 
   Laboratory.Rolodex = Rolodex = function(data) {
     var current, currentID, getProfile, i, index, j, len, prev, ref, value;
@@ -1126,7 +1157,7 @@
               localStorage.setItem("Laboratory | " + _this.origin, [client.redirect, client.clientID, client.clientSecret, +client.scope].join(" "));
               clearTimeout(timeout);
               _this.wrapup = void 0;
-              _this.waitingRequest.removeEventListener("response", handleClient);
+              _this.waitingRequest.remove(handleClient);
               return makeRequest.call(_this);
             };
           })(this);
@@ -1136,10 +1167,10 @@
             redirect: this.redirect,
             scope: this.scope
           });
-          this.waitingRequest.addEventListener("response", handleClient);
+          this.waitingRequest.assign(handleClient);
           this.wrapup = (function(_this) {
             return function() {
-              return _this.waitingRequest.removeEventListener("response", handleClient);
+              return _this.waitingRequest.remove(handleClient);
             };
           })(this);
           this.waitingRequest.start();

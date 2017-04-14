@@ -1,4 +1,4 @@
-<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.4.0</i> <br> <code>INSTALLING.litcoffee</code></p>
+<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.5.0</i> <br> <code>INSTALLING.litcoffee</code></p>
 
 #  USING LABORATORY  #
 
@@ -31,12 +31,12 @@ Laboratory doesn't have any external dependencies, and should run in any modern 
 >
 >       function init () {
 >           var request = new Laboratory.Authorization.Request({
->               origin: "https://myinstance.social"
->               name: "My Laboratory Client"
->               redirect: "/"
+>               origin: "https://myinstance.social",
+>               name: "My Laboratory Client",
+>               redirect: "/",
 >               scope: Laboratory.Authorization.READWRITEFOLLOW
 >           });
->           request.addEventListener("response", run);
+>           request.assign(run);
 >           request.start();
 >       }
 >

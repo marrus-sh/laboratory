@@ -1,4 +1,4 @@
-<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.4.0</i> <br> <code>API/Profile.litcoffee</code></p>
+<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.5.0</i> <br> <code>API/Profile.litcoffee</code></p>
 
 #  PROFILE REQUESTS  #
 
@@ -95,7 +95,7 @@ They should be fired with two parameters: `id`, which gives the id of the accoun
 >   }
 >
 >   var request = new Laboratory.Profile.Request({id: profileID});
->   request.addEventListener("response", requestCallback);
+>   request.assign(requestCallback);
 >   request.start();
 >   ```
 
@@ -110,7 +110,7 @@ They should be fired with two parameters: `id`, which gives the id of the accoun
 >       id: someProfile.id,
 >       value: true
 >   });
->   request.addEventListener("response", requestCallback);
+>   request.assign(requestCallback);
 >   request.start();
 >   ```
 
@@ -125,7 +125,7 @@ They should be fired with two parameters: `id`, which gives the id of the accoun
 >       id: someProfile.id,
 >       value: false
 >   });
->   request.addEventListener("response", requestCallback);
+>   request.assign(requestCallback);
 >   request.start();
 >   ```
 

@@ -1,4 +1,4 @@
-<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.4.0</i> <br> <code>API/Rolodex.litcoffee</code></p>
+<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.5.0</i> <br> <code>API/Rolodex.litcoffee</code></p>
 
 #  ROLODEX REQUESTS  #
 
@@ -65,7 +65,7 @@ These return new `Rolodex.Request`s which will respond with the previous and nex
 >       type: Laboratory.Rolodex.Type.FOLLOWERS
 >       query: someProfile.id
 >   });
->   request.addEventListener("response", requestCallback);
+>   request.assign(requestCallback);
 >   request.start();
 >   ```
 
@@ -81,7 +81,7 @@ These return new `Rolodex.Request`s which will respond with the previous and nex
 >       query: "account"
 >       limit: 5
 >   });
->   request.addEventListener("response", requestCallback);
+>   request.assign(requestCallback);
 >   request.start();
 >   ```
 
@@ -95,7 +95,7 @@ These return new `Rolodex.Request`s which will respond with the previous and nex
 >   var request = new Laboratory.Rolodex.Request({
 >       type: Laboratory.Rolodex.Type.BLOCKS
 >   });
->   request.addEventListener("response", requestCallback);
+>   request.assign(requestCallback);
 >   request.start();
 >   ```
 
@@ -114,14 +114,14 @@ These return new `Rolodex.Request`s which will respond with the previous and nex
 >
 >   function loadNextPage (request) {
 >       var newRequest = request.next();
->       newRequest.addEventListener("response", requestCallback);
+>       newRequest.assign(requestCallback);
 >       newRequest.start();
 >       return newRequest;
 >   }
 >
 >   function loadPrevPage (request) {
 >       var newRequest = request.prev();
->       newRequest.addEventListener("response", requestCallback);
+>       newRequest.assign(requestCallback);
 >       newRequest.start();
 >       return newRequest;
 >   }

@@ -1,4 +1,4 @@
-<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.4.0</i> <br> <code>README.litcoffee</code></p>
+<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.5.0</i> <br> <code>README.litcoffee</code></p>
 
 #  _LABORATORY_  #
 
@@ -79,7 +79,7 @@ This is the first file in our compiled source, so let's identify ourselves real 
                Source code available at:
         https://github.com/marrus-sh/laboratory
 
-                    Version 0.4.0
+                    Version 0.5.0
 
     ###
 
@@ -94,7 +94,7 @@ Laboratory thus assures that minor and patch numbers will never exceed `99` (ind
 
     Laboratory =
         ℹ: "https://github.com/marrus-sh/laboratory"
-        Nº: 4.0
+        Nº: 5.0
 
 Laboratory is designed to be extended, and these attributes provide extensions with a simple way of detecting Laboratory support.
 
@@ -169,55 +169,26 @@ This is a CoffeeScript re-implementation of the polyfill available on [the MDN](
         CE.prototype = Object.freeze Object.create window.Event.prototype
         Object.freeze CE
 
-###  `LaboratoryEventTarget()`:
+###  `reflection()` and `give()`:
 
-`LaboratoryEventTarget()` is a simple implementation of the [`EventTarget` interface](https://developer.mozilla.org/en-US/docs/Web/API/EventTarget), used to create an `XMLHttpRequest`-esque object for requesting Mastodon data.
-Note that the `addEventListener()`, `removeEventListener()`, and `dispatchEvent()` functions are (unlike with other `EventTarget`s) bound to the instance.
+`reflection()` is a function that just returns its `this`.
+For convenience, the `give()` function returns a reflection bound to its argument.
 
->   __[Issue #63](https://github.com/marrus-sh/laboratory/issues/63) :__
->   This interface may change drastically in the future.
+    reflection = -> this
+    give = (n) -> reflection.bind n
 
-    LaboratoryEventTarget = do ->
-        addEventListener = (callbackObj, event, callback) ->
-            unless this instanceof LaboratoryEventTarget
-                throw TypeError "this isnt a LaboratoryEventTarget"
-            unless typeof callback is "function"
-                throw TypeError "Listener is not a function"
-            event = do (String event).toUpperCase
-            callbackObj[event] = [] unless callbackObj[event]?
-            callbackObj[event].push callback unless callback in callbackObj[event]
-            return
-        removeEventListener = (callbackObj, event, callback) ->
-            unless this instanceof LaboratoryEventTarget
-                throw TypeError "this isnt a LaboratoryEventTarget"
-            event = do (String event).toUpperCase
-            if (index = callbackObj[event].indexOf callback) isnt -1
-                callbackObj[event]?.splice index, 1
-            return
-        dispatchEvent = (callbackObj, object) ->
-            unless this instanceof LaboratoryEventTarget
-                throw TypeError "this isnt a LaboratoryEventTarget"
-            unless object instanceof Event
-                throw TypeError "Attempted to dispatch something which wasn't an event"
-            event = do (String object.type).toUpperCase
-            if callbackObj[event]
-                callback object for callback in callbackObj[event]
-            return
-        LabEvtTgt = ->
-            callbacks = {}
-            @addEventListener = addEventListener.bind this, callbacks
-            @removeEventListener = removeEventListener.bind this, callbacks
-            @dispatchEvent = dispatchEvent.bind this, callbacks
-        LabEvtTgt.prototype = Object.freeze Object.create (
-            if window.EventTarget?.prototype then window.EventTarget.prototype
-            else window.Object.prototype
-        )
-        Object.freeze LabEvtTgt
+###  `isArray()`:
+
+`isArray()` checks to see if the given argument is an array.
+
+    isArray =
+        if typeof Array.isArray is "function" then Array.isArray
+        else (n) -> (Object.prototype.toString.call n) is "[object Array]"
 
 
 - - -
 
-<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.4.0</i> <br> <code>Constructors/README.litcoffee</code></p>
+<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.5.0</i> <br> <code>Constructors/README.litcoffee</code></p>
 
 #  LABORATORY CONSTRUCTORS  #
 
@@ -274,7 +245,7 @@ See specific constructor pages for details on their implementation.
 
 - - -
 
-<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.4.0</i> <br> <code>Constructors/Enumeral.litcoffee</code></p>
+<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.5.0</i> <br> <code>Constructors/Enumeral.litcoffee</code></p>
 
 #  LABORATORY ENUMERALS  #
 
@@ -425,7 +396,7 @@ We can now freeze our enumerals and return them.
 
 - - -
 
-<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.4.0</i> <br> <code>Constructors/Application.litcoffee</code></p>
+<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.5.0</i> <br> <code>Constructors/Application.litcoffee</code></p>
 
 #  THE APPLICATION CONSTRUCTOR  #
 
@@ -478,7 +449,7 @@ The `Application` prototype just inherits from `Object`.
 
 - - -
 
-<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.4.0</i> <br> <code>Constructors/Attachment.litcoffee</code></p>
+<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.5.0</i> <br> <code>Constructors/Attachment.litcoffee</code></p>
 
 #  THE ATTACHMENT CONSTRUCTOR  #
 
@@ -560,7 +531,7 @@ Here we define our `Attachment.Type`s, as described above:
 
 - - -
 
-<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.4.0</i> <br> <code>Constructors/Authorization.litcoffee</code></p>
+<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.5.0</i> <br> <code>Constructors/Authorization.litcoffee</code></p>
 
 #  THE AUTHORIZATION CONSTRUCTOR  #
 
@@ -654,7 +625,7 @@ Here we define our `Authorization.Scope`s, as described above:
 
 - - -
 
-<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.4.0</i> <br> <code>Constructors/Client.litcoffee</code></p>
+<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.5.0</i> <br> <code>Constructors/Client.litcoffee</code></p>
 
 #  THE CLIENT CONSTRUCTOR  #
 
@@ -722,7 +693,7 @@ The `Client` prototype just inherits from `Object`.
 
 - - -
 
-<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.4.0</i> <br> <code>Constructors/Timeline.litcoffee</code></p>
+<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.5.0</i> <br> <code>Constructors/Timeline.litcoffee</code></p>
 
 #  THE FAILURE CONSTRUCTOR  #
 
@@ -780,7 +751,7 @@ The `Failure` prototype just inherits from `Object`.
 
 - - -
 
-<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.4.0</i> <br> <code>Constructors/Post.litcoffee</code></p>
+<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.5.0</i> <br> <code>Constructors/Post.litcoffee</code></p>
 
 #  THE POST CONSTRUCTOR  #
 
@@ -1032,7 +1003,7 @@ Here we define our enumerals as described above.
 
 - - -
 
-<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.4.0</i> <br> <code>Constructors/Profile.litcoffee</code></p>
+<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.5.0</i> <br> <code>Constructors/Profile.litcoffee</code></p>
 
 #  THE PROFILE CONSTRUCTOR  #
 
@@ -1228,7 +1199,7 @@ Here we define profile relationships, as specified above.
 
 - - -
 
-<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.4.0</i> <br> <code>Constructors/Request.litcoffee</code></p>
+<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.5.0</i> <br> <code>Constructors/Request.litcoffee</code></p>
 
 #  THE REQUEST CONSTRUCTOR  #
 
@@ -1247,23 +1218,31 @@ Its properties are summarized below:
 >   __[Issue #38](https://github.com/marrus-sh/laboratory/issues/38) :__
 >   A `Request.STATE` enumeral is planned.
 
-###  Prototype methods:
+###  Instance methods:
 
-####  `start()`.
-
->   ```javascript
->       Laboratory.Request.prototype.start();
->   ```
-
-The `start()` prototype method begins a request.
-
-####  `stop()`.
+####  Starting and stopping.
 
 >   ```javascript
->       Laboratory.Request.prototype.stop();
+>   request.start();
+>   request.stop();
 >   ```
+>
+>   - __`request` :__ A `Request`.
 
-The `stop()` prototype method ends a request.
+The `start()` method starts a request, and `stop()` ends one.
+It is recommended that you always `stop()` a request after you're done using it.
+
+####  Assigning and removing callbacks.
+
+>   ```javascript
+>   request.assign(callback);
+>   request.remove(callback);
+>   ```
+>
+>   - __`request` :__ A `Request`.
+>   - __`callback` :__ A callback function to add or remove.
+
+The provided `callback` will be called when the `request` finishes.
 
  - - -
 
@@ -1276,83 +1255,23 @@ The `stop()` prototype method ends a request.
 
 ##  Implementation  ##
 
-###  The constructor:
+We define `Request()` inside a closure because it involves a number of helper functions.
 
-The `Request()` constructor takes a number of arguments: the `method` for the request, the request's `location`, the `data` of the request, and callbacks to be called `onComplete`.
+    Request = undefined
 
->   __[Issue #47](https://github.com/marrus-sh/laboratory/issues/47) :__
->   It would be great if it were possible to monitor the progress of `Request`s.
+    do ->
 
->   __[Issue #63](https://github.com/marrus-sh/laboratory/issues/63) :__
->   The method by which you listen for responses to `Request`s may change drastically in the future.
+###  Setting the response:
 
-    Request = (method, location, data, token, onComplete) ->
+The `setResponse()` function sets the `response` of a `Request` and triggers its callbacks.
+It can only be called from privileged code.
 
-####  Initial setup.
-
-        unless this and this instanceof Request
-            throw new TypeError "this is not a Request"
-
-First, we set up our `Request` as an event target.
-
-        LaboratoryEventTarget.call this
-
-Our `response` starts out as `null`.
-`Request()` never actually sets the value of its instances' `response`; it's up to others to make that decree.
-
-        response = null
-
-`response` can only be set by privileged code and automatically fires a `response` event when it is set.
-
-        Object.defineProperty this, "response",
-            configurable: yes
-            enumerable: yes
-            get: -> response
-            set: (n) ->
-                if do checkDecree then police =>
-                    response = n
-                    @dispatchEvent new CustomEvent "response",
-                        detail:
-                            request: this
-                            response: n
-
-If the provided method isn't `GET`, `POST`, or `DELETE`, then we aren't going to make any requests ourselves.
-
-        return this unless method is "GET" or method is "POST" or method is "DELETE"
-
-####  Creating the request.
-
-The core of any `Request` is an `XMLHttpRequest`.
-
-        location = String location
-        data = Object data
-        request = new XMLHttpRequest
-
-####  Setting the contents.
-
-If our contents aren't `FormData`, then we convert our key-value pairs into a URL-encoded format.
-Note that `FormData` isn't supported in IE 9.
-
-        contents =
-            if method is "POST" and typeof FormData is "function" and data instanceof FormData
-                data
-            else (
-                (
-                    for key, value of data when value?
-                        if value instanceof Array then (
-                            for subvalue in value
-                                (encodeURIComponent key) + "[]=" + encodeURIComponent subvalue
-                        ).join "&"
-                        else (encodeURIComponent key) + "=" + encodeURIComponent value
-                ).join "&"
-            ).replace /%20/g, '+'
-
-####  Setting our location.
-
-If our `method` isn't `"POST"` then we need to append our `contents` to the query of our `location`.
-
-        unless contents is "" or method is "POST"
-            location += (if (location.indexOf "?") isnt -1 then "&" else "?") + contents
+        setResponse = (stored, n) ->
+            if do checkDegree then police =>
+                stored.response = n
+                for callback in stored.callbacks when typeof callback is "function"
+                    callback this
+            return
 
 ####  The callback.
 
@@ -1370,14 +1289,14 @@ Laboratory doesn't support HTTP status codes like `206 PARTIAL CONTENT`.
 >   - `XMLHttpRequest.LOADING` (`3`)
 >   - `XMLHttpRequest.DONE` (`4`)
 
-        callback = =>
+        callback = (request, onComplete) ->
             switch request.readyState
                 when 0 then  #  Do nothing
                 when 1 then dispatch "LaboratoryRequestOpen", request
                 when 2, 3 then dispatch "LaboratoryRequestUpdate", request
                 when 4
                     status = request.status
-                    data =
+                    result =
                         try
                             if request.responseText then JSON.parse request.responseText
                             else {}
@@ -1407,60 +1326,157 @@ Laboratory doesn't support HTTP status codes like `206 PARTIAL CONTENT`.
                         )[1]
                     switch
                         when 200 <= status <= 205
-                            if data?.error?
-                                @dispatchEvent new CustomEvent "failure",
-                                    detail:
-                                        request: this
-                                        response: new Failure data, status
+                            if result?.error?
+                                decree => @response = police -> new Failure response, status
                                 dispatch "LaboratoryRequestError", request
                             else
-                                onComplete data, params if typeof onComplete is "function"
+                                onComplete response, params if typeof onComplete is "function"
                                 dispatch "LaboratoryRequestComplete", request
                         else
-                            @dispatchEvent new CustomEvent "failure",
-                                detail:
-                                    request: this
-                                    response: new Failure data, status
+                            decree => @response = police -> new Failure response, status
                             dispatch "LaboratoryRequestError", request
                     request.removeEventListener "readystatechange", callback
 
-####  Final steps.
+###  Adding and removing callbacks:
 
-We can now add our event listener and connect our `start` and `stop` properties to `send()` and `abort()` on the `request`.
-Note that `abort()` does *not* trigger a `readystatechange` event so our `callback()` will not be called.
+The `assign()` function assigns the provided `callback` to the `Request`.
+Meanwhile, the `remove()` function removes the provided `callback`.
+Both of these functions return the `Request` so that they can be chained.
+
+        assign = (stored, callback) ->
+            unless typeof callback is "function"
+                throw new TypeError "Provided callback was not a function"
+            stored.callbacks.push callback unless callback in stored.callbacks
+            return this
+
+        remove = (stored, callback) ->
+            until (index = stored.callbacks.indexOf callback) is -1
+                stored.callbacks.splice index, 1
+            return this
+
+###  Starting and stopping:
+
+The `start()` function begins a request, and the `stop()` function finishes one.
+`start()` automatically calls `stop()` before proceeding.
+
+        start = (stored) ->
+            return unless (request = stored.request) instanceof XMLHttpRequest
+            do @stop
+            contents = stored.contents
+            token = stored.token
+            request.open method = stored.method, stored.location
+            if method is "POST" and not (FormData? and contents instanceof FormData)
+                request.setRequestHeader "Content-type",
+                    "application/x-www-form-urlencoded"
+            request.setRequestHeader "Authorization", "Bearer " + token if token?
+            request.addEventListener "readystatechange", stored.callback
+            request.send if method is "POST" then contents else undefined
+            return
+
+        stop = (stored) ->
+            return unless (request = stored.request) instanceof XMLHttpRequest
+            request.removeEventListener "readystatechange", stored.callback
+            do request.abort
+            return
+
+###  The constructor:
+
+The `Request()` constructor takes a number of arguments: the `method` for the request, the request's `location`, the `data` of the request, and callbacks to be called `onComplete`.
+It can't actually be called from outside of Laboratory source.
+
+>   __[Issue #47](https://github.com/marrus-sh/laboratory/issues/47) :__
+>   It would be great if it were possible to monitor the progress of `Request`s.
+
+        Request = (method, location, data, token, onComplete) ->
+
+####  Initial setup.
+
+            unless this and this instanceof Request
+                throw new TypeError "this is not a Request"
+
+We'll keep track of all the callbacks assigned to this `Request` with the `stored.callbacks` array.
+Our `stored.response` starts out as `null`.
+`Request()` only sets the value of its instances' `response`s in the case of failures; it's up to others to make that decree otherwise.
+
+            data = Object(data)
+            stored =
+                callback: undefined
+                callbacks: []
+                contents: undefined
+                location: location = String location
+                method: method = String method
+                request: undefined
+                response: null
+                token: if token? then String token else undefined
+
+####  Defining instance properties and methods.
+
+We bind our instance to our helper functions and properties here.
 
 >   __[Issue #38](https://github.com/marrus-sh/laboratory/issues/38) :__
 >   `Request`s should have a `state` property which indicates their state (running or stopped).
 
->   __[Issue #39](https://github.com/marrus-sh/laboratory/issues/39) :__
->   These functions should be declared outside of the constructor and then bound to their proper values.
+            Object.defineProperties this,
+                assign:
+                    configurable: yes
+                    enumerable: no
+                    writable: no
+                    value: assign.bind this, stored
+                remove:
+                    configurable: yes
+                    enumerable: no
+                    writable: no
+                    value: remove.bind this, stored
+                response:
+                    configurable: yes
+                    enumerable: yes
+                    get: give stored.response
+                    set: setResponse.bind this, stored
+                start:
+                    configurable: yes
+                    enumerable: no
+                    writable: no
+                    value: start.bind this, stored
+                stop:
+                    configurable: yes
+                    enumerable: no
+                    writable: no
+                    value: stop.bind this, stored
 
-        Object.defineProperties this,
-            start:
-                configurable: yes
-                enumerable: no
-                writable: no
-                value: ->
-                    request.open method, location
-                    if method is "POST" and not (FormData? and contents instanceof FormData)
-                        request.setRequestHeader "Content-type",
-                            "application/x-www-form-urlencoded"
-                    request.setRequestHeader "Authorization", "Bearer " + token if token?
-                    request.addEventListener "readystatechange", callback
-                    request.send if method is "POST" then contents else undefined
-                    return
-            stop:
-                configurable: yes
-                enumerable: no
-                writable: no
-                value: ->
-                    request.removeEventListener "readystatechange", callback
-                    do request.abort
-                    return
+If the provided method isn't `GET`, `POST`, or `DELETE`, then we aren't going to make any requests ourselves.
+
+            return this unless method is "GET" or method is "POST" or method is "DELETE"
+            stored.callback = callback.bind this, stored.request = new XMLHttpRequest, onComplete
+
+####  Setting the contents.
+
+If our contents aren't `FormData`, then we convert our key-value pairs into a URL-encoded format.
+Note that `FormData` isn't supported in IE 9.
+
+            stored.contents = contents =
+                if method is "POST" and typeof FormData is "function" and data instanceof FormData
+                    data
+                else (
+                    (
+                        for key, value of data when value?
+                            if isArray value then (
+                                for subvalue in value
+                                    (encodeURIComponent key) + "[]=" + encodeURIComponent subvalue
+                            ).join "&"
+                            else (encodeURIComponent key) + "=" + encodeURIComponent value
+                    ).join "&"
+                ).replace /%20/g, '+'
+
+####  Setting our location.
+
+If our `method` isn't `"POST"` then we need to append our `contents` to the query of our `location`.
+
+            unless contents is "" or method is "POST"
+                stored.location += (if "?" in location then "&" else "?") + contents
 
 And with that, we're done.
 
-        return this
+            return this
 
 ###  The dummy:
 
@@ -1468,38 +1484,54 @@ External scripts don't actually get to access the `Request()` constructor.
 Instead, we feed them a dummy function with the same prototype—so `instanceof` will still match.
 (The prototype is set in the next section.)
 
-    Laboratory.Request = (data) -> throw new TypeError "Illegal constructor"
+        Laboratory.Request = (data) -> throw new TypeError "Illegal constructor"
 
 ###  The prototype:
 
-The `Request` prototype just inherits from `LaboratoryEventTarget`.
-We define dummy functions for `start()` and `stop()` but these should be overwritten by instances.
+The `Request` prototype mostly just inherits from `LaboratoryEventTarget`.
+The `go()` function creates a new `Promise` for the response.
+(Obviously, this requires support for `Promise`s to be present in the environment.)
+We define dummy functions for our instance methods but these should be overwritten by instances.
 You'll note that `Request.prototype.constructor` gives our dummy constructor, not the real one.
 
-    Object.defineProperty Request, "prototype",
-        configurable: no
-        enumerable: no
-        writable: no
-        value: Object.freeze Object.create LaboratoryEventTarget.prototype,
-            constructor:
-                enumerable: no
-                value: Laboratory.Request
-            start:
-                enumerable: no
-                value: ->
-            stop:
-                enumerable: no
-                value: ->
-    Object.defineProperty Laboratory.Request, "prototype",
-        configurable: no
-        enumerable: no
-        writable: no
-        value: Request.prototype
+        Object.defineProperty Request, "prototype",
+            configurable: no
+            enumerable: no
+            writable: no
+            value: Object.freeze Object.create Object.prototype,
+                assign:
+                    enumerable: no
+                    value: ->
+                constructor:
+                    enumerable: no
+                    value: Laboratory.Request
+                go:
+                    enumerable: no
+                    value: -> new Promise (resolve, reject) =>
+                        callback = (response) =>
+                            (if response instanceof Failure then reject else resolve) response
+                            @remove callback
+                        @assign callback
+                        @start
+                remove:
+                    enumerable: no
+                    value: ->
+                start:
+                    enumerable: no
+                    value: ->
+                stop:
+                    enumerable: no
+                    value: ->
+        Object.defineProperty Laboratory.Request, "prototype",
+            configurable: no
+            enumerable: no
+            writable: no
+            value: Request.prototype
 
 
 - - -
 
-<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.4.0</i> <br> <code>Constructors/Rolodex.litcoffee</code></p>
+<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.5.0</i> <br> <code>Constructors/Rolodex.litcoffee</code></p>
 
 #  THE ROLODEX CONSTRUCTOR  #
 
@@ -1675,7 +1707,7 @@ Here we define our `Rolodex.Type`s, as described above:
 
 - - -
 
-<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.4.0</i> <br> <code>Constructors/Timeline.litcoffee</code></p>
+<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.5.0</i> <br> <code>Constructors/Timeline.litcoffee</code></p>
 
 #  THE TIMELINE CONSTRUCTOR  #
 
@@ -1870,7 +1902,7 @@ Here we define our `Timeline.Type`s, as described above:
 
 - - -
 
-<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.4.0</i> <br> <code>API/README.litcoffee</code></p>
+<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.5.0</i> <br> <code>API/README.litcoffee</code></p>
 
 #  LABORATORY API  #
 
@@ -1939,11 +1971,8 @@ Constantly calling, listening for, and handling events can get tedious, so Labor
 Generally speaking, using this API means following these basic steps:
 
 1.  Create a new `Request` object, for example by calling `new Laboratory.Post.Request()`
-2.  Associate the `response` event with a callback using `request.addEventListener`
+2.  Associate the `Request` with a callback using `request.assign()`
 3.  Send the request using `request.start()`
-
->   __[Issue #63](https://github.com/marrus-sh/laboratory/issues/63) :__
->   The method by which you listen for responses to `Request`s may change drastically in the future.
 
 Every `Request` object has `start()` and `stop()` methods which can be used to send and cancel the request.
 In order to prevent memory leaks, it is recommended that you always call `stop()` when you are done with a `Request`.
@@ -1981,17 +2010,14 @@ These are as follows:
 
 ###  Requesting authorization:
 
->   __[Issue #63](https://github.com/marrus-sh/laboratory/issues/63) :__
->   The method by which you listen for responses to `Request`s may change drastically in the future.
-
 >   ```javascript
 >   request = Laboratory.Authorization.Request({
->       origin: "https://myinstance.social"
->       name: "My Laboratory Client"
->       redirect: "/"
+>       origin: "https://myinstance.social",
+>       name: "My Laboratory Client",
+>       redirect: "/",
 >       scope: Laboratory.Authorization.READWRITEFOLLOW
 >   });
->   request.addEventListener("response", callback);
+>   request.assign(callback);
 >   request.send();
 >   ```
 
@@ -2064,7 +2090,7 @@ It just sets up our detail and dispatches the event to `document`.
 
 - - -
 
-<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.4.0</i> <br> <code>API/Attachment.litcoffee</code></p>
+<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.5.0</i> <br> <code>API/Attachment.litcoffee</code></p>
 
 #  ATTACHMENT REQUESTS  #
 
@@ -2107,7 +2133,7 @@ The only relevant parameter is `file`, which should be the `File` to upload.
 >   var request = new Laboratory.Attachment.Request({
 >       file: myAttachment
 >   });
->   request.addEventListener("response", requestCallback);
+>   request.assign(requestCallback);
 >   request.start();
 >   ```
 
@@ -2174,7 +2200,7 @@ Our `Attachment.Request.prototype` just inherits from `Request`.
 
 - - -
 
-<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.4.0</i> <br> <code>API/Authorization.litcoffee</code></p>
+<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.5.0</i> <br> <code>API/Authorization.litcoffee</code></p>
 
 #  AUTHORIZATION REQUESTS  #
 
@@ -2241,7 +2267,7 @@ You don't need to specify a `window` if you're passing through an `accessToken`.
 >       redirect: "/",
 >       scope: Laboratory.Authorization.Scope.READWRITEFOLLOW
 >   });
->   request.addEventListener("response", requestCallback);
+>   request.assign(requestCallback);
 >   request.start(authWindow);
 >   ```
 
@@ -2257,7 +2283,7 @@ You don't need to specify a `window` if you're passing through an `accessToken`.
 >       accessToken: myAccessToken
 >       scope: Laboratory.Authorization.Scope.READWRITEFOLLOW
 >   });
->   request.addEventListener("response", requestCallback);
+>   request.assign(requestCallback);
 >   request.start();
 >   ```
 
@@ -2355,13 +2381,13 @@ Otherwise, we need to get new client credentials before proceeding.
                         ].join " "
                         clearTimeout timeout
                         @wrapup = undefined
-                        @waitingRequest.removeEventListener "response", handleClient
+                        @waitingRequest.remove handleClient
                         makeRequest.call this
 
                     @waitingRequest = new Client.Request {@name, @origin, @redirect, @scope}
 
-                    @waitingRequest.addEventListener "response", handleClient
-                    @wrapup = => @waitingRequest.removeEventListener "response", handleClient
+                    @waitingRequest.assign handleClient
+                    @wrapup = => @waitingRequest.remove handleClient
                     do @waitingRequest.start
 
 If we aren't able to acquire a client ID within 30 seconds, we timeout.
@@ -2475,7 +2501,7 @@ During verification, the Mastodon server will provide us with the current user's
                                 Authorization.Scope.WRITE * ("write" in scopes) +
                                 Authorization.Scope.FOLLOW * ("follow" in scopes)
                             @accessToken
-                            ].join " "
+                        ].join " "
                         dispatch "LaboratoryProfileReceived", new Profile mine
                         do @currentRequest.stop
                 ).start
@@ -2579,7 +2605,7 @@ It also exposes it to the window through `Exposed`.
 
 - - -
 
-<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.4.0</i> <br> <code>API/Client.litcoffee</code></p>
+<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.5.0</i> <br> <code>API/Client.litcoffee</code></p>
 
 #  CLIENT REQUESTS  #
 
@@ -2642,7 +2668,7 @@ However, you can request this yourself if you find yourself needing new client a
 >       redirect: "/",
 >       scope: Laboratory.Authorization.Scope.READWRITEFOLLOW
 >   });
->   request.addEventListener("response", requestCallback);
+>   request.assign(requestCallback);
 >   request.start();
 >   ```
 
@@ -2727,7 +2753,7 @@ Laboratory Client events do not have handlers.
 
 - - -
 
-<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.4.0</i> <br> <code>API/Initialization.litcoffee</code></p>
+<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.5.0</i> <br> <code>API/Initialization.litcoffee</code></p>
 
 #  INITIALIZATION  #
 
@@ -2805,7 +2831,7 @@ Laboratory Initialization events do not have handlers.
 
 - - -
 
-<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.4.0</i> <br> <code>API/Post.litcoffee</code></p>
+<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.5.0</i> <br> <code>API/Post.litcoffee</code></p>
 
 #  POST REQUESTS  #
 
@@ -2925,7 +2951,7 @@ They will respond with the updated post if they succeed.
 >       id: postID,
 >       type: Laboratory.Post.Type.STATUS
 >   });
->   request.addEventListener("response", requestCallback);
+>   request.assign(requestCallback);
 >   request.start();
 >   ```
 
@@ -2957,7 +2983,7 @@ They will respond with the updated post if they succeed.
 >       id: somePost.id,
 >       value: true
 >   });
->   request.addEventListener("response", requestCallback);
+>   request.assign(requestCallback);
 >   request.start();
 >   ```
 
@@ -2972,7 +2998,7 @@ They will respond with the updated post if they succeed.
 >       id: somePost.id,
 >       value: false
 >   });
->   request.addEventListener("response", requestCallback);
+>   request.assign(requestCallback);
 >   request.start();
 >   ```
 
@@ -3318,7 +3344,7 @@ The `LaboratoryPostDeleted` event removes the given post from our store.
 
 - - -
 
-<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.4.0</i> <br> <code>API/Profile.litcoffee</code></p>
+<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.5.0</i> <br> <code>API/Profile.litcoffee</code></p>
 
 #  PROFILE REQUESTS  #
 
@@ -3415,7 +3441,7 @@ They should be fired with two parameters: `id`, which gives the id of the accoun
 >   }
 >
 >   var request = new Laboratory.Profile.Request({id: profileID});
->   request.addEventListener("response", requestCallback);
+>   request.assign(requestCallback);
 >   request.start();
 >   ```
 
@@ -3430,7 +3456,7 @@ They should be fired with two parameters: `id`, which gives the id of the accoun
 >       id: someProfile.id,
 >       value: true
 >   });
->   request.addEventListener("response", requestCallback);
+>   request.assign(requestCallback);
 >   request.start();
 >   ```
 
@@ -3445,7 +3471,7 @@ They should be fired with two parameters: `id`, which gives the id of the accoun
 >       id: someProfile.id,
 >       value: false
 >   });
->   request.addEventListener("response", requestCallback);
+>   request.assign(requestCallback);
 >   request.start();
 >   ```
 
@@ -3759,7 +3785,7 @@ The `LaboratoryProfileReceived` event simply adds a received profile to our stor
 
 - - -
 
-<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.4.0</i> <br> <code>API/Request.litcoffee</code></p>
+<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.5.0</i> <br> <code>API/Request.litcoffee</code></p>
 
 #  REQUEST EVENTS  #
 
@@ -3827,7 +3853,7 @@ Laboratory Request events do not have handlers.
 
 - - -
 
-<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.4.0</i> <br> <code>API/Rolodex.litcoffee</code></p>
+<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.5.0</i> <br> <code>API/Rolodex.litcoffee</code></p>
 
 #  ROLODEX REQUESTS  #
 
@@ -3894,7 +3920,7 @@ These return new `Rolodex.Request`s which will respond with the previous and nex
 >       type: Laboratory.Rolodex.Type.FOLLOWERS
 >       query: someProfile.id
 >   });
->   request.addEventListener("response", requestCallback);
+>   request.assign(requestCallback);
 >   request.start();
 >   ```
 
@@ -3910,7 +3936,7 @@ These return new `Rolodex.Request`s which will respond with the previous and nex
 >       query: "account"
 >       limit: 5
 >   });
->   request.addEventListener("response", requestCallback);
+>   request.assign(requestCallback);
 >   request.start();
 >   ```
 
@@ -3924,7 +3950,7 @@ These return new `Rolodex.Request`s which will respond with the previous and nex
 >   var request = new Laboratory.Rolodex.Request({
 >       type: Laboratory.Rolodex.Type.BLOCKS
 >   });
->   request.addEventListener("response", requestCallback);
+>   request.assign(requestCallback);
 >   request.start();
 >   ```
 
@@ -3943,14 +3969,14 @@ These return new `Rolodex.Request`s which will respond with the previous and nex
 >
 >   function loadNextPage (request) {
 >       var newRequest = request.next();
->       newRequest.addEventListener("response", requestCallback);
+>       newRequest.assign(requestCallback);
 >       newRequest.start();
 >       return newRequest;
 >   }
 >
 >   function loadPrevPage (request) {
 >       var newRequest = request.prev();
->       newRequest.addEventListener("response", requestCallback);
+>       newRequest.assign(requestCallback);
 >       newRequest.start();
 >       return newRequest;
 >   }
@@ -4093,7 +4119,7 @@ Our `Rolodex.Request.prototype` inherits from `Request`, with additional dummy m
 
 - - -
 
-<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.4.0</i> <br> <code>API/Timeline.litcoffee</code></p>
+<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.5.0</i> <br> <code>API/Timeline.litcoffee</code></p>
 
 #  TIMELINE REQUESTS  #
 
@@ -4165,7 +4191,7 @@ These return new `Timeline.Request`s which will respond with the previous and ne
 >       type: Laboratory.Timeline.Type.ACCOUNT
 >       query: someProfile.id
 >   });
->   request.addEventListener("response", requestCallback);
+>   request.assign(requestCallback);
 >   request.start();
 >   ```
 
@@ -4180,7 +4206,7 @@ These return new `Timeline.Request`s which will respond with the previous and ne
 >       type: Laboratory.Timeline.Type.HASHTAG
 >       query: "hashtag"
 >   });
->   request.addEventListener("response", requestCallback);
+>   request.assign(requestCallback);
 >   request.start();
 >   ```
 
@@ -4194,7 +4220,7 @@ These return new `Timeline.Request`s which will respond with the previous and ne
 >   var request = new Laboratory.Timeline.Request({
 >       type: Laboratory.Timeline.Type.HOME
 >   });
->   request.addEventListener("response", requestCallback);
+>   request.assign(requestCallback);
 >   request.start();
 >   ```
 
@@ -4213,14 +4239,14 @@ These return new `Timeline.Request`s which will respond with the previous and ne
 >
 >   function loadNextPage (request) {
 >       var newRequest = request.next();
->       newRequest.addEventListener("response", requestCallback);
+>       newRequest.assign(requestCallback);
 >       newRequest.start();
 >       return newRequest;
 >   }
 >
 >   function loadPrevPage (request) {
 >       var newRequest = request.prev();
->       newRequest.addEventListener("response", requestCallback);
+>       newRequest.assign(requestCallback);
 >       newRequest.start();
 >       return newRequest;
 >   }
@@ -4387,7 +4413,7 @@ Our `Rolodex.Request.prototype` inherits from `Request`, with additional dummy m
 
 - - -
 
-<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.4.0</i> <br> <code>INSTALLING.litcoffee</code></p>
+<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.5.0</i> <br> <code>INSTALLING.litcoffee</code></p>
 
 #  USING LABORATORY  #
 
@@ -4420,12 +4446,12 @@ Laboratory doesn't have any external dependencies, and should run in any modern 
 >
 >       function init () {
 >           var request = new Laboratory.Authorization.Request({
->               origin: "https://myinstance.social"
->               name: "My Laboratory Client"
->               redirect: "/"
+>               origin: "https://myinstance.social",
+>               name: "My Laboratory Client",
+>               redirect: "/",
 >               scope: Laboratory.Authorization.READWRITEFOLLOW
 >           });
->           request.addEventListener("response", run);
+>           request.assign(run);
 >           request.start();
 >       }
 >

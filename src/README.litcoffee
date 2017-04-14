@@ -1,4 +1,4 @@
-<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.4.0</i> <br> <code>README.litcoffee</code></p>
+<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.5.0</i> <br> <code>README.litcoffee</code></p>
 
 #  _LABORATORY_  #
 
@@ -79,7 +79,7 @@ This is the first file in our compiled source, so let's identify ourselves real 
                Source code available at:
         https://github.com/marrus-sh/laboratory
 
-                    Version 0.4.0
+                    Version 0.5.0
 
     ###
 
@@ -94,7 +94,7 @@ Laboratory thus assures that minor and patch numbers will never exceed `99` (ind
 
     Laboratory =
         ℹ: "https://github.com/marrus-sh/laboratory"
-        Nº: 4.0
+        Nº: 5.0
 
 Laboratory is designed to be extended, and these attributes provide extensions with a simple way of detecting Laboratory support.
 
@@ -169,47 +169,18 @@ This is a CoffeeScript re-implementation of the polyfill available on [the MDN](
         CE.prototype = Object.freeze Object.create window.Event.prototype
         Object.freeze CE
 
-###  `LaboratoryEventTarget()`:
+###  `reflection()` and `give()`:
 
-`LaboratoryEventTarget()` is a simple implementation of the [`EventTarget` interface](https://developer.mozilla.org/en-US/docs/Web/API/EventTarget), used to create an `XMLHttpRequest`-esque object for requesting Mastodon data.
-Note that the `addEventListener()`, `removeEventListener()`, and `dispatchEvent()` functions are (unlike with other `EventTarget`s) bound to the instance.
+`reflection()` is a function that just returns its `this`.
+For convenience, the `give()` function returns a reflection bound to its argument.
 
->   __[Issue #63](https://github.com/marrus-sh/laboratory/issues/63) :__
->   This interface may change drastically in the future.
+    reflection = -> this
+    give = (n) -> reflection.bind n
 
-    LaboratoryEventTarget = do ->
-        addEventListener = (callbackObj, event, callback) ->
-            unless this instanceof LaboratoryEventTarget
-                throw TypeError "this isnt a LaboratoryEventTarget"
-            unless typeof callback is "function"
-                throw TypeError "Listener is not a function"
-            event = do (String event).toUpperCase
-            callbackObj[event] = [] unless callbackObj[event]?
-            callbackObj[event].push callback unless callback in callbackObj[event]
-            return
-        removeEventListener = (callbackObj, event, callback) ->
-            unless this instanceof LaboratoryEventTarget
-                throw TypeError "this isnt a LaboratoryEventTarget"
-            event = do (String event).toUpperCase
-            if (index = callbackObj[event].indexOf callback) isnt -1
-                callbackObj[event]?.splice index, 1
-            return
-        dispatchEvent = (callbackObj, object) ->
-            unless this instanceof LaboratoryEventTarget
-                throw TypeError "this isnt a LaboratoryEventTarget"
-            unless object instanceof Event
-                throw TypeError "Attempted to dispatch something which wasn't an event"
-            event = do (String object.type).toUpperCase
-            if callbackObj[event]
-                callback object for callback in callbackObj[event]
-            return
-        LabEvtTgt = ->
-            callbacks = {}
-            @addEventListener = addEventListener.bind this, callbacks
-            @removeEventListener = removeEventListener.bind this, callbacks
-            @dispatchEvent = dispatchEvent.bind this, callbacks
-        LabEvtTgt.prototype = Object.freeze Object.create (
-            if window.EventTarget?.prototype then window.EventTarget.prototype
-            else window.Object.prototype
-        )
-        Object.freeze LabEvtTgt
+###  `isArray()`:
+
+`isArray()` checks to see if the given argument is an array.
+
+    isArray =
+        if typeof Array.isArray is "function" then Array.isArray
+        else (n) -> (Object.prototype.toString.call n) is "[object Array]"

@@ -1,4 +1,4 @@
-<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.4.0</i> <br> <code>API/README.litcoffee</code></p>
+<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.5.0</i> <br> <code>API/README.litcoffee</code></p>
 
 #  LABORATORY API  #
 
@@ -67,11 +67,8 @@ Constantly calling, listening for, and handling events can get tedious, so Labor
 Generally speaking, using this API means following these basic steps:
 
 1.  Create a new `Request` object, for example by calling `new Laboratory.Post.Request()`
-2.  Associate the `response` event with a callback using `request.addEventListener`
+2.  Associate the `Request` with a callback using `request.assign()`
 3.  Send the request using `request.start()`
-
->   __[Issue #63](https://github.com/marrus-sh/laboratory/issues/63) :__
->   The method by which you listen for responses to `Request`s may change drastically in the future.
 
 Every `Request` object has `start()` and `stop()` methods which can be used to send and cancel the request.
 In order to prevent memory leaks, it is recommended that you always call `stop()` when you are done with a `Request`.
@@ -109,17 +106,14 @@ These are as follows:
 
 ###  Requesting authorization:
 
->   __[Issue #63](https://github.com/marrus-sh/laboratory/issues/63) :__
->   The method by which you listen for responses to `Request`s may change drastically in the future.
-
 >   ```javascript
 >   request = Laboratory.Authorization.Request({
->       origin: "https://myinstance.social"
->       name: "My Laboratory Client"
->       redirect: "/"
+>       origin: "https://myinstance.social",
+>       name: "My Laboratory Client",
+>       redirect: "/",
 >       scope: Laboratory.Authorization.READWRITEFOLLOW
 >   });
->   request.addEventListener("response", callback);
+>   request.assign(callback);
 >   request.send();
 >   ```
 

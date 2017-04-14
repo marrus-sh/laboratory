@@ -1,4 +1,4 @@
-<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.4.0</i> <br> <code>API/Timeline.litcoffee</code></p>
+<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.5.0</i> <br> <code>API/Timeline.litcoffee</code></p>
 
 #  TIMELINE REQUESTS  #
 
@@ -70,7 +70,7 @@ These return new `Timeline.Request`s which will respond with the previous and ne
 >       type: Laboratory.Timeline.Type.ACCOUNT
 >       query: someProfile.id
 >   });
->   request.addEventListener("response", requestCallback);
+>   request.assign(requestCallback);
 >   request.start();
 >   ```
 
@@ -85,7 +85,7 @@ These return new `Timeline.Request`s which will respond with the previous and ne
 >       type: Laboratory.Timeline.Type.HASHTAG
 >       query: "hashtag"
 >   });
->   request.addEventListener("response", requestCallback);
+>   request.assign(requestCallback);
 >   request.start();
 >   ```
 
@@ -99,7 +99,7 @@ These return new `Timeline.Request`s which will respond with the previous and ne
 >   var request = new Laboratory.Timeline.Request({
 >       type: Laboratory.Timeline.Type.HOME
 >   });
->   request.addEventListener("response", requestCallback);
+>   request.assign(requestCallback);
 >   request.start();
 >   ```
 
@@ -118,14 +118,14 @@ These return new `Timeline.Request`s which will respond with the previous and ne
 >
 >   function loadNextPage (request) {
 >       var newRequest = request.next();
->       newRequest.addEventListener("response", requestCallback);
+>       newRequest.assign(requestCallback);
 >       newRequest.start();
 >       return newRequest;
 >   }
 >
 >   function loadPrevPage (request) {
 >       var newRequest = request.prev();
->       newRequest.addEventListener("response", requestCallback);
+>       newRequest.assign(requestCallback);
 >       newRequest.start();
 >       return newRequest;
 >   }

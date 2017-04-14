@@ -2,9 +2,23 @@
 
 ##  Version 0  ##
 
+###  0.5
+
+####  0.5.0.
+
+#####  NEW
+
++ The `Request.prototype.go()` prototype method can be used to generate a `Promise` for use with `Request`s ([#49](https://github.com/marrus-sh/laboratory/issues/49))
+
+#####  CHANGED
+
+* `Request`s use a custom interface instead of `EventTarget`; `request.addEventListener("response", callback)` is now simply `request.assign(callback)` ([#63](https://github.com/marrus-sh/laboratory/issues/63))
+
+ - - -
+
 ###  0.4
 
-####  0.4.0
+####  0.4.0.
 
 #####  NEW
 

@@ -1,4 +1,4 @@
-<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.4.0</i> <br> <code>API/Attachment.litcoffee</code></p>
+<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.5.0</i> <br> <code>API/Attachment.litcoffee</code></p>
 
 #  ATTACHMENT REQUESTS  #
 
@@ -41,7 +41,7 @@ The only relevant parameter is `file`, which should be the `File` to upload.
 >   var request = new Laboratory.Attachment.Request({
 >       file: myAttachment
 >   });
->   request.addEventListener("response", requestCallback);
+>   request.assign(requestCallback);
 >   request.start();
 >   ```
 

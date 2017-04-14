@@ -1,4 +1,4 @@
-<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.4.0</i> <br> <code>API/Authorization.litcoffee</code></p>
+<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.5.0</i> <br> <code>API/Authorization.litcoffee</code></p>
 
 #  AUTHORIZATION REQUESTS  #
 
@@ -65,7 +65,7 @@ You don't need to specify a `window` if you're passing through an `accessToken`.
 >       redirect: "/",
 >       scope: Laboratory.Authorization.Scope.READWRITEFOLLOW
 >   });
->   request.addEventListener("response", requestCallback);
+>   request.assign(requestCallback);
 >   request.start(authWindow);
 >   ```
 
@@ -81,7 +81,7 @@ You don't need to specify a `window` if you're passing through an `accessToken`.
 >       accessToken: myAccessToken
 >       scope: Laboratory.Authorization.Scope.READWRITEFOLLOW
 >   });
->   request.addEventListener("response", requestCallback);
+>   request.assign(requestCallback);
 >   request.start();
 >   ```
 
@@ -179,13 +179,13 @@ Otherwise, we need to get new client credentials before proceeding.
                         ].join " "
                         clearTimeout timeout
                         @wrapup = undefined
-                        @waitingRequest.removeEventListener "response", handleClient
+                        @waitingRequest.remove handleClient
                         makeRequest.call this
 
                     @waitingRequest = new Client.Request {@name, @origin, @redirect, @scope}
 
-                    @waitingRequest.addEventListener "response", handleClient
-                    @wrapup = => @waitingRequest.removeEventListener "response", handleClient
+                    @waitingRequest.assign handleClient
+                    @wrapup = => @waitingRequest.remove handleClient
                     do @waitingRequest.start
 
 If we aren't able to acquire a client ID within 30 seconds, we timeout.
@@ -299,7 +299,7 @@ During verification, the Mastodon server will provide us with the current user's
                                 Authorization.Scope.WRITE * ("write" in scopes) +
                                 Authorization.Scope.FOLLOW * ("follow" in scopes)
                             @accessToken
-                            ].join " "
+                        ].join " "
                         dispatch "LaboratoryProfileReceived", new Profile mine
                         do @currentRequest.stop
                 ).start

@@ -1,4 +1,4 @@
-<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.4.0</i> <br> <code>API/Client.litcoffee</code></p>
+<p align="right"><i>Laboratory</i> <br> Source Code and Documentation <br> API Version: <i>0.5.0</i> <br> <code>API/Client.litcoffee</code></p>
 
 #  CLIENT REQUESTS  #
 
@@ -61,7 +61,7 @@ However, you can request this yourself if you find yourself needing new client a
 >       redirect: "/",
 >       scope: Laboratory.Authorization.Scope.READWRITEFOLLOW
 >   });
->   request.addEventListener("response", requestCallback);
+>   request.assign(requestCallback);
 >   request.start();
 >   ```
 
