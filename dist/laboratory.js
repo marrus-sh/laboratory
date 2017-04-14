@@ -515,36 +515,39 @@
   Request = void 0;
 
   (function() {
-    var assign, callback, remove, setResponse, start, stop;
+    var assign, finish, getResponse, remove, setResponse, start, stop;
     setResponse = function(stored, n) {
-      if (checkDegree()) {
-        police((function(_this) {
+      if (checkDecree()) {
+        return police((function(_this) {
           return function() {
-            var callback, i, len, ref, results;
+            var callback, i, len, ref;
             stored.response = n;
             ref = stored.callbacks;
-            results = [];
             for (i = 0, len = ref.length; i < len; i++) {
               callback = ref[i];
               if (typeof callback === "function") {
-                results.push(callback(_this));
+                callback(_this);
               }
             }
-            return results;
           };
         })(this));
       }
     };
-    callback = function(request, onComplete) {
+    getResponse = function(stored) {
+      return stored.response;
+    };
+    finish = function(request, onComplete) {
       var link, params, result, status;
       switch (request.readyState) {
         case 0:
           break;
         case 1:
-          return dispatch("LaboratoryRequestOpen", request);
+          dispatch("LaboratoryRequestOpen", request);
+          break;
         case 2:
         case 3:
-          return dispatch("LaboratoryRequestUpdate", request);
+          dispatch("LaboratoryRequestUpdate", request);
+          break;
         case 4:
           status = request.status;
           result = (function() {
@@ -573,14 +576,14 @@
                 decree((function(_this) {
                   return function() {
                     return _this.response = police(function() {
-                      return new Failure(response, status);
+                      return new Failure(result, status);
                     });
                   };
                 })(this));
                 dispatch("LaboratoryRequestError", request);
               } else {
                 if (typeof onComplete === "function") {
-                  onComplete(response, params);
+                  onComplete(result, params);
                 }
                 dispatch("LaboratoryRequestComplete", request);
               }
@@ -589,13 +592,12 @@
               decree((function(_this) {
                 return function() {
                   return _this.response = police(function() {
-                    return new Failure(response, status);
+                    return new Failure(result, status);
                   });
                 };
               })(this));
               dispatch("LaboratoryRequestError", request);
           }
-          return request.removeEventListener("readystatechange", callback);
       }
     };
     assign = function(stored, callback) {
@@ -672,7 +674,7 @@
         response: {
           configurable: true,
           enumerable: true,
-          get: give(stored.response),
+          get: getResponse.bind(this, stored),
           set: setResponse.bind(this, stored)
         },
         start: {
@@ -691,7 +693,7 @@
       if (!(method === "GET" || method === "POST" || method === "DELETE")) {
         return this;
       }
-      stored.callback = callback.bind(this, stored.request = new XMLHttpRequest, onComplete);
+      stored.callback = finish.bind(this, stored.request = new XMLHttpRequest, onComplete);
       stored.contents = contents = method === "POST" && typeof FormData === "function" && data instanceof FormData ? data : (((function() {
         var results;
         results = [];
@@ -741,6 +743,7 @@
           value: function() {
             return new Promise((function(_this) {
               return function(resolve, reject) {
+                var callback;
                 callback = function(response) {
                   (response instanceof Failure ? reject : resolve)(response);
                   return _this.remove(callback);
@@ -1148,15 +1151,16 @@
           makeRequest.call(this);
         } else {
           handleClient = (function(_this) {
-            return function(event) {
+            return function(request) {
               var client, ref1;
-              if (!((client = event.detail.response) instanceof Client && _this.currentRequest && client.origin === _this.origin && (_this.scope & client.scope) === +_this.scope && client.redirect === _this.redirect && client.clientID && client.clientSecret)) {
+              if (!((client = request.response) instanceof Client && _this.currentRequest && client.origin === _this.origin && (_this.scope & client.scope) === +_this.scope && client.redirect === _this.redirect && client.clientID && client.clientSecret)) {
                 return;
               }
               ref1 = [client.clientID, client.clientSecret], _this.clientID = ref1[0], _this.clientSecret = ref1[1];
               localStorage.setItem("Laboratory | " + _this.origin, [client.redirect, client.clientID, client.clientSecret, +client.scope].join(" "));
               clearTimeout(timeout);
               _this.wrapup = void 0;
+              _this.waitingRequest.stop();
               _this.waitingRequest.remove(handleClient);
               return makeRequest.call(_this);
             };
@@ -1174,13 +1178,17 @@
             };
           })(this);
           this.waitingRequest.start();
-          timeout = setTimeout((function() {
-            this.currentRequest.stop();
-            return this.dispatchEvent(new CustomEvent("failure", {
-              request: this,
-              response: new Failure("Unable to authorize client")
-            }));
-          }), 30000);
+          timeout = setTimeout(((function(_this) {
+            return function() {
+              _this.currentRequest.stop();
+              _this.waitingRequest.stop();
+              return decree(function() {
+                return _this.response = police(function() {
+                  return new Failure("Unable to authorize client");
+                });
+              });
+            };
+          })(this)), 30000);
         }
       };
       makeRequest = function() {

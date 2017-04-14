@@ -1261,17 +1261,21 @@ We define `Request()` inside a closure because it involves a number of helper fu
 
     do ->
 
-###  Setting the response:
+###  Setting and getting the response:
 
 The `setResponse()` function sets the `response` of a `Request` and triggers its callbacks.
 It can only be called from privileged code.
 
         setResponse = (stored, n) ->
-            if do checkDegree then police =>
+            if do checkDecree then police =>
                 stored.response = n
                 for callback in stored.callbacks when typeof callback is "function"
                     callback this
-            return
+                return
+
+`getResponse()` just returns the current value of the `response`.
+
+        getResponse = (stored) -> stored.response
 
 ####  The callback.
 
@@ -1289,7 +1293,7 @@ Laboratory doesn't support HTTP status codes like `206 PARTIAL CONTENT`.
 >   - `XMLHttpRequest.LOADING` (`3`)
 >   - `XMLHttpRequest.DONE` (`4`)
 
-        callback = (request, onComplete) ->
+        finish = (request, onComplete) ->
             switch request.readyState
                 when 0 then  #  Do nothing
                 when 1 then dispatch "LaboratoryRequestOpen", request
@@ -1327,15 +1331,15 @@ Laboratory doesn't support HTTP status codes like `206 PARTIAL CONTENT`.
                     switch
                         when 200 <= status <= 205
                             if result?.error?
-                                decree => @response = police -> new Failure response, status
+                                decree => @response = police -> new Failure result, status
                                 dispatch "LaboratoryRequestError", request
                             else
-                                onComplete response, params if typeof onComplete is "function"
+                                onComplete result, params if typeof onComplete is "function"
                                 dispatch "LaboratoryRequestComplete", request
                         else
-                            decree => @response = police -> new Failure response, status
+                            decree => @response = police -> new Failure result, status
                             dispatch "LaboratoryRequestError", request
-                    request.removeEventListener "readystatechange", callback
+            return
 
 ###  Adding and removing callbacks:
 
@@ -1430,7 +1434,7 @@ We bind our instance to our helper functions and properties here.
                 response:
                     configurable: yes
                     enumerable: yes
-                    get: give stored.response
+                    get: getResponse.bind this, stored
                     set: setResponse.bind this, stored
                 start:
                     configurable: yes
@@ -1446,7 +1450,7 @@ We bind our instance to our helper functions and properties here.
 If the provided method isn't `GET`, `POST`, or `DELETE`, then we aren't going to make any requests ourselves.
 
             return this unless method is "GET" or method is "POST" or method is "DELETE"
-            stored.callback = callback.bind this, stored.request = new XMLHttpRequest, onComplete
+            stored.callback = finish.bind this, stored.request = new XMLHttpRequest, onComplete
 
 ####  Setting the contents.
 
@@ -2367,8 +2371,8 @@ Otherwise, we need to get new client credentials before proceeding.
 
                 else
 
-                    handleClient = (event) =>
-                        return unless (client = event.detail.response) instanceof Client and
+                    handleClient = (request) =>
+                        return unless (client = request.response) instanceof Client and
                             @currentRequest and client.origin is @origin and
                             (@scope & client.scope) is +@scope and client.redirect is @redirect and
                             client.clientID and client.clientSecret
@@ -2381,6 +2385,7 @@ Otherwise, we need to get new client credentials before proceeding.
                         ].join " "
                         clearTimeout timeout
                         @wrapup = undefined
+                        do @waitingRequest.stop
                         @waitingRequest.remove handleClient
                         makeRequest.call this
 
@@ -2393,11 +2398,11 @@ Otherwise, we need to get new client credentials before proceeding.
 If we aren't able to acquire a client ID within 30 seconds, we timeout.
 
                     timeout = setTimeout (
-                        ->
+                        =>
                             do @currentRequest.stop
-                            @dispatchEvent new CustomEvent "failure",
-                                request: this
-                                response: new Failure "Unable to authorize client"
+                            do @waitingRequest.stop
+                            decree => @response = police ->
+                                new Failure "Unable to authorize client"
                     ), 30000
 
 Again, we have to explicitly return nothing because the window can see us.

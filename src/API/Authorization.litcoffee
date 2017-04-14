@@ -165,8 +165,8 @@ Otherwise, we need to get new client credentials before proceeding.
 
                 else
 
-                    handleClient = (event) =>
-                        return unless (client = event.detail.response) instanceof Client and
+                    handleClient = (request) =>
+                        return unless (client = request.response) instanceof Client and
                             @currentRequest and client.origin is @origin and
                             (@scope & client.scope) is +@scope and client.redirect is @redirect and
                             client.clientID and client.clientSecret
@@ -179,6 +179,7 @@ Otherwise, we need to get new client credentials before proceeding.
                         ].join " "
                         clearTimeout timeout
                         @wrapup = undefined
+                        do @waitingRequest.stop
                         @waitingRequest.remove handleClient
                         makeRequest.call this
 
@@ -191,11 +192,11 @@ Otherwise, we need to get new client credentials before proceeding.
 If we aren't able to acquire a client ID within 30 seconds, we timeout.
 
                     timeout = setTimeout (
-                        ->
+                        =>
                             do @currentRequest.stop
-                            @dispatchEvent new CustomEvent "failure",
-                                request: this
-                                response: new Failure "Unable to authorize client"
+                            do @waitingRequest.stop
+                            decree => @response = police ->
+                                new Failure "Unable to authorize client"
                     ), 30000
 
 Again, we have to explicitly return nothing because the window can see us.
