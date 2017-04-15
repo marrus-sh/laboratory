@@ -156,8 +156,8 @@ First, we handle our `data`.
 
 `before` and `after` will store the next and previous pages for our `Rolodex.Request`.
 
-                before = undefined
-                after = undefined
+                before = undefined unless Infinity > before > 0
+                after = undefined unless Infinity > after > 0
 
 Next, we set up our `Request`.
 Note that `Request()` ignores data parameters which have a value of `undefined` or `null`.

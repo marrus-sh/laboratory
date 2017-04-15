@@ -89,7 +89,7 @@ We sort our data according to their ids.
 The following loop removes any duplicates from our `data`.
 
         prev = null
-        for index in [data.length - 1 .. 0]
+        if data.length > 0 then for index in [data.length - 1 .. 0]
             currentID = (current = data[index]).id
             if prev? and currentID is prev.id
                 data.splice index, 1

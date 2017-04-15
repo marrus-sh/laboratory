@@ -1626,7 +1626,7 @@ We sort our data according to their ids.
 The following loop removes any duplicates from our `data`.
 
         prev = null
-        for index in [data.length - 1 .. 0]
+        if data.length > 0 then for index in [data.length - 1 .. 0]
             currentID = (current = data[index]).id
             if prev? and currentID is prev.id
                 data.splice index, 1
@@ -1825,7 +1825,7 @@ Next we walk the array and look for any duplicates, removing them.
 >   (Generally speaking, if you find yourself with two posts with identical `id`s but different `datetime`s, this is a sign that something has gone terribly wrong.)
 
         prev = null
-        for index in [data.length - 1 .. 0]
+        if data.length > 0 then for index in [data.length - 1 .. 0]
             currentID = (current = data[index]).id
             if prev? and currentID is prev.id and
                 (isNotification prev) is (isNotification current)
@@ -4016,8 +4016,8 @@ First, we handle our `data`.
 
 `before` and `after` will store the next and previous pages for our `Rolodex.Request`.
 
-                before = undefined
-                after = undefined
+                before = undefined unless Infinity > before > 0
+                after = undefined unless Infinity > after > 0
 
 Next, we set up our `Request`.
 Note that `Request()` ignores data parameters which have a value of `undefined` or `null`.
@@ -4287,8 +4287,8 @@ First, we handle our `data`.
 
 `before` and `after` will store the next and previous pages for our `Timeline.Request`.
 
-                before = undefined
-                after = undefined
+                before = undefined unless Infinity > before > 0
+                after = undefined unless Infinity > after > 0
 
 Next, we set up our `Request`.
 Note that `Request()` ignores data parameters which have a value of `undefined` or `null`.

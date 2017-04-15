@@ -791,13 +791,15 @@
       return second.id - first.id;
     });
     prev = null;
-    for (index = i = ref = data.length - 1; ref <= 0 ? i <= 0 : i >= 0; index = ref <= 0 ? ++i : --i) {
-      currentID = (current = data[index]).id;
-      if ((prev != null) && currentID === prev.id) {
-        data.splice(index, 1);
-        continue;
+    if (data.length > 0) {
+      for (index = i = ref = data.length - 1; ref <= 0 ? i <= 0 : i >= 0; index = ref <= 0 ? ++i : --i) {
+        currentID = (current = data[index]).id;
+        if ((prev != null) && currentID === prev.id) {
+          data.splice(index, 1);
+          continue;
+        }
+        prev = current;
       }
-      prev = current;
     }
     this.profiles = [];
     for (index = j = 0, len = data.length; j < len; index = ++j) {
@@ -924,13 +926,15 @@
       }
     });
     prev = null;
-    for (index = i = ref = data.length - 1; ref <= 0 ? i <= 0 : i >= 0; index = ref <= 0 ? ++i : --i) {
-      currentID = (current = data[index]).id;
-      if ((prev != null) && currentID === prev.id && (isNotification(prev)) === (isNotification(current))) {
-        data.splice(index, 1);
-        continue;
+    if (data.length > 0) {
+      for (index = i = ref = data.length - 1; ref <= 0 ? i <= 0 : i >= 0; index = ref <= 0 ? ++i : --i) {
+        currentID = (current = data[index]).id;
+        if ((prev != null) && currentID === prev.id && (isNotification(prev)) === (isNotification(current))) {
+          data.splice(index, 1);
+          continue;
+        }
+        prev = current;
       }
-      prev = current;
     }
     this.posts = [];
     for (index = j = 0, len = data.length; j < len; index = ++j) {
@@ -1989,8 +1993,12 @@
         }
         query = data.query != null ? String(data.query) : void 0;
         limit = (2e308 > (ref = data.limit) && ref > 0) ? Math.floor(data.limit) : void 0;
-        before = void 0;
-        after = void 0;
+        if (!((2e308 > before && before > 0))) {
+          before = void 0;
+        }
+        if (!((2e308 > after && after > 0))) {
+          after = void 0;
+        }
         Request.call(this, "GET", Store.auth.origin + ((function() {
           switch (type) {
             case Rolodex.Type.SEARCH:
@@ -2171,8 +2179,12 @@
         query = data.query != null ? String(data.query) : void 0;
         isLocal = !!data.isLocal;
         limit = (2e308 > (ref = data.limit) && ref > 0) ? Math.floor(data.limit) : void 0;
-        before = void 0;
-        after = void 0;
+        if (!((2e308 > before && before > 0))) {
+          before = void 0;
+        }
+        if (!((2e308 > after && after > 0))) {
+          after = void 0;
+        }
         Request.call(this, "GET", Store.auth.origin + ((function() {
           switch (type) {
             case Timeline.Type.HASHTAG:
