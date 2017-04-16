@@ -186,16 +186,11 @@ Note that `Request()` ignores data parameters which have a value of `undefined` 
                             when Timeline.Type.ACCOUNT then "/api/v1/accounts/" + query +
                                 "/statuses"
                             else "/api/v1"
-                    ), (
-                        switch type
-                            when isLocal
-                                local: yes
-                                max_id: before
-                                since_id: after
-                            else
-                                max_id: before
-                                since_id: after
-                    ), Store.auth.accessToken, (result, params) =>
+                    ), {
+                        local: isLocal or undefined
+                        max_id: before
+                        since_id: after
+                    }, Store.auth.accessToken, (result, params) =>
                         acctIDs = []
                         mentions = []
                         mentionIDs = []
