@@ -165,8 +165,8 @@ Otherwise, we need to get new client credentials before proceeding.
 
                 else
 
-                    handleClient = (request) =>
-                        return unless (client = request.response) instanceof Client and
+                    handleClient = (client) =>
+                        return unless client instanceof Client and
                             @currentRequest and client.origin is @origin and
                             (@scope & client.scope) is +@scope and client.redirect is @redirect and
                             client.clientID and client.clientSecret

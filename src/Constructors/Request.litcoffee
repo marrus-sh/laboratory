@@ -69,7 +69,7 @@ It can only be called from privileged code.
             if do checkDecree then police =>
                 stored.response = n
                 for callback in stored.callbacks when typeof callback is "function"
-                    callback this
+                    callback.call this, @response
                 return
 
 `getResponse()` just returns the current value of the `response`.
@@ -312,7 +312,9 @@ You'll note that `Request.prototype.constructor` gives our dummy constructor, no
                     enumerable: no
                     value: -> new Promise (resolve, reject) =>
                         callback = (response) =>
-                            (if response instanceof Failure then reject else resolve) response
+                            (
+                                if response instanceof Failure then reject else resolve
+                            ).call this, response
                             @remove callback
                         @assign callback
                         @start

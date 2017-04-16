@@ -1270,7 +1270,7 @@ It can only be called from privileged code.
             if do checkDecree then police =>
                 stored.response = n
                 for callback in stored.callbacks when typeof callback is "function"
-                    callback this
+                    callback.call this, @response
                 return
 
 `getResponse()` just returns the current value of the `response`.
@@ -1513,7 +1513,9 @@ You'll note that `Request.prototype.constructor` gives our dummy constructor, no
                     enumerable: no
                     value: -> new Promise (resolve, reject) =>
                         callback = (response) =>
-                            (if response instanceof Failure then reject else resolve) response
+                            (
+                                if response instanceof Failure then reject else resolve
+                            ).call this, response
                             @remove callback
                         @assign callback
                         @start
@@ -2371,8 +2373,8 @@ Otherwise, we need to get new client credentials before proceeding.
 
                 else
 
-                    handleClient = (request) =>
-                        return unless (client = request.response) instanceof Client and
+                    handleClient = (client) =>
+                        return unless client instanceof Client and
                             @currentRequest and client.origin is @origin and
                             (@scope & client.scope) is +@scope and client.redirect is @redirect and
                             client.clientID and client.clientSecret
@@ -4075,23 +4077,25 @@ Note that `Request()` ignores data parameters which have a value of `undefined` 
                     loadMore:
                         enumerable: no
                         value: =>
-                            callback = (event) =>
+                            callback = (response) =>
                                 after = next.after
-                                decree => @response = police -> @response.join next.response
-                                next.removeEventListener "response", callback
-                            (next = do @next).addEventListener "response", callback
+                                decree => @response = police -> @response.join response
+                                do next.stop
+                                next.remove callback
+                            (next = do @next).assign callback
                             do next.start
                     update:
                         enumerable: no
                         value: (keepGoing) =>
-                            callback = (event) =>
+                            callback = (response) =>
                                 before = prev.before
-                                decree => @response = police -> @response.join prev.response
-                                prev.removeEventListener "response", callback
-                                if keepGoing and prev.response.length
-                                    (prev = do @prev).addEventListener "response", callback
+                                decree => @response = police -> @response.join response
+                                do prev.stop
+                                prev.remove callback
+                                if keepGoing and response.length
+                                    (prev = do @prev).assign callback
                                     do prev.start
-                            (prev = do @prev).addEventListener "response", callback
+                            (prev = do @prev).assign callback
                             do prev.start
 
                 Object.freeze this
@@ -4364,23 +4368,25 @@ Note that `Request()` ignores data parameters which have a value of `undefined` 
                     loadMore:
                         enumerable: no
                         value: =>
-                            callback = (event) =>
+                            callback = (response) =>
                                 after = next.after
-                                decree => @response = police -> @response.join next.response
-                                next.removeEventListener "response", callback
-                            (next = do @next).addEventListener "response", callback
+                                decree => @response = police -> @response.join response
+                                do next.stop
+                                next.remove callback
+                            (next = do @next).assign callback
                             do next.start
                     update:
                         enumerable: no
                         value: (keepGoing) =>
-                            callback = (event) =>
+                            callback = (response) =>
                                 before = prev.before
-                                decree => @response = police -> @response.join prev.response
-                                prev.removeEventListener "response", callback
-                                if keepGoing and prev.response.length
-                                    (prev = do @prev).addEventListener "response", callback
+                                decree => @response = police -> @response.join response
+                                do prev.stop
+                                prev.remove callback
+                                if keepGoing and response.length
+                                    (prev = do @prev).assign callback
                                     do prev.start
-                            (prev = do @prev).addEventListener "response", callback
+                            (prev = do @prev).assign callback
                             do prev.start
 
                 Object.freeze this

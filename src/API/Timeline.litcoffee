@@ -238,23 +238,25 @@ Note that `Request()` ignores data parameters which have a value of `undefined` 
                     loadMore:
                         enumerable: no
                         value: =>
-                            callback = (event) =>
+                            callback = (response) =>
                                 after = next.after
-                                decree => @response = police -> @response.join next.response
-                                next.removeEventListener "response", callback
-                            (next = do @next).addEventListener "response", callback
+                                decree => @response = police -> @response.join response
+                                do next.stop
+                                next.remove callback
+                            (next = do @next).assign callback
                             do next.start
                     update:
                         enumerable: no
                         value: (keepGoing) =>
-                            callback = (event) =>
+                            callback = (response) =>
                                 before = prev.before
-                                decree => @response = police -> @response.join prev.response
-                                prev.removeEventListener "response", callback
-                                if keepGoing and prev.response.length
-                                    (prev = do @prev).addEventListener "response", callback
+                                decree => @response = police -> @response.join response
+                                do prev.stop
+                                prev.remove callback
+                                if keepGoing and response.length
+                                    (prev = do @prev).assign callback
                                     do prev.start
-                            (prev = do @prev).addEventListener "response", callback
+                            (prev = do @prev).assign callback
                             do prev.start
 
                 Object.freeze this

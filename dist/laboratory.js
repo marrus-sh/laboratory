@@ -526,7 +526,7 @@
             for (i = 0, len = ref.length; i < len; i++) {
               callback = ref[i];
               if (typeof callback === "function") {
-                callback(_this);
+                callback.call(_this, _this.response);
               }
             }
           };
@@ -745,7 +745,7 @@
               return function(resolve, reject) {
                 var callback;
                 callback = function(response) {
-                  (response instanceof Failure ? reject : resolve)(response);
+                  (response instanceof Failure ? reject : resolve).call(_this, response);
                   return _this.remove(callback);
                 };
                 _this.assign(callback);
@@ -1155,9 +1155,9 @@
           makeRequest.call(this);
         } else {
           handleClient = (function(_this) {
-            return function(request) {
-              var client, ref1;
-              if (!((client = request.response) instanceof Client && _this.currentRequest && client.origin === _this.origin && (_this.scope & client.scope) === +_this.scope && client.redirect === _this.redirect && client.clientID && client.clientSecret)) {
+            return function(client) {
+              var ref1;
+              if (!(client instanceof Client && _this.currentRequest && client.origin === _this.origin && (_this.scope & client.scope) === +_this.scope && client.redirect === _this.redirect && client.clientID && client.clientSecret)) {
                 return;
               }
               ref1 = [client.clientID, client.clientSecret], _this.clientID = ref1[0], _this.clientSecret = ref1[1];
@@ -2090,16 +2090,17 @@
             value: (function(_this) {
               return function() {
                 var callback, next;
-                callback = function(event) {
+                callback = function(response) {
                   after = next.after;
                   decree(function() {
                     return _this.response = police(function() {
-                      return this.response.join(next.response);
+                      return this.response.join(response);
                     });
                   });
-                  return next.removeEventListener("response", callback);
+                  next.stop();
+                  return next.remove(callback);
                 };
-                (next = _this.next()).addEventListener("response", callback);
+                (next = _this.next()).assign(callback);
                 return next.start();
               };
             })(this)
@@ -2109,21 +2110,22 @@
             value: (function(_this) {
               return function(keepGoing) {
                 var callback, prev;
-                callback = function(event) {
+                callback = function(response) {
                   var prev;
                   before = prev.before;
                   decree(function() {
                     return _this.response = police(function() {
-                      return this.response.join(prev.response);
+                      return this.response.join(response);
                     });
                   });
-                  prev.removeEventListener("response", callback);
-                  if (keepGoing && prev.response.length) {
-                    (prev = _this.prev()).addEventListener("response", callback);
+                  prev.stop();
+                  prev.remove(callback);
+                  if (keepGoing && response.length) {
+                    (prev = _this.prev()).assign(callback);
                     return prev.start();
                   }
                 };
-                (prev = _this.prev()).addEventListener("response", callback);
+                (prev = _this.prev()).assign(callback);
                 return prev.start();
               };
             })(this)
@@ -2293,16 +2295,17 @@
             value: (function(_this) {
               return function() {
                 var callback, next;
-                callback = function(event) {
+                callback = function(response) {
                   after = next.after;
                   decree(function() {
                     return _this.response = police(function() {
-                      return this.response.join(next.response);
+                      return this.response.join(response);
                     });
                   });
-                  return next.removeEventListener("response", callback);
+                  next.stop();
+                  return next.remove(callback);
                 };
-                (next = _this.next()).addEventListener("response", callback);
+                (next = _this.next()).assign(callback);
                 return next.start();
               };
             })(this)
@@ -2312,21 +2315,22 @@
             value: (function(_this) {
               return function(keepGoing) {
                 var callback, prev;
-                callback = function(event) {
+                callback = function(response) {
                   var prev;
                   before = prev.before;
                   decree(function() {
                     return _this.response = police(function() {
-                      return this.response.join(prev.response);
+                      return this.response.join(response);
                     });
                   });
-                  prev.removeEventListener("response", callback);
-                  if (keepGoing && prev.response.length) {
-                    (prev = _this.prev()).addEventListener("response", callback);
+                  prev.stop();
+                  prev.remove(callback);
+                  if (keepGoing && response.length) {
+                    (prev = _this.prev()).assign(callback);
                     return prev.start();
                   }
                 };
-                (prev = _this.prev()).addEventListener("response", callback);
+                (prev = _this.prev()).assign(callback);
                 return prev.start();
               };
             })(this)
