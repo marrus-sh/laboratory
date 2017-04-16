@@ -113,7 +113,8 @@ Otherwise, we have to change some variable names around.
             @id = Number data.id
             @username = String data.username
             @account = String data.acct + (
-                if (origin = Store.auth.origin)? and "@" not in data.acct then "@" + origin
+                if (origin = Store.auth.origin)? and "@" not in data.acct
+                    "@" + origin.substr 8
                 else ""
             )
             @localAccount = String data.acct

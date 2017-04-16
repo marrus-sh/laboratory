@@ -464,7 +464,7 @@
     } else {
       this.id = Number(data.id);
       this.username = String(data.username);
-      this.account = String(data.acct + (((origin = Store.auth.origin) != null) && indexOf.call(data.acct, "@") < 0 ? "@" + origin : ""));
+      this.account = String(data.acct + (((origin = Store.auth.origin) != null) && indexOf.call(data.acct, "@") < 0 ? "@" + origin.substr(8) : ""));
       this.localAccount = String(data.acct);
       this.displayName = String(data.display_name);
       this.bio = String(data.note);

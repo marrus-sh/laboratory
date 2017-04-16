@@ -16,6 +16,7 @@
 * Fixed a number of bugs from 0.4:
     * Fixed a bug preventing proper `Timeline` and `Rolodex` pagination
     * Fixed a bug preventing local timelines from working properly
+    * Fixed a bug where local `Profiles` had an `https://` in their `account`
 
  - - -
 
