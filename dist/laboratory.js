@@ -2202,21 +2202,11 @@
             default:
               return "/api/v1";
           }
-        })()), ((function() {
-          switch (type) {
-            case isLocal:
-              return {
-                local: true,
-                max_id: before,
-                since_id: after
-              };
-            default:
-              return {
-                max_id: before,
-                since_id: after
-              };
-          }
-        })()), Store.auth.accessToken, (function(_this) {
+        })()), {
+          local: isLocal || void 0,
+          max_id: before,
+          since_id: after
+        }, Store.auth.accessToken, (function(_this) {
           return function(result, params) {
             var account, acctIDs, i, ids, j, k, l, len, len1, len2, len3, mention, mentionIDs, mentions, ref1, ref10, ref2, ref3, ref4, ref5, ref6, ref7, ref8, ref9, srcMentions, status;
             acctIDs = [];

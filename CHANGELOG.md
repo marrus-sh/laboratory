@@ -13,6 +13,9 @@
 #####  CHANGED
 
 * `Request`s use a custom interface instead of `EventTarget`; `request.addEventListener("response", callback)` is now simply `request.assign(callback)` ([#63](https://github.com/marrus-sh/laboratory/issues/63))
+* Fixed a number of bugs from 0.4:
+    * Fixed a bug preventing proper `Timeline` and `Rolodex` pagination
+    * Fixed a bug preventing local timelines from working properly
 
  - - -
 
