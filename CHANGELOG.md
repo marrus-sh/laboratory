@@ -9,14 +9,21 @@
 #####  NEW
 
 + The `Request.prototype.go()` prototype method can be used to generate a `Promise` for use with `Request`s ([#49](https://github.com/marrus-sh/laboratory/issues/49))
++ Chronological sorting is now supported in `Rolodex`es ([#67](https://github.com/marrus-sh/laboratory/issues/67))
 
 #####  CHANGED
 
 * `Request`s use a custom interface instead of `EventTarget`; `request.addEventListener("response", callback)` is now simply `request.assign(callback)` ([#63](https://github.com/marrus-sh/laboratory/issues/63))
+* Chronological sorting in `Timeline`s is now optional ([#65](https://github.com/marrus-sh/laboratory/issues/65))
 * Fixed a number of bugs from 0.4:
     * Fixed a bug preventing proper `Timeline` and `Rolodex` pagination
     * Fixed a bug preventing local timelines from working properly
     * Fixed a bug where local `Profiles` had an `https://` in their `account`
+    * The sanctity of `Timeline` and `Rolodex` data has been improved
+
+#####  REMOVED
+
+- `Timeline`s and `Rolodex`es are no longer sorted by default ([#66](https://github.com/marrus-sh/laboratory/issues/66))
 
  - - -
 

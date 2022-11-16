@@ -66,58 +66,85 @@ The `remove()` prototype method collects the `Profile`s of a `Rolodex` except fo
 
 ##  Implementation  ##
 
-###  The constructor:
+    Laboratory.Rolodex = Rolodex = do ->
 
-The `Rolodex()` constructor takes a `data` object and uses it to construct a rolodex.
-`data` can be either an API response or an array of `Profile`s.
+###  Helpers:
 
-    Laboratory.Rolodex = Rolodex = (data) ->
-
-        unless this and this instanceof Rolodex
-            throw new TypeError "this is not a Rolodex"
-        unless data?
-            throw new TypeError "Unable to create Rolodex; no data provided"
+####  `getProfile()`.
 
 We'll use the `getProfile()` function in our profile getters.
 
         getProfile = (id) -> Store.profiles[id]
 
-We sort our data according to their ids.
+####  `sort()`.
 
-        data.sort (first, second) -> second.id - first.id
+The `sort()` function sorts our profiles for us.
 
-The following loop removes any duplicates from our `data`.
+        sort = (chronological , first , second) ->
+            return 0 unless chronological? and first? and second?
+            if chronological and (a = Number first.datetime) isnt (b = Number second.datetime)
+                -1 + 2 * (a > b)
+            else second.id - first.id
 
-        prev = null
-        if data.length > 0 then for index in [data.length - 1 .. 0]
-            currentID = (current = data[index]).id
-            if prev? and currentID is prev.id
-                data.splice index, 1
-                continue
-            prev = current
+###  The constructor:
+
+The `Rolodex()` constructor takes a `data` object and uses it to construct a rolodex.
+`data` can be either an API response or an array of `Profile`s.
+
+        return (data , chronological) ->
+
+            unless this and this instanceof Rolodex
+                throw new TypeError "this is not a Rolodex"
+            unless isArray data
+                throw new TypeError "Unable to create Rolodex; no data provided"
+
+Here we process our `data`.
+If we are given an array of ids, we assume them to be existing profiles, otherwise we receive the ones we are given.
+
+            profiles = []
+            for item in data then switch
+                when item instanceof Profile or item is Object item
+                    profile = new Profile item
+                    dispatch "LaboratoryProfileReceived", profile
+                    profiles.push profile
+                when Infinity > +item > 0 and Store.profiles[+item] instanceof Profile
+                    profiles.push Store.profiles[+item]
+
+If `chronological` was specified, we sort our data according to their id or when they were created, depending on its value:
+
+            if chronological? and profiles.length
+                profiles.sort sort.bind undefined, chronological
+
+Next we walk the array and look for any duplicates, removing them.
+There's no sense in doing this if we didn't sort our data.
+
+                prev = null
+                for index in [profiles.length - 1 .. 0]
+                    currentID = (profile = profiles[index]).id
+                    if not currentID or prev? and currentID is prev.id
+                        data.splice index , 1
+                        continue
+                    prev = profile
 
 Finally, we implement our list of `profiles` as getters such that they always return the most current data.
 **Note that this will likely prevent optimization of the `profiles` array, so it is recommended that you make a static copy (using `Array.prototype.slice()` or similar) before doing intensive array operations with it.**
 
->   __[Issue #28](https://github.com/marrus-sh/laboratory/issues/28) :__
->   At some point in the future, `Rolodex` might instead be implemented using a linked list.
+            @profiles = []
+            Object.defineProperty @profiles , index , {
+                enumerable: yes
+                get: getProfile.bind(this , profile.id)
+            } for profile , index in profiles
+            Object.freeze @profiles
 
-        @profiles = []
-        Object.defineProperty @profiles, index, {
-            enumerable: yes
-            get: getProfile.bind(this, value.id)
-        } for value, index in data
-        Object.freeze @profiles
+            @length = @profiles.length
 
-        @length = data.length
-
-        return Object.freeze this
+            return Object.freeze this
 
 ###  The prototype:
 
 The `Rolodex` prototype has two functions.
 
-    Object.defineProperty Rolodex, "prototype",
+    Object.defineProperty Rolodex , "prototype" ,
         value: Object.freeze
 
 ####  `join()`.
@@ -126,22 +153,24 @@ The `join()` function creates a new `Rolodex` which combines the `Profile`s of t
 Its `data` argument can be either a `Profile`, an array thereof, or a `Rolodex`.
 We don't have to worry about duplicates here because the `Rolodex()` constructor should take care of them for us.
 
-            join: (data) ->
+            join: (data , chronological) ->
                 return this unless data instanceof Profile or data instanceof Array or
                     data instanceof Rolodex
-                combined = profile for profile in switch
-                    when data instanceof Profile then [data]
-                    when data instanceof Rolodex then data.profiles
-                    else data
-                combined.push profile for profile in @profiles
-                return new Rolodex combined
+                redacted = (profile for profile in @profiles)
+                combined.push profile for profile in (
+                    switch
+                        when data instanceof Profile then [data]
+                        when data instanceof Rolodex then data.profiles
+                        else data
+                ) when profile instanceof Profile
+                return new Rolodex combined , chronological
 
 ####  `remove()`.
 
 The `remove()` function returns a new `Rolodex` with the provided `Profile`s removed.
 Its `data` argument can be either a `Profile`, an array thereof, or a `Rolodex`.
 
-            remove: (data) ->
+            remove: (data , chronological) ->
                 return this unless data instanceof Profile or data instanceof Array or
                     data instanceof Rolodex
                 redacted = (profile for profile in @profiles)
@@ -150,15 +179,20 @@ Its `data` argument can be either a `Profile`, an array thereof, or a `Rolodex`.
                         when data instanceof Profile then [data]
                         when data instanceof Rolodex then data.profiles
                         else data
-                ) when (index = redacted.indexOf profile) isnt -1
-                return new Rolodex redacted
+                ) when profile instanceof Profile and (
+                    index = redacted.indexOf profile
+                ) isnt -1
+                return new Rolodex redacted , chronological
+                
+####  `sort()`.
+
+The `sort()` function simply resorts a `Rolodex`.
+
+            sort: (chronological) -> new Rolodex @profiles , !!chronological
 
 ###  Defining rolodex types:
 
 Here we define our `Rolodex.Type`s, as described above:
-
->   __[Issue #18](https://github.com/marrus-sh/laboratory/issues/18) :__
->   There should also be a follow-request rolodex.
 
     Rolodex.Type = Enumeral.generate
         UNDEFINED       : 0x00

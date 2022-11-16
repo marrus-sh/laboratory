@@ -61,121 +61,134 @@ The `remove()` prototype method collects the `Post`s of a timeline except for th
 
 ##  Implementation  ##
 
-###  The constructor:
+    Laboratory.Timeline = Timeline = do ->
 
-The `Timeline()` constructor takes a `data` object and uses it to construct a timeline.
-`data` can be either an API response or an array of `Post`s.
+###  Helpers:
 
-    Laboratory.Timeline = Timeline = (data) ->
-
-        unless this and this instanceof Timeline
-            throw new TypeError "this is not a Timeline"
-        unless data?
-            throw new TypeError "Unable to create Timeline; no data provided"
-
-Mastodon keeps track of ids for notifications separately from ids for posts, as best as I can tell, so we have to verify that our posts are of matching type before proceeding.
-Really all we care about is whether the posts are notifications, so that's all we test.
-
-        isNotification = (object) -> !!(
-            (
-                switch
-                    when object instanceof Post then object.type
-                    when object.type? then Post.Type.NOTIFICATION  #  This is an approximation
-                    else Post.Type.STATUS
-            ) & Post.Type.NOTIFICATION
-        )
+####  `getPost()`.
 
 We'll use the `getPost()` function in our post getters.
 
         getPost = (id, isANotification) ->
             if isANotification then Store.notifications[id] else Store.statuses[id]
+            
+####  `sort()`.
 
-We sort our data according to when they were created, unless two posts were created at the same time.
-Then we use their ids.
+The `sort()` function sorts our posts for us.
 
->   __Note :__
->   Until/unless Mastodon starts assigning times to notifications, there are a few (albeit extremely unlikely) edge-cases where the following `sort()` function will cease to be well-defined.
->   Regardless, attempting to create a timeline out of both notifications and statuses will likely result in a very odd sorting.
+        sort = (chronological , first , second) ->
+            return 0 unless chronological? and first? and second?
+            if chronological and (a = Number first.datetime) isnt (b = Number second.datetime)
+                -1 + 2 * (a > b)
+            else second.id - first.id
 
-        data.sort (first, second) ->
-            if not (isNotification first) and not (isNotification second) and (
-                a = Number first instanceof Post and first.datetime or Date first.created_at
-            ) isnt (
-                b = Number second instanceof Post and second.datetime or Date second.created_at
-            ) then -1 + 2 * (a > b) else second.id - first.id
+###  The constructor:
+
+The `Timeline()` constructor takes a `data` object and uses it to construct a timeline.
+The `chronological` argument determines whether to sort the timeline by `datetime` or `id`.
+`data` can be either an API response or an array of `Post`s.
+
+        return (data , chronological) ->
+
+            unless this and this instanceof Timeline
+                throw new TypeError "this is not a Timeline"
+            unless isArray data
+                throw new TypeError "Unable to create Timeline; no data provided"
+
+Here we process our `data`.
+If we are given an array of ids, we assume them to be existing statuses, otherwise we receive the posts.
+
+            posts = []
+            for item in data then switch
+                when item instanceof Post or item is Object item
+                    post = new Post item
+                    dispatch "LaboratoryPostReceived", post
+                    posts.push post
+                when Infinity > +item > 0 and Store.statuses[+item] instanceof Post
+                    posts.push Store.statuses[+item]
+
+If `chronological` was specified, we sort our data according to their id or when they were created, depending on its value:
+
+            if chronological? and posts.length
+                posts.sort sort.bind undefined , chronological
 
 Next we walk the array and look for any duplicates, removing them.
+There's no sense in doing this if we didn't sort our data.
 
 >   __Note :__
->   Although `Timeline()` purports to remove all duplicate `Post`s, this behaviour is only guaranteed for *contiguous* `Post`s—given our sort algorithm, this means posts whose `datetime` values are also the same.
+>   Although `Timeline()` purports to remove all duplicate `Post`s, this behaviour is only guaranteed for *contiguous* `Post`s—for a chronological sort, this means posts whose `datetime` values are also the same.
 >   If the same post ends up sorted to two different spots, `Timeline()` will leave both in place.
 >   (Generally speaking, if you find yourself with two posts with identical `id`s but different `datetime`s, this is a sign that something has gone terribly wrong.)
 
-        prev = null
-        if data.length > 0 then for index in [data.length - 1 .. 0]
-            currentID = (current = data[index]).id
-            if prev? and currentID is prev.id and
-                (isNotification prev) is (isNotification current)
-                    data.splice index, 1
-                    continue
-            prev = current
+                prev = null
+                for index in [posts.length - 1 .. 0]
+                    currentID = (post = posts[index]).id
+                    if not currentID or prev? and currentID is prev.id and
+                        ~(prev.type ^ post.type) & Post.Type.NOTIFICATION
+                            posts.splice index, 1
+                            continue
+                    prev = post
 
 Finally, we implement our list of `posts` as getters such that they always return the most current data.
 **Note that this will likely prevent optimization of the `posts` array, so it is recommended that you make a static copy (using `Array.prototype.slice()` or similar) before doing intensive array operations with it.**
 
->   __[Issue #28](https://github.com/marrus-sh/laboratory/issues/28) :__
->   At some point in the future, `Timeline` might instead be implemented using a linked list.
+            @posts = []
+            Object.defineProperty @posts , index , {
+                enumerable : yes
+                get        : getPost.bind this , post.id , post.type & Post.Type.NOTIFICATION
+            } for post , index in posts
+            Object.freeze @posts
 
-        @posts = []
-        Object.defineProperty @posts, index, {
-            enumerable: yes
-            get: getPost.bind(this, value.id, isNotification value)
-        } for value, index in data
-        Object.freeze @posts
+            @length = @posts.length
 
-        @length = data.length
-
-        return Object.freeze this
+            return Object.freeze this
 
 ###  The prototype:
 
 The `Timeline` prototype has two functions.
 
-    Object.defineProperty Timeline, "prototype",
-        value: Object.freeze
+    Object.defineProperty Timeline , "prototype" ,
+        value : Object.freeze
 
 ####  `join()`.
 
 The `join()` function creates a new `Timeline` which combines the `Post`s of the original and the provided `data`.
 Its `data` argument can be either a `Post`, an array thereof, or a `Timeline`.
-We don't have to worry about duplicates here because the `Timeline()` constructor should take care of them for us.
 
-            join: (data) ->
+            join : (data , chronological) ->
                 return this unless data instanceof Post or data instanceof Array or
                     data instanceof Timeline
-                combined = post for post in switch
-                    when data instanceof Post then [data]
-                    when data instanceof Timeline then data.posts
-                    else data
-                combined.push post for post in @posts
-                return new Timeline combined
+                redacted = (post for post in @posts)
+                combined.push post for post in (
+                    switch
+                        when data instanceof Post then [data]
+                        when data instanceof Timeline then data.posts
+                        else data
+                ) when post instanceof Post
+                return new Timeline combined , chronological
 
 ####  `remove()`.
 
 The `remove()` function returns a new `Timeline` with the provided `Post`s removed.
 Its `data` argument can be either a `Post`, an array thereof, or a `Timeline`.
 
-            remove: (data) ->
+            remove : (data , chronological) ->
                 return this unless data instanceof Post or data instanceof Array or
                     data instanceof Timeline
                 redacted = (post for post in @posts)
-                redacted.splice index, 1 for post in (
+                redacted.splice index , 1 for post in (
                     switch
                         when data instanceof Post then [data]
                         when data instanceof Timeline then data.posts
                         else data
-                ) when (index = redacted.indexOf post) isnt -1
-                return new Timeline redacted
+                ) when post instanceof Post and (index = redacted.indexOf post) isnt -1
+                return new Timeline redacted , chronological
+                
+####  `sort()`.
+
+The `sort()` function simply resorts a `Timeline`.
+
+            sort : (chronological) -> new Timeline @posts , !!chronological
 
 ###  Defining timeline types:
 

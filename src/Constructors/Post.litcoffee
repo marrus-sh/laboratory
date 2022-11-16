@@ -111,6 +111,7 @@ The `Post()` constructor takes a `data` object from an API response and reads it
             throw new TypeError "this is not a Post"
         unless data?
             throw new TypeError "Unable to create Post; no data provided"
+        return data if data instanceof Post
 
 We'll use the `getProfile()` function in our various account getters.
 
